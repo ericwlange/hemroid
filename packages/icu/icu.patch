@@ -1,0 +1,26 @@
+diff -Naur icu/source/tools/toolutil/flagparser.c hemroid/vault/src/icu/source/tools/toolutil/flagparser.c
+--- icu/source/tools/toolutil/flagparser.c	2015-10-08 09:24:06.000000000 +0530
++++ hemroid/vault/src/icu/source/tools/toolutil/flagparser.c	2016-02-14 10:58:06.000000000 +0530
+@@ -97,7 +97,7 @@
+ 
+     T_FileStream_close(f);
+     
+-    if (U_FAILURE(*status)) {
++    if (U_FAILURE(*status)  && *status != U_BUFFER_OVERFLOW_ERROR) {
+         return -1;
+     }
+ 
+diff -Naur icu/source/tools/toolutil/pkg_genc.c hemroid/vault/src/icu/source/tools/toolutil/pkg_genc.c
+--- icu/source/tools/toolutil/pkg_genc.c	2015-10-08 09:24:04.000000000 +0530
++++ hemroid/vault/src/icu/source/tools/toolutil/pkg_genc.c	2016-02-14 23:44:06.000000000 +0530
+@@ -764,6 +764,10 @@
+     T_FileStream_close(in);
+ }
+ 
++#ifndef ELF64_ST_INFO
++#define ELF64_ST_INFO(B,T)      (((B) << 4) + ((T) & 0xF))
++#endif
++
+ U_CAPI void U_EXPORT2
+ writeObjectCode(const char *filename, const char *destdir, const char *optEntryPoint, const char *optMatchArch, const char *optFilename, char *outFilePath) {
+     /* common variables */

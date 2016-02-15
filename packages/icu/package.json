@@ -1,0 +1,29 @@
+{
+	"version" : {
+		"major" : 56,
+		"minor" : 1
+	},
+	"source" : {
+		"url" : "http://download.icu-project.org/files/icu4c/56.1/icu4c-56_1-src.tgz",
+		"dir" : "icu"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+		"icu.patch"
+	],
+	"steps": [
+		{
+			"message": "Building ICU for host OS",
+			"environment": "host",
+			"shell": "/bin/bash",
+			"script": "build_host.sh"
+		},
+		{
+			"message": "Building ICU for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

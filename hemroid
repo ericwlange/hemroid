@@ -1,0 +1,459 @@
+#!/usr/bin/python
+
+import os,sys,errno
+from subprocess import call, check_output, Popen, PIPE
+import inspect
+import json
+import uuid
+
+DEFAULT_API = 16
+HEMDIR  = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))
+VAULT   = HEMDIR + '/vault'
+PKGDIR  = HEMDIR + '/packages'
+DISTDIR = HEMDIR + '/dist'
+CACHEDIR= VAULT + '/cache'
+SRCDIR  = VAULT + '/src'
+REPODIR = VAULT + '/repo'
+HEMROOT = VAULT + '/hemroot'
+
+def require(tool, env):
+    path = os.environ.get(env) or tool
+    path = check_output(['which',path])
+    if path is None or path.strip() == '':
+        raise ValueError("'" + tool + "' is required.  Either put in PATH or set " + env)
+    return path.strip()
+
+AVAILABLE_PACKAGES = []
+for subdir, dirs, files in os.walk(PKGDIR):
+    if subdir == PKGDIR:
+        AVAILABLE_PACKAGES.extend(dirs)
+
+PLATFORMS = {
+    'armeabi'     : 'arch-arm',
+    'armeabi-v7a' : 'arch-arm',
+    'arm64-v8a'   : 'arch-arm64',
+    'x86'         : 'arch-x86',
+    'x86_64'      : 'arch-x86_64',
+    'mips'        : 'arch-mips',
+    'mips64'      : 'arch-mips64'
+}
+
+HOSTS = {
+    'armeabi'     : 'arm-eabi',
+    'armeabi-v7a' : 'arm-eabiv7a',
+    'arm64-v8a'   : 'arm-eabiv8a',
+    'x86'         : 'x86',
+    'x86_64'      : 'x86_64',
+    'mips'        : 'mips',
+    'mips64'      : 'mips64'
+}
+
+PREFIXES = {
+    'armeabi'     : 'arm-linux-androideabi',
+    'armeabi-v7a' : 'arm-linux-androideabi',
+    'arm64-v8a'   : 'aarch64-linux-android',
+    'x86'         : 'i686-linux-android',
+    'x86_64'      : 'x86_64-linux-android',
+    'mips'        : 'mipsel-linux-android',
+    'mips64'      : 'mips64el-linux-android'
+}
+
+GCC_VERSION      = '4.9'
+
+if "Darwin" in check_output([require('uname','UNAME'),'-a']): SYSTEM_OS = 'darwin-x86_64'
+else: SYSTEM_OS = 'linux-x86_64'
+
+TOOLCHAINS_GCC = {
+    'armeabi'     : 'arm-linux-androideabi-',
+    'armeabi-v7a' : 'arm-linux-androideabi-',
+    'arm64-v8a'   : 'aarch64-linux-android-',
+    'x86'         : 'x86-',
+    'x86_64'      : 'x86_64-',
+    'mips'        : 'mipsel-linux-android-',
+    'mips64'      : 'mips64el-linux-android-'
+}
+
+CLANG_VERSION  = '3.6'
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+def create_toolchain(abi,api):
+    TAR  = require('tar', 'TAR')
+    BASH = require('bash','BASH')
+    RM   = require('rm',  'RM')
+
+    try: ANDROID_NDK = os.environ['ANDROID_NDK']
+    except KeyError: raise ValueError('ANDROID_NDK environment variable not set')
+    
+    toolchain_dir = '/'.join([VAULT,'android-'+str(api),abi,'toolchain'])
+    if os.path.exists(toolchain_dir):
+        return
+    mkdir_p(toolchain_dir)
+    output = call([
+        BASH,
+        ANDROID_NDK + '/build/tools/make-standalone-toolchain.sh',
+        '--toolchain='+TOOLCHAINS_GCC[abi]+GCC_VERSION,
+#        '--llvm-version='+CLANG_VERSION, # don't use CLANG -- too many bugs
+        '--platform=android-' + str(api),
+        '--install-dir=' + toolchain_dir,
+        '--system='+SYSTEM_OS,
+        '--stl=gnustl'
+    ])
+    if output != 0:
+        call([RM,'-rf',toolchain_dir])
+        raise ValueError("Can't build toolchain for " + abi)
+    if abi in ['arm64-v8a','x86_64','mips64']:
+        dist = abi
+        if "linux" in SYSTEM_OS: host = "linux"
+        else: host = "darwin"
+        if dist == 'arm64-v8a': dist = 'arm64'
+        dist = 'gcc-'+dist+'-'+host+'-x86_64.tar.bz2' 
+        output = call([TAR,
+                    'xf',
+                    '/'.join([DISTDIR,dist]),
+                    '--strip-components=1',
+                    '-C',
+                    toolchain_dir
+                 ])
+        if output != 0:
+            call([RM,'-rf',toolchain_dir])
+            raise ValueError("ERROR: Can't extract gcc patch for " + abi)
+    return
+
+def usage():
+    print \
+"""
+hemroid - package manager for android
+
+Usage:
+    hemroid <command> <options>
+Where:
+    <command> is one of:
+      install
+      remove
+      update
+
+hemroid install <pkg> [--abi=<abi>] [--api=<api>]
+
+"""
+
+def valid_ABI(abi):
+    VALID = ['armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64', 'mips', 'mips64']
+    if abi is None: return VALID
+    if abi in VALID:
+        return abi
+    else:
+        raise ValueError('Unknown abi "' + abi + '"')
+        
+class Options:
+    def _require_value(key, value):
+        if value is None: raise ValueError(self._key + ' requires a value')
+        return value
+        
+    def __unknown_option(self, value):
+        raise ValueError("Unknown option " + self._key)
+        
+    def option(self, _key, value):
+        self._key = _key
+        key = "_opt_" + _key.lstrip('-')
+        method = getattr(self, key, self.__unknown_option)
+        return method(value)
+        
+    def parse_options(self, argv):
+        rem = []
+        for arg in argv:
+            a = arg.split('=',1)
+            key = a[0]
+            if len(a) < 2: value = None
+            else: value = a[1]
+            if key.startswith('--'):
+                self.option(key,value)
+                rem.append(arg)
+        for arg in rem: argv.remove(arg)
+
+class Install(Options):
+    def _opt_abi(self, value):
+        self._abis.append(valid_ABI(self._require_value(value)))
+    def _opt_api(self, value):
+        self._api = int(self._require_value(value))
+        
+    def parse_package_json(self,pkg):
+        with open('/'.join([PKGDIR,pkg,'package.json'])) as data_file:    
+            self._pkg_data = json.load(data_file)
+    
+    def cache_archive(self,pkg):
+        RM   =  require('rm',   'RM')
+        WGET =  require('wget', 'WGET')
+        UNZIP = require('unzip','UNZIP')
+        TAR =   require('tar',  'TAR')
+        PATCH=  require('patch','PATCH')
+
+        url = self._pkg_data['source']['url']
+        fname = os.path.basename(url)
+        cachename = '/'.join([CACHEDIR,fname])
+        srcdir = '/'.join([SRCDIR,self._pkg_data['source']['dir']])
+        pkgdir = '/'.join([PKGDIR,pkg])
+
+        if not os.path.exists(cachename):
+            mkdir_p(CACHEDIR)
+            output = call([WGET,'-O',cachename,url])
+            if output != 0:
+                call([RM,'-f',cachename])
+                raise ValueError('ERROR: ' + url + ' failed to download.')
+            call([RM,'-rf',srcdir])
+        if not os.path.exists(srcdir):
+            mkdir_p(SRCDIR)
+            output = 0
+            with open('/dev/null', "w") as devnull:
+                if fname.endswith('.zip'):
+                    output = call([UNZIP,cachename,'-d',SRCDIR], stderr=devnull)
+                elif fname.endswith('tar.gz') or fname.endswith('.tgz'):
+                    output = call([TAR,'zxvf',cachename,'-C',SRCDIR], stderr=devnull)
+                elif fname.endswith('tar.xz') or fname.endswith('.tgx') or \
+                     fname.endswith('.tar.bz2'):
+                    output = call([TAR,'xvf',cachename,'-C',SRCDIR], stderr=devnull)
+                else: raise ValueError("ERROR: Don't know how to extract '" + fname + "'")
+            if output != 0:
+                call([RM,'-rf',srcdir])
+                raise ValueError
+            try:
+                patches = self._pkg_data['patches']
+                for patch in patches:
+                    output = call([PATCH,
+                        '-d',  srcdir,
+                        '-p1',
+                        '-i',  '/'.join([pkgdir,patch])])
+                    if output != 0:
+                        call([RM,'-rf',srcdir])
+                        raise ValueError("Failed to apply patch '" + \
+                            '/'.join([pkgdir,patch]) + "'") 
+            except KeyError:
+                """ No patches """
+            
+    def perform_steps(self,pkg,abi,api,sandbox):
+        CP =  require('cp', 'CP')
+        TAR = require('tar','TAR')
+        srcdir = '/'.join([SRCDIR,self._pkg_data['source']['dir']])
+        pkgdir = '/'.join([PKGDIR,pkg])
+        hostdir = '/'.join([VAULT,'sandbox',sandbox,self._pkg_data['source']['dir']])
+        crossdir = '/'.join([VAULT,'sandbox',sandbox,abi,
+            'packages',self._pkg_data['source']['dir']])
+        toolchain_dir = '/'.join([VAULT,'android-'+str(api),abi,'toolchain'])
+
+        env = ''.join(["SRCDIR=",srcdir," PKGDIR=",pkgdir," HOSTDIR=",hostdir,
+            " CROSSDIR=",crossdir])
+    
+        try: ANDROID_NDK = os.environ['ANDROID_NDK']
+        except KeyError:
+            raise ValueError('ANDROID_NDK environment variable not set')
+
+        PLATFORM = toolchain_dir+'/sysroot'
+        CFLAGS = "\"-fPIC -DANDROID -Wno-multichar " + \
+            "-isystem " + ANDROID_NDK +  "/sources/android/support/include" + \
+            "-Wno-error=implicit-function-declaration -DANDROID_API=" + \
+            str(api) + '"'
+        CPPFLAGS = "\"-fPIC -DANDROID -DNO_XMALLOC -mandroid " + \
+            "-isystem " + ANDROID_NDK +  "/sources/android/support/include" + \
+            "-Wno-error=implicit-function-declaration -DANDROID_API=" + \
+            str(api) + '"'
+        LIBS = "-lc"            
+        SANDBOX = '/'.join([VAULT,'sandbox',sandbox,abi,'hemroot'])
+        OUTPUT = '/'.join([VAULT,'sandbox',sandbox,abi,'out'])
+        LDFLAGS ="\"-Wl,-rpath-link=" + toolchain_dir + "/usr/lib/ " + \
+            "-L${SANDBOX}/lib64 -L${SANDBOX}/lib -L${PLATFORM}/usr/lib64 " + \
+            "-L${PLATFORM}/usr/lib\""
+        PREFIX =  PREFIXES[abi]
+        CROSS_COMPILE = toolchain_dir+"/bin/${PREFIX}"
+        CC="\"${CROSS_COMPILE}-gcc --sysroot=$PLATFORM\""
+        CXX="\"${CROSS_COMPILE}-g++ --sysroot=$PLATFORM\""
+        AR="${CROSS_COMPILE}-ar"
+        AS="${CROSS_COMPILE}-as"
+        LD="${CROSS_COMPILE}-ld"
+        RANLIB="${CROSS_COMPILE}-ranlib"
+        NM="${CROSS_COMPILE}-nm"
+        STRIP="${CROSS_COMPILE}-strip"
+        cross_env = env + ''.join([
+            ' PLATFORM=',PLATFORM,
+            ' CFLAGS=',CFLAGS,
+            ' CPPFLAGS=',CPPFLAGS,
+            ' LIBS=',LIBS,
+            ' SANDBOX=',SANDBOX,
+            ' OUTPUT=',OUTPUT,
+            ' LDFLAGS=',LDFLAGS,
+            ' PREFIX=',PREFIX,
+            ' CROSS_COMPILE=',CROSS_COMPILE,
+            ' CC=',CC,
+            ' CXX=',CXX,
+            ' AR=',AR,
+            ' AS=',AS,
+            ' LD=',LD,
+            ' RANLIB=',RANLIB,
+            ' NM=',NM,
+            ' STRIP=', STRIP]);
+            
+        try:
+            for step in self._pkg_data['steps']:
+                try: message = step['message']
+                except KeyError: message = ""
+                try: environment = step['environment']
+                except KeyError: environement = "cross"
+                try: shell = step['shell']
+                except KeyError: shell = "/bin/bash"
+                try: script = step['script']
+                except KeyError: script = None
+
+                if environment == 'host':
+                    print "[Host] " + message
+                    mkdir_p(hostdir)
+                    command = "cd " + hostdir + "; " + env + " " + shell + \
+                        " " + pkgdir + "/" + script
+                elif environment == 'cross':
+                    print "["+abi+"] " + message
+                    mkdir_p(crossdir)
+                    command = "cd " + crossdir + "; " + cross_env + " " + shell + \
+                        " " + pkgdir + "/" + script
+                else:
+                    raise ValueError("Unknown environment type '" + environment + "'")
+                    
+                process = Popen(command,stdout=PIPE,stderr=PIPE,shell=True)
+                proc_stdout = process.communicate()[0].strip()
+                if process.returncode != 0:
+                    f = open('/tmp/hemroid.burst', 'w')
+                    print >> f, command
+                    print >> f, proc_stdout
+                    f.close()
+                    raise ValueError("Problem building '" + pkg + \
+                        "', see /tmp/hemroid.burst for details")
+        except KeyError:
+            """ No steps """
+            
+        hemdir = '/'.join([OUTPUT,'hemroid'])
+        mkdir_p(hemdir)
+        output = call([CP,'/'.join([pkgdir,'package.json']),
+            '/'.join([hemdir,pkg+'.json'])])
+        if output != 0: raise ValueError("Failed to copy pkg json")
+        
+        version = ''
+        try:
+            version = version + '.' + str(self._pkg_data['version']['major'])
+            version = version + '.' + str(self._pkg_data['version']['minor'])
+            version = version + '.' + str(self._pkg_data['version']['patch'])
+        except KeyError:
+            """ not all version elements required """
+
+        pkgtar = pkg + '.' + str(api) + '.' + abi + version + '.tar.gz'
+        print "Packaging repo " + pkgtar
+        mkdir_p(REPODIR)
+        output = call([TAR,'-czf',REPODIR + '/' + pkgtar,'-C',OUTPUT,'.'])
+        if output !=0: raise ValueError("Failed to create repo file")
+        
+    def check_install(self,pkg,abi,api,dest):
+        try:
+           with open('/'.join([dest,'hemroid',pkg+'.json'])) as data_file:    
+                pkg_data = json.load(data_file)
+               
+                i_version = 0
+                try:
+                    i_version = i_version + pkg_data['version']['major'] * 1000 * 1000
+                    i_version = i_version + pkg_data['version']['minor'] * 1000
+                    i_version = i_version + pkg_data['version']['patch']
+                except KeyError:
+                    """ not all version elements required """
+                version = 0
+                try:
+                    version = version + self._pkg_data['version']['major'] * 1000 * 1000
+                    version = version + self._pkg_data['version']['minor'] * 1000
+                    version = version + self._pkg_data['version']['patch']
+                except KeyError:
+                    """ not all version elements required """
+                    
+                if i_version >= version:
+                    return True
+                return False
+        except:
+            return False
+    
+    def install_repo(self,pkg,abi,api,dest):
+        TAR = require('tar','TAR')
+        pkgs = os.listdir(REPODIR)
+        version = 0
+        try:
+            version = version + self._pkg_data['version']['major'] * 1000 * 1000
+            version = version + self._pkg_data['version']['minor'] * 1000
+            version = version + self._pkg_data['version']['patch']
+        except KeyError:
+            """ not all version elements required """
+        
+        repo = None
+        for p in pkgs:
+            p_version = 0
+            a = (p.replace('.tar.gz','')).split('.')
+            name = a[0]; p_api = int(a[1]); p_abi = a[2]
+            if len(a) > 3: p_version = int(a[3]) * 1000 * 1000
+            if len(a) > 4: p_version = p_version + (int(a[4]) * 1000)
+            if len(a) > 5: p_version = p_version + int(a[5])
+            if name == pkg and p_version >= version and abi == p_abi and api >= p_api:
+                 repo = p
+                 break
+        
+        if repo is not None:
+            mkdir_p(dest)
+            output = call([TAR,'-xzf',REPODIR + '/' + repo,'-C',dest])
+            if output !=0: raise ValueError("Failed to extract repo")
+            return True
+            
+        return False
+
+    def __init__(self,argv,loc=None):
+        self.returnVal = lambda: 0
+        self._abis = []
+        self._api  = DEFAULT_API
+        RM  = require('rm', 'RM')
+
+        sandbox = str(uuid.uuid4())
+
+        try:
+            self.parse_options(argv)
+            if len(self._abis) == 0: self._abis = valid_ABI(None)
+
+            for pkg in argv:
+                if pkg not in AVAILABLE_PACKAGES:
+                    raise ValueError("Don't know how to build package '" + pkg + "'\n" +
+                        "Available packages: " + " ".join(sorted(AVAILABLE_PACKAGES)))
+        
+            for abi in self._abis:
+                create_toolchain(abi,self._api)
+                if loc is None: dest = '/'.join([HEMROOT,abi])
+                else: dest = dest = '/'.join([loc,abi])
+                for pkg in argv:
+                    self.parse_package_json(pkg)
+                    if self.check_install(pkg,abi,self._api,dest):
+                        print "'" + pkg + "' already installed for " + abi
+                    else:
+                        #out = '/'.join([VAULT,'sandbox',sandbox,abi,'hemroot'])
+                        if not self.install_repo(pkg,abi,self._api,dest):
+                            self.cache_archive(pkg)
+                            self.perform_steps(pkg,abi,self._api,sandbox)
+                            self.install_repo(pkg,abi,self._api,dest)
+                        print "Package '" + pkg + "' installed at " + dest
+                
+        except ValueError as e:
+            print e
+            self.returnVal = lambda: -1
+            
+        call([RM,'-rf','/'.join([VAULT,'sandbox',sandbox])])
+
+def main(argv):
+    if len(argv) == 0:       return usage()
+    if argv[0] == 'install': return Install(argv[1:]).returnVal()
+    return usage()
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
