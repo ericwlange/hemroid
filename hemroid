@@ -6,7 +6,6 @@ import inspect
 import json
 import uuid
 
-DEFAULT_API = 16
 HEMDIR  = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))
 VAULT   = HEMDIR + '/vault'
 PKGDIR  = HEMDIR + '/packages'
@@ -182,11 +181,31 @@ class Install(Options):
     def _opt_abi(self, value):
         self._abis.append(valid_ABI(self._require_value(value)))
     def _opt_api(self, value):
-        self._api = int(self._require_value(value))
+        self._force_api = int(self._require_value(value))
         
     def parse_package_json(self,pkg):
         with open('/'.join([PKGDIR,pkg,'package.json'])) as data_file:    
             self._pkg_data = json.load(data_file)
+            
+    def get_available_apis(self):
+        try: ANDROID_NDK = os.environ['ANDROID_NDK']
+        except KeyError:
+            raise ValueError('ANDROID_NDK environment variable not set')
+
+        self._apis = { 'arm' : 99, 'mips' : 99, 'x86' : 99, 'x86_64' : 99, 'mips64' : 99,
+            'arm64' : 99 }
+        for subdir, dirs, files in os.walk(ANDROID_NDK+'/platforms'):
+            subdir_ = subdir.split('/')[-1]
+            if subdir_.startswith('android-'):
+                api = int(subdir_.replace('android-',''))
+                for dir in dirs:
+                    if dir.startswith('arch-'):
+                        arch = dir.replace('arch-','')
+                        min = self._apis[arch]
+                        if api < min: self._apis[arch] = api
+        self._apis['armeabi'] = self._apis['arm']
+        self._apis['armeabi-v7a'] = self._apis['arm']
+        self._apis['arm64-v8a'] = self._apis['arm64']
     
     def cache_archive(self,pkg):
         RM   =  require('rm',   'RM')
@@ -414,8 +433,10 @@ class Install(Options):
     def __init__(self,argv,loc=None):
         self.returnVal = lambda: 0
         self._abis = []
-        self._api  = DEFAULT_API
+        self._force_api = None
         RM  = require('rm', 'RM')
+        
+        self.get_available_apis()
 
         sandbox = str(uuid.uuid4())
 
@@ -429,11 +450,26 @@ class Install(Options):
                         "Available packages: " + " ".join(sorted(AVAILABLE_PACKAGES)))
         
             for abi in self._abis:
-                create_toolchain(abi,self._api)
                 if loc is None: dest = '/'.join([HEMROOT,abi])
                 else: dest = dest = '/'.join([loc,abi])
                 for pkg in argv:
                     self.parse_package_json(pkg)
+                    if self._force_api is not None:
+                        if self._force_api < self._apis[abi]:
+                            print "Warning: API level "+str(self._force_api)+ " is not " \
+                                "available for '" + abi + "'. Using level " + \
+                                str(self._apis[abi]) + " instead."
+                            self._api = self._apis[abi]
+                        else:
+                            self._api = self._force_api
+                    else:
+						try:
+							self._api = self._pkg_data['api']['min']
+						except KeyError:
+							self._api = self._apis[abi]
+						self._api = max(self._apis[abi], self._api)
+                    create_toolchain(abi,self._api)
+                    print "[" + abi + "] Using API level " + str(self._api)
                     if self.check_install(pkg,abi,self._api,dest):
                         print "'" + pkg + "' already installed for " + abi
                     else:

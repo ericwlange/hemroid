@@ -12,6 +12,9 @@
 	"patches" : [
 		"icu.patch"
 	],
+	"api" : {
+		"min" : 9
+	},
 	"steps": [
 		{
 			"message": "Building ICU for host OS",
