@@ -352,12 +352,20 @@ class Install(Options):
                         "', see /tmp/hemroid.burst for details")
         except KeyError:
             """ No steps """
-            
+
+        try:
+            self._pkg_data['api']['installed'] = api
+        except KeyError:
+            self._pkg_data['api'] = { 'installed' : api }
+        
         hemdir = '/'.join([OUTPUT,'hemroid'])
         mkdir_p(hemdir)
-        output = call([CP,'/'.join([pkgdir,'package.json']),
-            '/'.join([hemdir,pkg+'.json'])])
-        if output != 0: raise ValueError("Failed to copy pkg json")
+        with open('/'.join([hemdir,pkg+'.json']), 'w') as outfile:
+            self._pkg_data['files'] = []
+            for subdir, dirs, files in os.walk(OUTPUT):
+                for file in files:
+                    self._pkg_data['files'].append(subdir.replace(OUTPUT+'/','') + '/' + file)
+            json.dump(self._pkg_data, outfile)
         
         version = ''
         try:
@@ -378,6 +386,9 @@ class Install(Options):
            with open('/'.join([dest,'hemroid',pkg+'.json'])) as data_file:    
                 pkg_data = json.load(data_file)
                
+                if pkg_data['api']['installed'] > api:
+                    return False
+                
                 i_version = 0
                 try:
                     i_version = i_version + pkg_data['version']['major'] * 1000 * 1000
@@ -411,6 +422,7 @@ class Install(Options):
             """ not all version elements required """
         
         repo = None
+        min_api = 99
         for p in pkgs:
             p_version = 0
             a = (p.replace('.tar.gz','')).split('.')
@@ -418,9 +430,11 @@ class Install(Options):
             if len(a) > 3: p_version = int(a[3]) * 1000 * 1000
             if len(a) > 4: p_version = p_version + (int(a[4]) * 1000)
             if len(a) > 5: p_version = p_version + int(a[5])
-            if name == pkg and p_version >= version and abi == p_abi and api >= p_api:
-                 repo = p
-                 break
+            if name == pkg and p_version >= version and abi == p_abi and \
+                api >= p_api and p_api < min_api:
+                repo = p
+                min_api = p_api
+                break
         
         if repo is not None:
             mkdir_p(dest)
@@ -463,11 +477,11 @@ class Install(Options):
                         else:
                             self._api = self._force_api
                     else:
-						try:
-							self._api = self._pkg_data['api']['min']
-						except KeyError:
-							self._api = self._apis[abi]
-						self._api = max(self._apis[abi], self._api)
+                        try:
+                            self._api = self._pkg_data['api']['min']
+                        except KeyError:
+                            self._api = self._apis[abi]
+                        self._api = max(self._apis[abi], self._api)
                     create_toolchain(abi,self._api)
                     print "[" + abi + "] Using API level " + str(self._api)
                     if self.check_install(pkg,abi,self._api,dest):
@@ -477,6 +491,7 @@ class Install(Options):
                         if not self.install_repo(pkg,abi,self._api,dest):
                             self.cache_archive(pkg)
                             self.perform_steps(pkg,abi,self._api,sandbox)
+                            Remove(['--quiet','--abi='+abi,pkg],loc=dest)
                             self.install_repo(pkg,abi,self._api,dest)
                         print "Package '" + pkg + "' installed at " + dest
                 
@@ -485,10 +500,77 @@ class Install(Options):
             self.returnVal = lambda: -1
             
         call([RM,'-rf','/'.join([VAULT,'sandbox',sandbox])])
+        
+class Remove(Options):
+    def _opt_abi(self, value):
+        self._abis.append(valid_ABI(self._require_value(value)))
+    def _opt_quiet(self, value):
+        self._quiet = True
+        
+    def __init__(self,argv,loc=None):
+        self.returnVal = lambda: 0
+        self._abis = []
+        self._quiet = False
+        RM   = require('rm',   'RM')
+        RMDIR= require('rmdir','RMDIR')
+        
+        try:
+            self.parse_options(argv)
+            if len(self._abis) == 0: self._abis = valid_ABI(None)
+
+            for pkg in argv:
+                for abi in self._abis:
+                    if loc is None: dest = '/'.join([HEMROOT,abi])
+                    else: dest = dest = '/'.join([loc,abi])
+                    try:
+                        with open('/'.join([dest,'hemroid',pkg+'.json'])) as df:
+                            json.load(df)['files']
+                    except IOError:
+                        if not self._quiet:
+                            raise ValueError("Package '" + pkg + "' is not installed for"\
+                                " '" + abi + "'" )
+                    except KeyError:
+                        raise ValueError("Package '" + pkg + "' for '" + abi + "' " \
+                            " does not contain any files.")
+                    
+            for pkg in argv:
+                for abi in self._abis:
+                    if loc is None: dest = '/'.join([HEMROOT,abi])
+                    else: dest = dest = '/'.join([loc,abi])
+                    pkg_data = {}
+                    try:
+                        with open('/'.join([dest,'hemroid',pkg+'.json'])) as data_file:
+                            pkg_data = json.load(data_file)
+                        for file in pkg_data['files']:
+                            path = dest + '/' + file
+                            call([RM,'-f',path])
+                            """ Attempt to remove empty directories too """
+                            path = '/'.join(path.split('/')[:-1])
+                        for root, dirs, files in os.walk(dest,topdown=False):
+                            for name in dirs:
+                                fname = os.path.join(root,name)
+                                try:
+                                    if not os.listdir(fname):
+                                        os.removedirs(fname)
+                                except OSError:
+                                    if os.path.islink(fname):
+                                        os.remove(fname)
+                    except IOError as e:
+                        if not self._quiet: raise ValueError(e)
+
+                    if not self._quiet:
+                        print "Package '" + pkg + "' removed for" \
+                                " '" + abi + "'"
+
+        except ValueError as e:
+            print e
+            self.returnVal = lambda: -1
+
 
 def main(argv):
     if len(argv) == 0:       return usage()
     if argv[0] == 'install': return Install(argv[1:]).returnVal()
+    if argv[0] == 'remove':  return Remove (argv[1:]).returnVal()
     return usage()
 
 if __name__ == "__main__":
