@@ -1,0 +1,25 @@
+{
+	"version" : {
+		"major" : 1,
+		"minor" : 14
+	},
+	"source" : {
+		"url" : "http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz",
+		"dir" : "libiconv-1.14"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building iconv for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

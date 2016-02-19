@@ -1,0 +1,26 @@
+{
+	"version" : {
+		"major" : 3,
+		"minor" : 0,
+		"patch" : 13
+	},
+	"source" : {
+		"url" : "ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz",
+		"dir" : "libffi-3.0.13"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building ffi for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

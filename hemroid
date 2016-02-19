@@ -275,11 +275,11 @@ class Install(Options):
 
         PLATFORM = toolchain_dir+'/sysroot'
         CFLAGS = "\"-fPIC -DANDROID -Wno-multichar " + \
-            "-isystem " + ANDROID_NDK +  "/sources/android/support/include" + \
+            "-isystem " + ANDROID_NDK +  "/sources/android/support/include " + \
             "-Wno-error=implicit-function-declaration -DANDROID_API=" + \
             str(api) + '"'
         CPPFLAGS = "\"-fPIC -DANDROID -DNO_XMALLOC -mandroid " + \
-            "-isystem " + ANDROID_NDK +  "/sources/android/support/include" + \
+            "-isystem " + ANDROID_NDK +  "/sources/android/support/include " + \
             "-Wno-error=implicit-function-declaration -DANDROID_API=" + \
             str(api) + '"'
         LIBS = "-lc"            
@@ -289,6 +289,7 @@ class Install(Options):
             "-L${SANDBOX}/lib64 -L${SANDBOX}/lib -L${PLATFORM}/usr/lib64 " + \
             "-L${PLATFORM}/usr/lib\""
         PREFIX =  PREFIXES[abi]
+        HOST   =  HOSTS[abi]
         CROSS_COMPILE = toolchain_dir+"/bin/${PREFIX}"
         CC="\"${CROSS_COMPILE}-gcc --sysroot=$PLATFORM\""
         CXX="\"${CROSS_COMPILE}-g++ --sysroot=$PLATFORM\""
@@ -307,6 +308,7 @@ class Install(Options):
             ' OUTPUT=',OUTPUT,
             ' LDFLAGS=',LDFLAGS,
             ' PREFIX=',PREFIX,
+            ' HOST=', HOST,
             ' CROSS_COMPILE=',CROSS_COMPILE,
             ' CC=',CC,
             ' CXX=',CXX,
