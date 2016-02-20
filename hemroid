@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os,sys,errno
-from subprocess import call, check_output, Popen, PIPE
+from subprocess import call, check_output, Popen, PIPE, STDOUT
 import inspect
 import json
 import uuid
@@ -150,6 +150,38 @@ def valid_ABI(abi):
         return abi
     else:
         raise ValueError('Unknown abi "' + abi + '"')
+
+def get_available_apis():
+    try: ANDROID_NDK = os.environ['ANDROID_NDK']
+    except KeyError:
+        raise ValueError('ANDROID_NDK environment variable not set')
+
+    _apis = { 'arm' : 99, 'mips' : 99, 'x86' : 99, 'x86_64' : 99, 'mips64' : 99,
+        'arm64' : 99 }
+    for subdir, dirs, files in os.walk(ANDROID_NDK+'/platforms'):
+        subdir_ = subdir.split('/')[-1]
+        if subdir_.startswith('android-'):
+            api = int(subdir_.replace('android-',''))
+            for dir in dirs:
+                if dir.startswith('arch-'):
+                    arch = dir.replace('arch-','')
+                    min = _apis[arch]
+                    if api < min: _apis[arch] = api
+    _apis['armeabi'] = _apis['arm']
+    _apis['armeabi-v7a'] = _apis['arm']
+    _apis['arm64-v8a'] = _apis['arm64']
+    return _apis
+    
+def get_version(js):
+    version = 0
+    try:
+        version = version + js['major'] * 1000 * 1000
+        version = version + js['minor'] * 1000
+        version = version + js['patch']
+    except KeyError:
+        """ not all version elements required """
+    
+    return version
         
 class Options:
     def _require_value(key, value):
@@ -182,30 +214,12 @@ class Install(Options):
         self._abis.append(valid_ABI(self._require_value(value)))
     def _opt_api(self, value):
         self._force_api = int(self._require_value(value))
+    def _opt_dirty(self, value):
+        self._dirty = True
         
     def parse_package_json(self,pkg):
         with open('/'.join([PKGDIR,pkg,'package.json'])) as data_file:    
             self._pkg_data = json.load(data_file)
-            
-    def get_available_apis(self):
-        try: ANDROID_NDK = os.environ['ANDROID_NDK']
-        except KeyError:
-            raise ValueError('ANDROID_NDK environment variable not set')
-
-        self._apis = { 'arm' : 99, 'mips' : 99, 'x86' : 99, 'x86_64' : 99, 'mips64' : 99,
-            'arm64' : 99 }
-        for subdir, dirs, files in os.walk(ANDROID_NDK+'/platforms'):
-            subdir_ = subdir.split('/')[-1]
-            if subdir_.startswith('android-'):
-                api = int(subdir_.replace('android-',''))
-                for dir in dirs:
-                    if dir.startswith('arch-'):
-                        arch = dir.replace('arch-','')
-                        min = self._apis[arch]
-                        if api < min: self._apis[arch] = api
-        self._apis['armeabi'] = self._apis['arm']
-        self._apis['armeabi-v7a'] = self._apis['arm']
-        self._apis['arm64-v8a'] = self._apis['arm64']
     
     def cache_archive(self,pkg):
         RM   =  require('rm',   'RM')
@@ -283,7 +297,9 @@ class Install(Options):
             "-Wno-error=implicit-function-declaration -DANDROID_API=" + \
             str(api) + '"'
         LIBS = "-lc"            
-        SANDBOX = '/'.join([VAULT,'sandbox',sandbox,abi,'hemroot'])
+        SANDBOX = '/'.join([VAULT,'sandbox',sandbox,'hemroot',abi])
+        PKG_CONFIG_DIR = ""
+        PKG_CONFIG_LIBDIR = "${SANDBOX}/lib/pkgconfig:${SANDBOX}/share/pkgconfig:"
         OUTPUT = '/'.join([VAULT,'sandbox',sandbox,abi,'out'])
         LDFLAGS ="\"-Wl,-rpath-link=" + toolchain_dir + "/usr/lib/ " + \
             "-L${SANDBOX}/lib64 -L${SANDBOX}/lib -L${PLATFORM}/usr/lib64 " + \
@@ -305,6 +321,8 @@ class Install(Options):
             ' CPPFLAGS=',CPPFLAGS,
             ' LIBS=',LIBS,
             ' SANDBOX=',SANDBOX,
+            ' PKG_CONFIG_DIR=',PKG_CONFIG_DIR,
+            ' PKG_CONFIG_LIBDIR=',PKG_CONFIG_LIBDIR,
             ' OUTPUT=',OUTPUT,
             ' LDFLAGS=',LDFLAGS,
             ' PREFIX=',PREFIX,
@@ -343,7 +361,7 @@ class Install(Options):
                 else:
                     raise ValueError("Unknown environment type '" + environment + "'")
                     
-                process = Popen(command,stdout=PIPE,stderr=PIPE,shell=True)
+                process = Popen(command,stdout=PIPE,stderr=STDOUT,shell=True)
                 proc_stdout = process.communicate()[0].strip()
                 if process.returncode != 0:
                     f = open('/tmp/hemroid.burst', 'w')
@@ -391,20 +409,8 @@ class Install(Options):
                 if pkg_data['api']['installed'] > api:
                     return False
                 
-                i_version = 0
-                try:
-                    i_version = i_version + pkg_data['version']['major'] * 1000 * 1000
-                    i_version = i_version + pkg_data['version']['minor'] * 1000
-                    i_version = i_version + pkg_data['version']['patch']
-                except KeyError:
-                    """ not all version elements required """
-                version = 0
-                try:
-                    version = version + self._pkg_data['version']['major'] * 1000 * 1000
-                    version = version + self._pkg_data['version']['minor'] * 1000
-                    version = version + self._pkg_data['version']['patch']
-                except KeyError:
-                    """ not all version elements required """
+                i_version = get_version(pkg_data['version'])
+                version = get_version(self._pkg_data['version'])
                     
                 if i_version >= version:
                     return True
@@ -415,13 +421,7 @@ class Install(Options):
     def install_repo(self,pkg,abi,api,dest):
         TAR = require('tar','TAR')
         pkgs = os.listdir(REPODIR)
-        version = 0
-        try:
-            version = version + self._pkg_data['version']['major'] * 1000 * 1000
-            version = version + self._pkg_data['version']['minor'] * 1000
-            version = version + self._pkg_data['version']['patch']
-        except KeyError:
-            """ not all version elements required """
+        version = get_version(self._pkg_data['version'])
         
         repo = None
         min_api = 99
@@ -450,9 +450,10 @@ class Install(Options):
         self.returnVal = lambda: 0
         self._abis = []
         self._force_api = None
+        self._dirty = False
         RM  = require('rm', 'RM')
         
-        self.get_available_apis()
+        self._apis = get_available_apis()
 
         sandbox = str(uuid.uuid4())
 
@@ -485,11 +486,46 @@ class Install(Options):
                             self._api = self._apis[abi]
                         self._api = max(self._apis[abi], self._api)
                     create_toolchain(abi,self._api)
-                    print "[" + abi + "] Using API level " + str(self._api)
+                    #print "[" + abi + "] Using API level " + str(self._api)
+
                     if self.check_install(pkg,abi,self._api,dest):
                         print "'" + pkg + "' already installed for " + abi
                     else:
-                        #out = '/'.join([VAULT,'sandbox',sandbox,abi,'hemroot'])
+                        opts = ["--quiet","--abi="+abi]
+                        if self._force_api is not None:
+                            opts.append("--api="+str(self._force_api))
+                        dependencies = CheckDependencies(opts + [pkg],loc=loc)
+                        if dependencies.returnVal() != 0:
+                            raise ValueError
+                        dependencies = dependencies.get_required()[abi][pkg]
+                        if len(dependencies) > 0:
+                            print "The following dependencies need to be installed: " + \
+                                ', '.join(dependencies)
+                            opts = ["--quiet","--abi="+abi] + dependencies
+                            if Remove(opts,loc=loc).returnVal() != 0:
+                                raise ValueError
+                            opts = ["--abi="+abi]
+                            if self._force_api is not None:                  
+                                opts.append("--api="+str(self._force_api))
+                            if Install(opts+dependencies,loc=loc).returnVal() != 0:
+                                raise ValueError
+
+                        try:
+                            dependencies = self._pkg_data['dependencies']
+                        except KeyError:
+                            dependencies = []
+                        deps = []
+                        for dep in dependencies:
+                            deps.append(dep['package'])
+                        out = '/'.join([VAULT,'sandbox',sandbox,'hemroot'])
+
+                        if len(deps) > 0:                            
+                            opts = ["--abi="+abi]
+                            if self._force_api is not None:                             
+                                opts.append("--api="+str(self._force_api))
+                            if Install(opts+deps,loc=out).returnVal() != 0:
+                                raise ValueError
+                            
                         if not self.install_repo(pkg,abi,self._api,dest):
                             self.cache_archive(pkg)
                             self.perform_steps(pkg,abi,self._api,sandbox)
@@ -501,7 +537,168 @@ class Install(Options):
             print e
             self.returnVal = lambda: -1
             
-        call([RM,'-rf','/'.join([VAULT,'sandbox',sandbox])])
+        if not self._dirty:
+            call([RM,'-rf','/'.join([VAULT,'sandbox',sandbox])])
+
+class PackageInfo(Options):
+    def _opt_abi(self, value):
+        self._abis.append(valid_ABI(self._require_value(value)))
+    def _opt_api(self, value):
+        self._force_api = int(self._require_value(value))
+    def _opt_quiet(self, value):
+        self._quiet = True    
+
+    def get_info(self):
+        return self._info
+
+    def __init__(self,argv,loc=None):
+        self.returnVal = lambda: 0
+        self._abis = []
+        self._force_api = None
+        self._apis = get_available_apis()
+        self._info = {}
+        self._quiet = False
+        
+        try:
+            self.parse_options(argv)
+            if len(self._abis) == 0: self._abis = valid_ABI(None)
+
+            info = {}
+
+            for pkg in argv:
+                for abi in self._abis:
+                    if loc is None: dest = '/'.join([HEMROOT,abi])
+                    else: dest = dest = '/'.join([loc,abi])
+                    try:
+                        with open('/'.join([dest,'hemroid',pkg+'.json'])) as df:
+                            js = json.load(df)
+                            installed = { 'api' : js['api']['installed'],
+                                'version': get_version(js['version']) }
+                            try:
+                                installed['dependencies'] = js['dependencies']
+                                for dep in installed['dependencies']:
+                                    dep['version'] = get_version(dep['version'])
+                            except KeyError:
+                                installed['dependencies'] = []
+                    except IOError:
+                            installed = None
+
+                    try:
+                        with open('/'.join([PKGDIR,pkg,'package.json'])) as df:
+                            js = json.load(df)
+                    except IOError:
+                        raise ValueError("Package '" + pkg + "' does not exist")
+
+                    latest = {}
+                    try:
+                        latest['version'] = get_version(js['version'])
+                        try:
+                            latest['dependencies'] = js['dependencies']
+                            for dep in latest['dependencies']:
+                                dep['version'] = get_version(dep['version'])
+                        except KeyError:
+                            latest['dependencies'] = []
+                        latest['api'] = js['api']['min']
+                    except KeyError:
+                        raise ValueError("Package '" + pkg + "' illformed")
+
+                    if self._force_api is not None:
+                        if self._force_api < self._apis[abi]:
+                            print "Warning: API level "+str(self._force_api)+ " is not " \
+                                "available for '" + abi + "'. Using level " + \
+                                str(self._apis[abi]) + " instead."
+                            self._api = self._apis[abi]
+                        else:
+                            self._api = self._force_api
+                    else:
+                        try:
+                            self._api = latest['api']
+                        except KeyError:
+                            self._api = self._apis[abi]
+                        self._api = max(self._apis[abi], self._api)
+                    latest['api'] = self._api
+                                            
+                    info = { "installed": installed, "latest": latest }
+                        
+                    try:
+                        self._info[abi][pkg] = info
+                    except KeyError:
+                        self._info[abi] = { pkg: info }
+                        
+            if not self._quiet:
+                print self._info
+
+        except ValueError as e:
+            print e
+            self.returnVal = lambda: -1
+
+class CheckDependencies(Options):
+    def _opt_abi(self, value):
+        self._abis.append(valid_ABI(self._require_value(value)))
+    def _opt_api(self, value):
+        self._force_api = int(self._require_value(value))
+    def _opt_quiet(self, value):
+        self._quiet = True
+
+    def get_required(self):
+        return self._required
+        
+    def uniq(self,seq):
+        seen = set()
+        seen_add = seen.add
+        return [x for x in seq if not (x in seen or seen_add(x))]
+
+    def __init__(self,argv,loc=None):
+        self.returnVal = lambda: 0
+        self._abis = []
+        self._force_api = None
+        self._apis = get_available_apis()
+        self._quiet = False
+        
+        try:
+            self.parse_options(argv)
+            if len(self._abis) == 0: self._abis = valid_ABI(None)
+            
+            self._required = {}
+
+            for abi in self._abis:
+                self._required[abi] = {}
+                for pkg in argv:
+                    self._required[abi][pkg] = []
+                    opts = ["--quiet","--abi="+abi]
+                    if self._force_api is not None:
+                        opts.append("--api="+str(self._force_api))
+                    info = PackageInfo(opts + [pkg],loc=loc)
+                    if info.returnVal() != 0:
+                        raise ValueError
+                    app = info.get_info()[abi][pkg]
+                    if app['installed'] is not None:
+                        use = app['installed']
+                    else:
+                        use = app['latest']
+                    for dep in use['dependencies']:
+                        dep_info = PackageInfo(opts + [dep['package']],loc=loc)
+                        if dep_info.returnVal() != 0:
+                            raise ValueError
+                        dep_info = dep_info.get_info()[abi][dep['package']]
+                        d = CheckDependencies(opts + [dep['package']],loc=loc)
+                        if d.returnVal() != 0:
+                            raise ValueError
+                        self._required[abi][pkg].extend(
+                            d.get_required()[abi][dep['package']])
+                        if dep_info['installed'] is None or \
+                            dep_info['installed']['version'] < dep['version'] or \
+                            dep_info['installed']['api'] < dep_info['latest']['api']:
+                            
+                            self._required[abi][pkg].append(dep['package'])
+                    self._required[abi][pkg] = self.uniq(self._required[abi][pkg])
+        
+            if not self._quiet:
+                print self._required
+
+        except ValueError as e:
+            print e
+            self.returnVal = lambda: -1
         
 class Remove(Options):
     def _opt_abi(self, value):
@@ -573,6 +770,8 @@ def main(argv):
     if len(argv) == 0:       return usage()
     if argv[0] == 'install': return Install(argv[1:]).returnVal()
     if argv[0] == 'remove':  return Remove (argv[1:]).returnVal()
+    if argv[0] == 'pkginfo': return PackageInfo(argv[1:]).returnVal()
+    if argv[0] == 'dependencies': return CheckDependencies(argv[1:]).returnVal()
     return usage()
 
 if __name__ == "__main__":
