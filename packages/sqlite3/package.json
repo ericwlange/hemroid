@@ -1,0 +1,26 @@
+{
+	"version" : {
+		"major" : 3,
+		"minor" : 11,
+		"patch" : 0
+	},
+	"source" : {
+		"url" : "http://sqlite.org/2016/sqlite-autoconf-3110000.tar.gz",
+		"dir" : "sqlite-autoconf-3110000"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building sqlite3 for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

@@ -1,0 +1,56 @@
+{
+    "version" : {
+        "major" : 3,
+        "minor" : 4,
+        "patch" : 9
+    },
+    "source" : {
+        "url" : "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.9.tar.xz",
+        "dir" : "gnutls-3.4.9"
+    },
+    "dependencies": [
+        {
+            "package" : "nettle",
+            "version" : {
+                "major" : 3,
+                "minor" : 2
+            }
+        },
+        {
+            "package" : "gmp",
+            "version" : {
+                "major" : 6,
+                "minor" : 1,
+                "patch" : 0
+            }
+        },
+        {
+            "package" : "libtasn1",
+            "version" : {
+                "major" : 4,
+                "minor" : 7
+            }
+        },
+        {
+            "package" : "openssl",
+            "version" : {
+                "major" : 1,
+                "minor" : 0,
+                "patch" : 2
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building gnutls for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

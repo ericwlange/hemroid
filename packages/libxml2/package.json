@@ -1,0 +1,27 @@
+{
+	"version" : {
+		"major" : 2,
+		"minor" : 9,
+		"patch" : 2
+	},
+	"source" : {
+		"url" : "http://xmlsoft.org/sources/libxml2-2.9.2.tar.gz",
+		"dir" : "libxml2-2.9.2"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+	    "libxml2-2.9.2.patch"
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building libxml2 for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

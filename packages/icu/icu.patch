@@ -1,6 +1,6 @@
-diff -Naur icu/source/tools/toolutil/flagparser.c hemroid/vault/src/icu/source/tools/toolutil/flagparser.c
+diff -Naur icu/source/tools/toolutil/flagparser.c icu/source/tools/toolutil/flagparser.c
 --- icu/source/tools/toolutil/flagparser.c	2015-10-08 09:24:06.000000000 +0530
-+++ hemroid/vault/src/icu/source/tools/toolutil/flagparser.c	2016-02-14 10:58:06.000000000 +0530
++++ icu/source/tools/toolutil/flagparser.c	2016-02-14 10:58:06.000000000 +0530
 @@ -97,7 +97,7 @@
  
      T_FileStream_close(f);
@@ -10,9 +10,9 @@ diff -Naur icu/source/tools/toolutil/flagparser.c hemroid/vault/src/icu/source/t
          return -1;
      }
  
-diff -Naur icu/source/tools/toolutil/pkg_genc.c hemroid/vault/src/icu/source/tools/toolutil/pkg_genc.c
+diff -Naur icu/source/tools/toolutil/pkg_genc.c icu/source/tools/toolutil/pkg_genc.c
 --- icu/source/tools/toolutil/pkg_genc.c	2015-10-08 09:24:04.000000000 +0530
-+++ hemroid/vault/src/icu/source/tools/toolutil/pkg_genc.c	2016-02-14 23:44:06.000000000 +0530
++++ icu/source/tools/toolutil/pkg_genc.c	2016-02-14 23:44:06.000000000 +0530
 @@ -764,6 +764,10 @@
      T_FileStream_close(in);
  }

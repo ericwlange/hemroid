@@ -1,0 +1,26 @@
+{
+	"version" : {
+		"major" : 1,
+		"minor" : 0,
+		"patch" : 2
+	},
+	"source" : {
+		"url" : "https://openssl.org/source/openssl-1.0.2f.tar.gz",
+		"dir" : "openssl-1.0.2f"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building openssl for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

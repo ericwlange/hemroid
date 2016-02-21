@@ -1,0 +1,25 @@
+{
+	"version" : {
+		"major" : 3,
+		"minor" : 2
+	},
+	"source" : {
+		"url" : "https://ftp.gnu.org/gnu/nettle/nettle-3.2.tar.gz",
+		"dir" : "nettle-3.2"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building nettle for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

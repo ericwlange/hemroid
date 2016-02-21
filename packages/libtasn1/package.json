@@ -1,0 +1,25 @@
+{
+	"version" : {
+		"major" : 4,
+		"minor" : 7
+	},
+	"source" : {
+		"url" : "http://ftp.gnu.org/gnu/libtasn1/libtasn1-4.7.tar.gz",
+		"dir" : "libtasn1-4.7"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building libtasn1 for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

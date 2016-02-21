@@ -216,6 +216,8 @@ class Install(Options):
         self._force_api = int(self._require_value(value))
     def _opt_dirty(self, value):
         self._dirty = True
+    def _opt_quiet(self, value):
+        self._quiet = True    
         
     def parse_package_json(self,pkg):
         with open('/'.join([PKGDIR,pkg,'package.json'])) as data_file:    
@@ -301,7 +303,7 @@ class Install(Options):
         PKG_CONFIG_DIR = ""
         PKG_CONFIG_LIBDIR = "${SANDBOX}/lib/pkgconfig:${SANDBOX}/share/pkgconfig:"
         OUTPUT = '/'.join([VAULT,'sandbox',sandbox,abi,'out'])
-        LDFLAGS ="\"-Wl,-rpath-link=" + toolchain_dir + "/usr/lib/ " + \
+        LDFLAGS ="\"-Wl,-rpath-link," + toolchain_dir + "/usr/lib " + \
             "-L${SANDBOX}/lib64 -L${SANDBOX}/lib -L${PLATFORM}/usr/lib64 " + \
             "-L${PLATFORM}/usr/lib\""
         PREFIX =  PREFIXES[abi]
@@ -396,7 +398,18 @@ class Install(Options):
             """ not all version elements required """
 
         pkgtar = pkg + '.' + str(api) + '.' + abi + version + '.tar.gz'
-        print "Packaging repo " + pkgtar
+        if not self._quiet:
+            print "[" + abi + "] " + \
+                "Packaging repo " + pkgtar
+        command = "find " + OUTPUT + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
+            "xargs sed -i '' -E 's," + SANDBOX + ",{{SANDBOX}},g'; "
+        command = command + \
+            "find " + OUTPUT + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
+            "xargs sed -i '' -E 's," + OUTPUT + ",{{SANDBOX}},g'"
+        process = Popen(command,stdout=PIPE,stderr=STDOUT,shell=True)
+        proc_stdout = process.communicate()[0].strip()
+        if process.returncode != 0: raise ValueError(proc_stdout)
+        
         mkdir_p(REPODIR)
         output = call([TAR,'-czf',REPODIR + '/' + pkgtar,'-C',OUTPUT,'.'])
         if output !=0: raise ValueError("Failed to create repo file")
@@ -442,6 +455,11 @@ class Install(Options):
             mkdir_p(dest)
             output = call([TAR,'-xzf',REPODIR + '/' + repo,'-C',dest])
             if output !=0: raise ValueError("Failed to extract repo")
+            command = "find " + dest + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
+                "xargs sed -i '' -E 's,{{SANDBOX}}," + dest + ",g'"
+            process = Popen(command,stdout=PIPE,stderr=STDOUT,shell=True)
+            proc_stdout = process.communicate()[0].strip()
+            if process.returncode != 0: raise ValueError(proc_stdout)
             return True
             
         return False
@@ -451,6 +469,7 @@ class Install(Options):
         self._abis = []
         self._force_api = None
         self._dirty = False
+        self._quiet = False
         RM  = require('rm', 'RM')
         
         self._apis = get_available_apis()
@@ -473,9 +492,10 @@ class Install(Options):
                     self.parse_package_json(pkg)
                     if self._force_api is not None:
                         if self._force_api < self._apis[abi]:
-                            print "Warning: API level "+str(self._force_api)+ " is not " \
-                                "available for '" + abi + "'. Using level " + \
-                                str(self._apis[abi]) + " instead."
+                            if not self._quiet:
+                                print "Warning: API level "+str(self._force_api)+ " is not " \
+                                    "available for '" + abi + "'. Using level " + \
+                                    str(self._apis[abi]) + " instead."
                             self._api = self._apis[abi]
                         else:
                             self._api = self._force_api
@@ -486,10 +506,11 @@ class Install(Options):
                             self._api = self._apis[abi]
                         self._api = max(self._apis[abi], self._api)
                     create_toolchain(abi,self._api)
-                    #print "[" + abi + "] Using API level " + str(self._api)
 
                     if self.check_install(pkg,abi,self._api,dest):
-                        print "'" + pkg + "' already installed for " + abi
+                        if not self._quiet:
+                            print "[" + abi + "] " + \
+                                "'" + pkg + "' already installed for " + abi
                     else:
                         opts = ["--quiet","--abi="+abi]
                         if self._force_api is not None:
@@ -497,30 +518,25 @@ class Install(Options):
                         dependencies = CheckDependencies(opts + [pkg],loc=loc)
                         if dependencies.returnVal() != 0:
                             raise ValueError
-                        dependencies = dependencies.get_required()[abi][pkg]
-                        if len(dependencies) > 0:
-                            print "The following dependencies need to be installed: " + \
-                                ', '.join(dependencies)
-                            opts = ["--quiet","--abi="+abi] + dependencies
+                        missing = dependencies.get_required()[abi][pkg]['missing']
+                        if len(missing) > 0:
+                            print "[" + abi + "] " + \
+                                "The following dependencies need to be installed: " + \
+                                ', '.join(missing)
+                            opts = ["--quiet","--abi="+abi] + missing
                             if Remove(opts,loc=loc).returnVal() != 0:
                                 raise ValueError
                             opts = ["--abi="+abi]
                             if self._force_api is not None:                  
                                 opts.append("--api="+str(self._force_api))
-                            if Install(opts+dependencies,loc=loc).returnVal() != 0:
+                            if Install(opts+missing,loc=loc).returnVal() != 0:
                                 raise ValueError
 
-                        try:
-                            dependencies = self._pkg_data['dependencies']
-                        except KeyError:
-                            dependencies = []
-                        deps = []
-                        for dep in dependencies:
-                            deps.append(dep['package'])
                         out = '/'.join([VAULT,'sandbox',sandbox,'hemroot'])
+                        deps = dependencies.get_required()[abi][pkg]['all']
 
                         if len(deps) > 0:                            
-                            opts = ["--abi="+abi]
+                            opts = ["--quiet","--abi="+abi]
                             if self._force_api is not None:                             
                                 opts.append("--api="+str(self._force_api))
                             if Install(opts+deps,loc=out).returnVal() != 0:
@@ -531,7 +547,9 @@ class Install(Options):
                             self.perform_steps(pkg,abi,self._api,sandbox)
                             Remove(['--quiet','--abi='+abi,pkg],loc=dest)
                             self.install_repo(pkg,abi,self._api,dest)
-                        print "Package '" + pkg + "' installed at " + dest
+                        if not self._quiet:
+                            print "[" + abi + "] " + \
+                                "Package '" + pkg + "' installed at " + dest
                 
         except ValueError as e:
             print e
@@ -664,7 +682,7 @@ class CheckDependencies(Options):
             for abi in self._abis:
                 self._required[abi] = {}
                 for pkg in argv:
-                    self._required[abi][pkg] = []
+                    self._required[abi][pkg] = { 'missing':[], 'all':[] }
                     opts = ["--quiet","--abi="+abi]
                     if self._force_api is not None:
                         opts.append("--api="+str(self._force_api))
@@ -684,14 +702,21 @@ class CheckDependencies(Options):
                         d = CheckDependencies(opts + [dep['package']],loc=loc)
                         if d.returnVal() != 0:
                             raise ValueError
-                        self._required[abi][pkg].extend(
-                            d.get_required()[abi][dep['package']])
+                        self._required[abi][pkg]['missing'].extend(
+                            d.get_required()[abi][dep['package']]['missing'])
+                        self._required[abi][pkg]['all'].extend(
+                            d.get_required()[abi][dep['package']]['all'])
                         if dep_info['installed'] is None or \
                             dep_info['installed']['version'] < dep['version'] or \
                             dep_info['installed']['api'] < dep_info['latest']['api']:
                             
-                            self._required[abi][pkg].append(dep['package'])
-                    self._required[abi][pkg] = self.uniq(self._required[abi][pkg])
+                            self._required[abi][pkg]['missing'].append(dep['package'])
+                        self._required[abi][pkg]['all'].append(dep['package'])
+                        
+                    self._required[abi][pkg]['missing'] = \
+                        self.uniq(self._required[abi][pkg]['missing'])
+                    self._required[abi][pkg]['all'] = \
+                        self.uniq(self._required[abi][pkg]['all'])
         
             if not self._quiet:
                 print self._required
