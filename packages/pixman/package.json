@@ -1,0 +1,35 @@
+{
+    "version" : {
+        "major" : 0,
+        "minor" : 34,
+        "patch" : 0
+    },
+    "source" : {
+        "url" : "http://cairographics.org/releases/pixman-0.34.0.tar.gz",
+        "dir" : "pixman-0.34.0"
+    },
+    "dependencies": [
+        {
+            "package" : "libpng",
+            "version" : {
+                "major" : 1,
+                "minor" : 6,
+                "patch" : 21
+            }
+        }       
+    ],
+    "patches" : [
+        "pixman-0.34.0.patch"
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building pixman for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

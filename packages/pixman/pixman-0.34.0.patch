@@ -1,0 +1,30 @@
+diff -Naur pixman-0.34.0/pixman/pixman-arm.c pixman-0.34.0/pixman/pixman-arm.c
+--- pixman-0.34.0/pixman/pixman-arm.c	2015-06-30 15:18:31.000000000 +0530
++++ pixman-0.34.0/pixman/pixman-arm.c	2016-02-22 08:15:16.000000000 +0530
+@@ -102,6 +102,7 @@
+ detect_cpu_features (void)
+ {
+     arm_cpu_features_t features = 0;
++/*
+     AndroidCpuFamily cpu_family;
+     uint64_t cpu_features;
+ 
+@@ -119,6 +120,18 @@
+ 	if (cpu_features & ANDROID_CPU_ARM_FEATURE_NEON)
+ 	    features |= ARM_NEON;
+     }
++*/
++#if __ARM_ARCH__ == 7
++	features |= ARM_V7;
++#endif
++
++#ifdef __ARM_HAVE_VFP
++	features |= ARM_VFP;
++#endif
++
++#ifdef __ARM_HAVE_NEON
++	features |= ARM_NEON;
++#endif
+ 
+     return features;
+ }

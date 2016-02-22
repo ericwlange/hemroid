@@ -1,0 +1,50 @@
+{
+    "version" : {
+        "major" : 2,
+        "minor" : 52,
+        "patch" : 2
+    },
+    "source" : {
+        "url" : "http://ftp.gnome.org/pub/gnome/sources/libsoup/2.52/libsoup-2.52.2.tar.xz",
+        "dir" : "libsoup-2.52.2"
+    },
+    "dependencies": [
+        {
+            "package" : "glib-networking",
+            "version" : {
+                "major" : 2,
+                "minor" : 46,
+                "patch" : 1
+            }
+        },
+        {
+            "package" : "libxml2",
+            "version" : {
+                "major" : 2,
+                "minor" : 9,
+                "patch" : 3
+            }
+        },
+        {
+            "package" : "sqlite3",
+            "version" : {
+                "major" : 3,
+                "minor" : 11,
+                "patch" : 0
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building libsoup for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

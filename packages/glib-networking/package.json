@@ -1,0 +1,42 @@
+{
+	"version" : {
+		"major" : 2,
+		"minor" : 46,
+		"patch" : 1
+	},
+	"source" : {
+		"url" : "http://ftp.gnome.org/pub/gnome/sources/glib-networking/2.46/glib-networking-2.46.1.tar.xz",
+		"dir" : "glib-networking-2.46.1"
+	},
+	"dependencies": [
+	    {
+	        "package" : "glib-2",
+	        "version" : {
+	            "major" : 2,
+	            "minor" : 46,
+	            "patch" : 2
+	        }
+	    },
+	    {
+	        "package" : "gnutls",
+	        "version" : {
+	            "major" : 3,
+	            "minor" : 4,
+	            "patch" : 9
+	        }
+	    }
+	],
+	"patches" : [
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building glib-networking for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}
