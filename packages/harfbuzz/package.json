@@ -1,0 +1,55 @@
+{
+    "version" : {
+        "major" : 1,
+        "minor" : 1,
+        "patch" : 3
+    },
+    "source" : {
+        "url" : "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.1.3.tar.bz2",
+        "dir" : "harfbuzz-1.1.3"
+    },
+    "dependencies": [
+        {
+            "package" : "glib-2",
+            "version" : {
+                "major" : 2,
+                "minor" : 46,
+                "patch" : 2
+            }
+        },
+        {
+            "package" : "icu",
+            "version" : {
+                "major" : 56,
+                "minor" : 1
+            }
+        },
+        {
+            "package" : "freetype2",
+            "version" : {
+                "major" : 2,
+                "minor" : 6,
+                "patch" : 3
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building harfbuzz for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_harfbuzz.sh"
+        },
+        {
+            "message": "Building freetype2 (with harfbuzz)",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_freetype2.sh"
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "version" : {
+        "major" : 1,
+        "minor" : 1,
+        "patch" : 28
+    },
+    "source" : {
+        "url" : "http://xmlsoft.org/sources/libxslt-1.1.28.tar.gz",
+        "dir" : "libxslt-1.1.28"
+    },
+    "dependencies": [
+        {
+            "package" : "libxml2",
+            "version" : {
+                "major" : 2,
+                "minor" : 9,
+                "patch" : 3
+            }
+        }
+    ],
+    "patches" : [
+        "libxslt-1.1.28.patch"
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building libxslt for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

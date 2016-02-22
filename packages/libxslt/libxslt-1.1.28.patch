@@ -1,0 +1,44 @@
+diff -Naur libxslt-1.1.28/Makefile.in libxslt-1.1.28/Makefile.in
+--- libxslt-1.1.28/Makefile.in	2012-11-21 12:51:51.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/libxslt-1.1.28/Makefile.in	2016-02-22 22:41:11.000000000 +0530
+@@ -346,13 +346,13 @@
+ top_srcdir = @top_srcdir@
+ SUBDIRS = \
+ 	libxslt \
+-	libexslt \
+-	xsltproc \
+-	doc \
+-	$(PYTHON_SUBDIR) \
+-	tests
++	libexslt
++#	xsltproc \
++#	doc \
++#	$(PYTHON_SUBDIR) \
++#	tests
+ 
+-DIST_SUBDIRS = libxslt libexslt xsltproc python doc tests
++DIST_SUBDIRS = libxslt libexslt #xsltproc python doc tests
+ confexecdir = $(libdir)
+ confexec_DATA = xsltConf.sh
+ bin_SCRIPTS = xslt-config
+diff -Naur libxslt-1.1.28/config.sub libxslt-1.1.28/config.sub
+--- libxslt-1.1.28/config.sub	2008-01-31 01:57:02.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/libxslt-1.1.28/config.sub	2016-02-22 22:45:42.000000000 +0530
+@@ -317,6 +317,7 @@
+ 	| alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
++	| aarch64-* \
+ 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
+ 	| avr-* | avr32-* \
+ 	| bfin-* | bs2000-* \
+@@ -1256,6 +1257,9 @@
+ 	-linux*)
+ 		os=`echo $os | sed -e 's|linux|linux-gnu|'`
+ 		;;
++	-android*)
++		os=`echo $os | sed -e 's|linux|linux-gnu|'`
++		;;
+ 	-sunos5*)
+ 		os=`echo $os | sed -e 's|sunos5|solaris2|'`
+ 		;;

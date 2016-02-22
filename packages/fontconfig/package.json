@@ -1,0 +1,43 @@
+{
+    "version" : {
+        "major" : 2,
+        "minor" : 11,
+        "patch" : 1
+    },
+    "source" : {
+        "url" : "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.bz2",
+        "dir" : "fontconfig-2.11.1"
+    },
+    "dependencies": [
+        {
+            "package" : "freetype2",
+            "version" : {
+                "major" : 2,
+                "minor" : 6,
+                "patch" : 3
+            }
+        },
+        {
+            "package" : "libxml2",
+            "version" : {
+                "major" : 2,
+                "minor" : 9,
+                "patch" : 3
+            }
+        }
+    ],
+    "patches" : [
+        "fontconfig-2.11.1.patch"
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building fontconfig for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

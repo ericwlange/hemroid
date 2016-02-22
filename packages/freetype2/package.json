@@ -1,0 +1,34 @@
+{
+    "version" : {
+        "major" : 2,
+        "minor" : 6,
+        "patch" : 3
+    },
+    "source" : {
+        "url" : "http://downloads.sourceforge.net/freetype/freetype-2.6.3.tar.bz2",
+        "dir" : "freetype-2.6.3"
+    },
+    "dependencies": [
+        {
+            "package" : "libpng",
+            "version" : {
+                "major" : 1,
+                "minor" : 6,
+                "patch" : 21
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building freetype2 for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

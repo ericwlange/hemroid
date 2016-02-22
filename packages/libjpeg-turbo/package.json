@@ -1,0 +1,33 @@
+{
+	"version" : {
+		"major" : 1,
+		"minor" : 4,
+		"patch" : 2
+	},
+	"source" : {
+		"url" : "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-1.4.2.tar.gz",
+		"dir" : "libjpeg-turbo-1.4.2"
+	},
+	"dependencies": [
+	],
+	"patches" : [
+	    "libjpeg-turbo-1.4.2.patch"
+	],
+	"api" : {
+		"min" : 9
+	},
+	"steps": [
+		{
+			"message": "Building nasm for host",
+			"environment": "host",
+			"shell": "/bin/bash",
+			"script": "build_host.sh"
+		},
+		{
+			"message": "Building libjpeg-turbo for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}
