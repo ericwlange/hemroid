@@ -10,10 +10,10 @@
     },
     "dependencies": [
         {
-            "package" : "freetype2",
+            "package" : "harfbuzz",
             "version" : {
-                "major" : 2,
-                "minor" : 6,
+                "major" : 1,
+                "minor" : 1,
                 "patch" : 3
             }
         },

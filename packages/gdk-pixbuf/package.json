@@ -1,0 +1,50 @@
+{
+    "version" : {
+        "major" : 2,
+        "minor" : 32,
+        "patch" : 3
+    },
+    "source" : {
+        "url" : "http://ftp.gnome.org/pub/gnome/sources/gdk-pixbuf/2.32/gdk-pixbuf-2.32.3.tar.xz",
+        "dir" : "gdk-pixbuf-2.32.3"
+    },
+    "dependencies": [
+        {
+            "package" : "libpng",
+            "version" : {
+                "major" : 1,
+                "minor" : 6,
+                "patch" : 21
+            }
+        },
+        {
+            "package" : "libjpeg-turbo",
+            "version" : {
+                "major" : 1,
+                "minor" : 4,
+                "patch" : 2
+            }
+        },
+        {
+            "package" : "glib-2",
+            "version" : {
+                "major" : 2,
+                "minor" : 46,
+                "patch" : 2
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building gdk-pixbuf for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

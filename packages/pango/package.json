@@ -1,0 +1,50 @@
+{
+    "version" : {
+        "major" : 1,
+        "minor" : 38,
+        "patch" : 1
+    },
+    "source" : {
+        "url" : "http://ftp.gnome.org/pub/gnome/sources/pango/1.38/pango-1.38.1.tar.xz",
+        "dir" : "pango-1.38.1"
+    },
+    "dependencies": [
+        {
+            "package" : "fontconfig",
+            "version" : {
+                "major" : 2,
+                "minor" : 11,
+                "patch" : 1
+            }
+        },
+        {
+            "package" : "glib-2",
+            "version" : {
+                "major" : 2,
+                "minor" : 46,
+                "patch" : 2
+            }
+        },
+        {
+            "package" : "cairo",
+            "version" : {
+                "major" : 1,
+                "minor" : 14,
+                "patch" : 6
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building pango for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

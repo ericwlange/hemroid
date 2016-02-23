@@ -515,6 +515,9 @@ class Install(Options):
                         opts = ["--quiet","--abi="+abi]
                         if self._force_api is not None:
                             opts.append("--api="+str(self._force_api))
+                        if not self._quiet:
+                            print "[" + abi + "] " + \
+                                "checking dependencies for '" + pkg + "'"
                         dependencies = CheckDependencies(opts + [pkg],loc=loc)
                         if dependencies.returnVal() != 0:
                             raise ValueError

@@ -1,0 +1,58 @@
+{
+    "version" : {
+        "major" : 1,
+        "minor" : 14,
+        "patch" : 6
+    },
+    "source" : {
+        "url" : "http://cairographics.org/releases/cairo-1.14.6.tar.xz",
+        "dir" : "cairo-1.14.6"
+    },
+    "dependencies": [
+        {
+            "package" : "libpng",
+            "version" : {
+                "major" : 1,
+                "minor" : 6,
+                "patch" : 21
+            }
+        },
+        {
+            "package" : "pixman",
+            "version" : {
+                "major" : 0,
+                "minor" : 34,
+                "patch" : 0
+            }
+        },
+        {
+            "package" : "glib-2",
+            "version" : {
+                "major" : 2,
+                "minor" : 46,
+                "patch" : 2
+            }
+        },
+        {
+            "package" : "fontconfig",
+            "version" : {
+                "major" : 2,
+                "minor" : 11,
+                "patch" : 1
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building cairo for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

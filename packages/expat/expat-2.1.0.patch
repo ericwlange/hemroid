@@ -1,0 +1,11 @@
+diff -Naur expat-2.1.0/conftools/config.sub expat-2.1.0/conftools/config.sub
+--- expat-2.1.0/conftools/config.sub	2012-03-25 00:42:39.000000000 +0530
++++ expat-2.1.0/conftools/config.sub	2016-02-23 09:05:49.000000000 +0530
+@@ -251,6 +251,7 @@
+ 	| alpha64 | alpha64ev[4-8] | alpha64ev56 | alpha64ev6[78] | alpha64pca5[67] \
+ 	| am33_2.0 \
+ 	| arc | arm | arm[bl]e | arme[lb] | armv[2345] | armv[345][lb] | avr | avr32 \
++	| aarch64 \
+ 	| bfin \
+ 	| c4x | clipper \
+ 	| d10v | d30v | dlx | dsp16xx \
