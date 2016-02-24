@@ -1,0 +1,35 @@
+{
+    "version" : {
+        "major" : 0,
+        "minor" : 18,
+        "patch" : 4
+    },
+    "source" : {
+        "url" : "http://ftp.gnome.org/pub/gnome/sources/libsecret/0.18/libsecret-0.18.4.tar.xz",
+        "dir" : "libsecret-0.18.4"
+    },
+    "dependencies": [
+        {
+            "package" : "glib-2",
+            "version" : {
+                "major" : 2,
+                "minor" : 46,
+                "patch" : 2
+            }
+        }
+    ],
+    "patches" : [
+        "libsecret-0.18.4.patch"
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building libsecret for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

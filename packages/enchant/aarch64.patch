@@ -1,0 +1,11 @@
+diff -Naur enchant-1.6.0/config.sub enchant-1.6.0/config.sub
+--- enchant-1.6.0/config.sub	2016-02-24 23:23:18.000000000 +0530
++++ enchant-1.6.0/config.sub	2016-02-24 23:23:32.000000000 +0530
+@@ -331,6 +331,7 @@
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
+ 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
++	| aarch64-* \
+ 	| avr-* | avr32-* \
+ 	| bfin-* | bs2000-* \
+ 	| c[123]* | c30-* | [cjt]90-* | c4x-* | c54x-* | c55x-* | c6x-* \

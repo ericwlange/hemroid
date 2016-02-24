@@ -1,0 +1,26 @@
+{
+    "version" : {
+        "major" : 2,
+        "minor" : 8,
+        "patch" : 8
+    },
+    "source" : {
+        "url" : "http://downloads.sourceforge.net/project/hunspell/Hyphen/2.8/hyphen-2.8.8.tar.gz",
+        "dir" : "hyphen-2.8.8"
+    },
+    "dependencies": [
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building hyphen for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

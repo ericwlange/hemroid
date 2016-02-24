@@ -1,0 +1,35 @@
+diff -Naur enchant-1.6.0/Makefile.am enchant-1.6.0/Makefile.am
+--- enchant-1.6.0/Makefile.am	2010-04-02 02:23:37.000000000 +0530
++++ enchant-1.6.0/Makefile.am	2016-02-06 23:32:17.000000000 +0530
+@@ -1,4 +1,5 @@
+-SUBDIRS=src tests doc data
++#SUBDIRS=src tests doc data
++SUBDIRS=src data
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = enchant.pc
+diff -Naur enchant-1.6.0/Makefile.in enchant-1.6.0/Makefile.in
+--- enchant-1.6.0/Makefile.in	2010-04-02 02:26:38.000000000 +0530
++++ enchant-1.6.0/Makefile.in	2016-02-06 23:33:26.000000000 +0530
+@@ -273,7 +273,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-SUBDIRS = src tests doc data
++SUBDIRS = src data
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = enchant.pc
+ EXTRA_DIST = \
+diff -Naur enchant-1.6.0/config.sub enchant-1.6.0/config.sub
+--- enchant-1.6.0/config.sub	2010-04-02 02:26:37.000000000 +0530
++++ enchant-1.6.0/config.sub	2016-02-06 23:28:22.000000000 +0530
+@@ -1274,6 +1274,9 @@
+ 	-gnu/linux*)
+ 		os=`echo $os | sed -e 's|gnu/linux|linux-gnu|'`
+ 		;;
++	-android*)
++		os=-linux-gnu
++		;;
+ 	# First accept the basic system types.
+ 	# The portable systems comes first.
+ 	# Each alternative MUST END IN A *, to match a version number.

@@ -1,0 +1,36 @@
+{
+    "version" : {
+        "major" : 1,
+        "minor" : 6,
+        "patch" : 0
+    },
+    "source" : {
+        "url" : "http://www.abisource.com/downloads/enchant/1.6.0/enchant-1.6.0.tar.gz",
+        "dir" : "enchant-1.6.0"
+    },
+    "dependencies": [
+        {
+            "package" : "glib-2",
+            "version" : {
+                "major" : 2,
+                "minor" : 46,
+                "patch" : 2
+            }
+        }
+    ],
+    "patches" : [
+        "enchant-1.6.0.patch",
+        "aarch64.patch"
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building enchant for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}
