@@ -439,6 +439,7 @@ class Install(Options):
     
     def install_repo(self,pkg,abi,api,dest,ignore_version=False):
         TAR = require('tar','TAR')
+        mkdir_p(REPODIR)
         pkgs = os.listdir(REPODIR)
         version = get_version(self._pkg_data['version'])
         
