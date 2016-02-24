@@ -1,0 +1,12 @@
+diff -Naur libepoxy-1.3.1/configure libepoxy-1.3.1/configure
+--- libepoxy-1.3.1/configure	2015-07-16 05:17:03.000000000 +0530
++++ libepoxy-1.3.1/configure	2016-02-24 08:00:02.000000000 +0530
+@@ -18660,7 +18660,7 @@
+         ;;
+     *)
+         build_egl=yes
+-        build_glx=yes
++        build_glx=no
+         build_wgl=no
+         # On platforms with dlopen, we load everything dynamically and
+         # don't link against a specific window system or GL implementation.

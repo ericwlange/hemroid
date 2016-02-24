@@ -151,7 +151,12 @@ def valid_ABI(abi):
     else:
         raise ValueError('Unknown abi "' + abi + '"')
 
+g_apis = None
 def get_available_apis():
+    global g_apis
+    if g_apis is not None:
+        return g_apis
+        
     try: ANDROID_NDK = os.environ['ANDROID_NDK']
     except KeyError:
         raise ValueError('ANDROID_NDK environment variable not set')
@@ -170,6 +175,7 @@ def get_available_apis():
     _apis['armeabi'] = _apis['arm']
     _apis['armeabi-v7a'] = _apis['arm']
     _apis['arm64-v8a'] = _apis['arm64']
+    g_apis = _apis
     return _apis
     
 def get_version(js):
@@ -431,7 +437,7 @@ class Install(Options):
         except:
             return False
     
-    def install_repo(self,pkg,abi,api,dest):
+    def install_repo(self,pkg,abi,api,dest,ignore_version=False):
         TAR = require('tar','TAR')
         pkgs = os.listdir(REPODIR)
         version = get_version(self._pkg_data['version'])
@@ -445,7 +451,8 @@ class Install(Options):
             if len(a) > 3: p_version = int(a[3]) * 1000 * 1000
             if len(a) > 4: p_version = p_version + (int(a[4]) * 1000)
             if len(a) > 5: p_version = p_version + int(a[5])
-            if name == pkg and p_version >= version and abi == p_abi and \
+            if name == pkg and (p_version >= version or ignore_version) and \
+                abi == p_abi and \
                 api >= p_api and p_api < min_api:
                 repo = p
                 min_api = p_api
@@ -538,12 +545,17 @@ class Install(Options):
                         out = '/'.join([VAULT,'sandbox',sandbox,'hemroot'])
                         deps = dependencies.get_required()[abi][pkg]['all']
 
-                        if len(deps) > 0:                            
+                        if len(deps) > 0:
+                            for dep in deps:
+                                self.install_repo(dep,abi,self._api,out+'/'+abi,
+                                    ignore_version=True)
+                            """
                             opts = ["--quiet","--abi="+abi]
                             if self._force_api is not None:                             
                                 opts.append("--api="+str(self._force_api))
                             if Install(opts+deps,loc=out).returnVal() != 0:
                                 raise ValueError
+                            """
                             
                         if not self.install_repo(pkg,abi,self._api,dest):
                             self.cache_archive(pkg)
