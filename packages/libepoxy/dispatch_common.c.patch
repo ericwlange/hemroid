@@ -1,0 +1,12 @@
+--- libepoxy-1.3.1/src/dispatch_common.c	2015-07-16 03:15:02.000000000 +0530
++++ libepoxy-1.3.1/src/dispatch_common.c	2016-02-02 23:50:47.000000000 +0530
+@@ -657,7 +657,9 @@
+     return epoxy_gl_dlsym(name);
+ #else
+     if (epoxy_current_context_is_glx()) {
++#ifndef __ANDROID__
+         return glXGetProcAddressARB((const GLubyte *)name);
++#endif
+     } else {
+ #if PLATFORM_HAS_EGL
+         GLenum egl_api = epoxy_egl_get_current_gl_context_api();

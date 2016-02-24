@@ -1,0 +1,76 @@
+diff -Naur gtk+-3.18.7/configure gtk+-3.18.7/configure
+--- gtk+-3.18.7/configure	2016-01-28 09:55:26.000000000 +0530
++++ gtk+-3.18.7/configure	2016-02-02 08:32:11.000000000 +0530
+@@ -25016,7 +25016,7 @@
+ if $PKG_CONFIG --exists $PANGO_PACKAGES ; then
+         PANGO_CFLAGS=`$PKG_CONFIG --cflags $PANGO_PACKAGES`
+         PANGO_LIBS=`$PKG_CONFIG --libs $PANGO_PACKAGES`
+-
++        PANGO_LIBS="$PANGO_LIBS -lffi"
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PANGO_CFLAGS $PANGO_LIBS" >&5
+ $as_echo "$PANGO_CFLAGS $PANGO_LIBS" >&6; }
+ else
+diff -Naur gtk+-3.18.7/gdk/broadway/broadway-server.c gtk+-3.18.7/gdk/broadway/broadway-server.c
+--- gtk+-3.18.7/gdk/broadway/broadway-server.c	2016-01-07 08:55:56.000000000 +0530
++++ gtk+-3.18.7/gdk/broadway/broadway-server.c	2016-02-02 23:23:20.000000000 +0530
+@@ -829,7 +829,11 @@
+   void *ptr;
+   char *filename = NULL;
+ 
++#ifdef __ANDROID__
++  fd = -1;
++#else
+   fd = shm_open (name, O_RDONLY, 0600);
++#endif
+   if (fd == -1)
+     {
+       filename = g_build_filename (g_get_tmp_dir (), name, NULL);
+@@ -852,8 +856,10 @@
+       unlink (filename);
+       g_free (filename);
+     }
++#ifndef __ANDROID__
+   else
+     shm_unlink (name);
++#endif
+ 
+   return ptr;
+ 
+diff -Naur gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c
+--- gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c	2016-01-07 08:55:56.000000000 +0530
++++ gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c	2016-02-02 23:33:18.000000000 +0530
+@@ -533,7 +533,11 @@
+   void *ptr;
+   int res;
+ 
++#ifdef __ANDROID__
++  fd = -1;
++#else
+   fd = shm_open(name, O_RDWR|O_CREAT|O_EXCL, 0600);
++#endif
+   if (fd == -1)
+     {
+       if (errno == EEXIST)
+@@ -564,8 +568,10 @@
+     {
+       if (filename)
+ 	unlink (filename);
++#ifndef __ANDROID__
+       else
+ 	shm_unlink (name);
++#endif
+       g_error ("Not enough shared memory for window surface");
+     }
+ #endif
+@@ -681,7 +687,11 @@
+ 
+   munmap (data->data, data->data_size);
+   if (data->is_shm)
++#ifdef __ANDROID__
++    ;
++#else
+     shm_unlink (data->name);
++#endif
+   else
+     {
+       char *filename = g_build_filename (g_get_tmp_dir (), data->name, NULL);
