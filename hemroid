@@ -256,10 +256,10 @@ class Install(Options):
                 if fname.endswith('.zip'):
                     output = call([UNZIP,cachename,'-d',SRCDIR], stderr=devnull)
                 elif fname.endswith('tar.gz') or fname.endswith('.tgz'):
-                    output = call([TAR,'zxvf',cachename,'-C',SRCDIR], stderr=devnull)
+                    output = call([TAR,'zxf',cachename,'-C',SRCDIR], stderr=devnull)
                 elif fname.endswith('tar.xz') or fname.endswith('.tgx') or \
                      fname.endswith('.tar.bz2'):
-                    output = call([TAR,'xvf',cachename,'-C',SRCDIR], stderr=devnull)
+                    output = call([TAR,'xf',cachename,'-C',SRCDIR], stderr=devnull)
                 else: raise ValueError("ERROR: Don't know how to extract '" + fname + "'")
             if output != 0:
                 call([RM,'-rf',srcdir])
@@ -407,11 +407,11 @@ class Install(Options):
         if not self._quiet:
             print "[" + abi + "] " + \
                 "Packaging repo " + pkgtar
-        command = "find " + OUTPUT + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
-            "xargs sed -i '' -E 's," + SANDBOX + ",{{SANDBOX}},g'; "
+        command = "(find " + OUTPUT + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
+            "xargs sed -i'' -e 's|" + SANDBOX + "|{{SANDBOX}}|g') ; "
         command = command + \
-            "find " + OUTPUT + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
-            "xargs sed -i '' -E 's," + OUTPUT + ",{{SANDBOX}},g'"
+            "(find " + OUTPUT + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
+            "xargs sed -i'' -e 's|" + OUTPUT + "|{{SANDBOX}}|g')"
         process = Popen(command,stdout=PIPE,stderr=STDOUT,shell=True)
         proc_stdout = process.communicate()[0].strip()
         if process.returncode != 0: raise ValueError(proc_stdout)
@@ -464,7 +464,7 @@ class Install(Options):
             output = call([TAR,'-xzf',REPODIR + '/' + repo,'-C',dest])
             if output !=0: raise ValueError("Failed to extract repo")
             command = "find " + dest + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
-                "xargs sed -i '' -E 's,{{SANDBOX}}," + dest + ",g'"
+                "xargs sed -i'' -e 's|{{SANDBOX}}|" + dest + "|g'"
             process = Popen(command,stdout=PIPE,stderr=STDOUT,shell=True)
             proc_stdout = process.communicate()[0].strip()
             if process.returncode != 0: raise ValueError(proc_stdout)
