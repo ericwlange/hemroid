@@ -10,6 +10,7 @@
 	"dependencies": [
 	],
 	"patches" : [
+	    "libiconv-1.14.patch"
 	],
 	"api" : {
 		"min" : 9

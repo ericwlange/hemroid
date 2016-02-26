@@ -29,6 +29,12 @@
 			"environment": "cross",
 			"shell": "/bin/bash",
 			"script": "build_android.sh"
+		},
+		{
+			"message": "Building iconv (with gettext) for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_iconv.sh"
 		}
 	]
 }

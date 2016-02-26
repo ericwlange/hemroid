@@ -1,0 +1,22 @@
+diff -Naur libiconv-1.14/build-aux/config.sub libiconv-1.14/build-aux/config.sub
+--- libiconv-1.14/build-aux/config.sub	2009-06-21 16:47:33.000000000 +0530
++++ libiconv-1.14/build-aux/config.sub	2016-02-26 23:12:48.000000000 +0530
+@@ -322,6 +322,7 @@
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
+ 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
++	| aarch64-* \
+ 	| avr-* | avr32-* \
+ 	| bfin-* | bs2000-* \
+ 	| c[123]* | c30-* | [cjt]90-* | c4x-* | c54x-* | c55x-* | c6x-* \
+diff -Naur libiconv-1.14/libcharset/build-aux/config.sub libiconv-1.14/libcharset/build-aux/config.sub
+--- libiconv-1.14/libcharset/build-aux/config.sub	2009-06-21 16:47:33.000000000 +0530
++++ libiconv-1.14/libcharset/build-aux/config.sub	2016-02-26 23:14:17.000000000 +0530
+@@ -317,6 +317,7 @@
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
+ 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
++	| aarch64-* \
+ 	| avr-* \
+ 	| bfin-* | bs2000-* \
+ 	| c[123]* | c30-* | [cjt]90-* | c4x-* | c54x-* | c55x-* | c6x-* \
