@@ -224,6 +224,8 @@ class Install(Options):
         self._dirty = True
     def _opt_quiet(self, value):
         self._quiet = True    
+    def _opt_verbose(self, value):
+        self._verbose = True    
         
     def parse_package_json(self,pkg):
         with open('/'.join([PKGDIR,pkg,'package.json'])) as data_file:    
@@ -370,6 +372,13 @@ class Install(Options):
                     raise ValueError("Unknown environment type '" + environment + "'")
                     
                 process = Popen(command,stdout=PIPE,stderr=STDOUT,shell=True)
+                if self._verbose:
+                    while True:
+                        line = process.stdout.readline()
+                        if line != '':
+                            print "["+abi+"] " + line.rstrip()
+                        else:
+                            break
                 proc_stdout = process.communicate()[0].strip()
                 if process.returncode != 0:
                     f = open('/tmp/hemroid.burst', 'w')
@@ -478,6 +487,7 @@ class Install(Options):
         self._force_api = None
         self._dirty = False
         self._quiet = False
+        self._verbose = False
         RM  = require('rm', 'RM')
         
         self._apis = get_available_apis()
