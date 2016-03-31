@@ -1,0 +1,41 @@
+{
+    "version" : {
+        "major" : 2,
+        "minor" : 10,
+        "patch" : 7
+    },
+    "source" : {
+        "dir" : "MiniBrowser-2.10.7"
+    },
+    "dependencies": [
+        {
+            "package" : "webkitgtk+",
+            "version" : {
+                "major" : 2,
+                "minor" : 10,
+                "patch" : 7
+            }
+        },
+        {
+            "package" : "adwaita-icon-theme",
+            "version" : {
+                "major" : 3,
+                "minor" : 18,
+                "patch" : 0
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 13
+    },
+    "steps": [
+        {
+            "message": "Building MiniBrowser for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_minibrowser.sh"
+        }
+    ]
+}

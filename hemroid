@@ -5,6 +5,7 @@ from subprocess import call, check_output, Popen, PIPE, STDOUT
 import inspect
 import json
 import uuid
+import glob
 
 HEMDIR  = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))
 VAULT   = HEMDIR + '/vault'
@@ -238,10 +239,20 @@ class Install(Options):
         TAR =   require('tar',  'TAR')
         PATCH=  require('patch','PATCH')
 
-        url = self._pkg_data['source']['url']
+        srcdir = None
+        url = None
+        try:
+            srcdir = '/'.join([SRCDIR,self._pkg_data['source']['dir']])
+            url = self._pkg_data['source']['url']
+        except KeyError:
+            if srcdir is not None:
+                mkdir_p(srcdir)
+            else:
+                raise
+            return
+        
         fname = os.path.basename(url)
         cachename = '/'.join([CACHEDIR,fname])
-        srcdir = '/'.join([SRCDIR,self._pkg_data['source']['dir']])
         pkgdir = '/'.join([PKGDIR,pkg])
 
         if not os.path.exists(cachename):
@@ -291,11 +302,14 @@ class Install(Options):
         toolchain_dir = '/'.join([VAULT,'android-'+str(api),abi,'toolchain'])
 
         env = ''.join(["SRCDIR=",srcdir," PKGDIR=",pkgdir," HOSTDIR=",hostdir,
-            " CROSSDIR=",crossdir])
+            " CROSSDIR=",crossdir," ABI=",abi])
     
         try: ANDROID_NDK = os.environ['ANDROID_NDK']
         except KeyError:
             raise ValueError('ANDROID_NDK environment variable not set')
+        try: ANDROID_SDK = os.environ['ANDROID_SDK']
+        except KeyError:
+            raise ValueError('ANDROID_SDK environment variable not set')
 
         PLATFORM = toolchain_dir+'/sysroot'
         CFLAGS = "\"-fPIC -DANDROID -Wno-multichar " + \
@@ -313,7 +327,7 @@ class Install(Options):
         OUTPUT = '/'.join([VAULT,'sandbox',sandbox,abi,'out'])
         LDFLAGS ="\"-Wl,-rpath-link," + toolchain_dir + "/usr/lib " + \
             "-L${SANDBOX}/lib64 -L${SANDBOX}/lib -L${PLATFORM}/usr/lib64 " + \
-            "-L${PLATFORM}/usr/lib\""
+            "-L${PLATFORM}/usr/lib -pie\""
         PREFIX =  PREFIXES[abi]
         HOST   =  HOSTS[abi]
         CROSS_COMPILE = toolchain_dir+"/bin/${PREFIX}"
@@ -330,6 +344,7 @@ class Install(Options):
             ' CFLAGS=',CFLAGS,
             ' CPPFLAGS=',CPPFLAGS,
             ' LIBS=',LIBS,
+            ' ANDROID_API=',str(api),
             ' SANDBOX=',SANDBOX,
             ' PKG_CONFIG_DIR=',PKG_CONFIG_DIR,
             ' PKG_CONFIG_LIBDIR=',PKG_CONFIG_LIBDIR,
@@ -756,11 +771,14 @@ class Remove(Options):
         self._abis.append(valid_ABI(self._require_value(value)))
     def _opt_quiet(self, value):
         self._quiet = True
+    def _opt_clean(self, value):
+        self._clean = True
         
     def __init__(self,argv,loc=None):
         self.returnVal = lambda: 0
         self._abis = []
         self._quiet = False
+        self._clean = False
         RM   = require('rm',   'RM')
         RMDIR= require('rmdir','RMDIR')
         
@@ -776,7 +794,7 @@ class Remove(Options):
                         with open('/'.join([dest,'hemroid',pkg+'.json'])) as df:
                             json.load(df)['files']
                     except IOError:
-                        if not self._quiet:
+                        if not self._quiet and not self._clean:
                             raise ValueError("Package '" + pkg + "' is not installed for"\
                                 " '" + abi + "'" )
                     except KeyError:
@@ -789,6 +807,12 @@ class Remove(Options):
                     else: dest = dest = '/'.join([loc,abi])
                     pkg_data = {}
                     try:
+                        if self._clean:
+                            repos = glob.glob(REPODIR+"/"+pkg+".*."+abi+".*")
+                            for repo in repos:
+                                call([RM,'-f',repo])
+                                if not self._quiet:
+                                    print "Removed repo " + repo
                         with open('/'.join([dest,'hemroid',pkg+'.json'])) as data_file:
                             pkg_data = json.load(data_file)
                         for file in pkg_data['files']:
@@ -806,7 +830,7 @@ class Remove(Options):
                                     if os.path.islink(fname):
                                         os.remove(fname)
                     except IOError as e:
-                        if not self._quiet: raise ValueError(e)
+                        if not self._quiet and not self._clean: raise ValueError(e)
 
                     if not self._quiet:
                         print "Package '" + pkg + "' removed for" \

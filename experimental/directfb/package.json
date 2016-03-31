@@ -1,0 +1,64 @@
+{
+    "version" : {
+        "major" : 1,
+        "minor" : 6,
+        "patch" : 2
+    },
+    "source" : {
+        "url" : "http://pkgs.fedoraproject.org/repo/pkgs/directfb/DirectFB-1.6.3.tar.gz/641e8e999c017770da647f9b5b890906/DirectFB-1.6.3.tar.gz",
+        "dir" : "DirectFB-1.6.3"
+    },
+    "dependencies": [
+        {
+            "package" : "freetype2",
+            "version" : {
+                "major" : 2,
+                "minor" : 6,
+                "patch" : 3
+            }
+        },
+        {
+            "package" : "libpng",
+            "version" : {
+                "major" : 1,
+                "minor" : 6,
+                "patch" : 21
+            }
+        },
+        {
+            "package" : "libjpeg-turbo",
+            "version" : {
+                "major" : 1,
+                "minor" : 4,
+                "patch" : 2
+            }
+        },
+        {
+            "package" : "flux",
+            "version" : {
+                "major" : 1,
+                "minor" : 4,
+                "patch" : 4
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building flux for host",
+            "environment": "host",
+            "shell": "/bin/bash",
+            "script": "build_flux.sh"
+        },
+        {
+            "message": "Building DirectFB for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+diff -Naur wayland-1.10.0/src/dtddata.S wayland-1.10.0/src/dtddata.S
+--- wayland-1.10.0/src/dtddata.S	2015-11-24 01:36:44.000000000 +0530
++++ wayland-1.10.0/src/dtddata.S	2016-02-27 23:19:20.000000000 +0530
+@@ -22,6 +22,18 @@
+ 
+ /* from: http://www.linuxjournal.com/content/embedding-file-executable-aka-hello-world-version-5967#comment-348129 */
+ 
++#ifdef __clang__
++	.p2align 2
++	.globl _DTD_DATA_begin
++_DTD_DATA_begin:
++	.incbin "src/wayland.dtd.embed"
++_DTD_DATA_end:
++	.byte 0
++	.p2align 2
++	.globl _DTD_DATA_len
++_DTD_DATA_len:
++	.int (_DTD_DATA_end - _DTD_DATA_begin)
++#else
+ .macro binfile name file
+ 	.p2align 2
+ 	.globl \name\()_begin
+@@ -37,3 +49,4 @@
+ 
+ .section .rodata
+ binfile DTD_DATA src/wayland.dtd.embed
++#endif

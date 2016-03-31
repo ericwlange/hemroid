@@ -1,0 +1,66 @@
+{
+    "version" : {
+        "major" : 2,
+        "minor" : 24,
+        "patch" : 29
+    },
+    "source" : {
+        "url" : "http://ftp.gnome.org/pub/gnome/sources/gtk+/2.24/gtk+-2.24.29.tar.xz",
+        "dir" : "gtk+-2.24.29"
+    },
+    "dependencies": [
+        {
+            "package" : "atk",
+            "version" : {
+                "major" : 2,
+                "minor" : 18,
+                "patch" : 0
+            }
+        },
+        {
+            "package" : "gdk-pixbuf",
+            "version" : {
+                "major" : 2,
+                "minor" : 32,
+                "patch" : 3
+            }
+        },
+        {
+            "package" : "pango",
+            "version" : {
+                "major" : 1,
+                "minor" : 38,
+                "patch" : 1
+            }
+        },
+        {
+            "package" : "cairo",
+            "version" : {
+                "major" : 1,
+                "minor" : 14,
+                "patch" : 6
+            }
+        },
+        {
+            "package" : "directfb",
+            "version" : {
+                "major" : 1,
+                "minor" : 6,
+                "patch" : 3
+            }
+        }
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building gtk+-2 for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

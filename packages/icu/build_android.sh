@@ -11,5 +11,7 @@ then
 		--enable-tests=yes --enable-samples=no --enable-dyload=no
 	make -j8
 	make install
+	mkdir -p ${OUTPUT}/lib/icu/stubdata
+	cp stubdata/libicudata* ${OUTPUT}/lib/icu/stubdata
 	touch .allgood
 fi

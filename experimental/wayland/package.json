@@ -1,0 +1,57 @@
+{
+	"version" : {
+		"major" : 1,
+		"minor" : 10,
+		"patch" : 0
+	},
+	"source" : {
+		"url" : "http://wayland.freedesktop.org/releases/wayland-1.10.0.tar.xz",
+		"dir" : "wayland-1.10.0"
+	},
+	"dependencies": [
+	    {
+	        "package": "ffi",
+            "version" : {
+                "major" : 3,
+                "minor" : 0,
+                "patch" : 13
+            }
+	    },
+	    {
+	        "package": "expat",
+            "version" : {
+                "major" : 2,
+                "minor" : 1,
+                "patch" : 0
+            }
+	    },
+	    {
+	        "package": "libxml2",
+            "version" : {
+                "major" : 2,
+                "minor" : 9,
+                "patch" : 3
+            }
+	    }	    
+	],
+	"patches" : [
+	    "wayland-1.10.0.patch"
+	],
+	"api" : {
+		"min" : 21
+	},
+	"steps": [
+		{
+			"message": "Building wayland-scanner for host",
+			"environment": "host",
+			"shell": "/bin/bash",
+			"script": "build_host.sh"
+		},
+		{
+			"message": "Building wayland for android",
+			"environment": "cross",
+			"shell": "/bin/bash",
+			"script": "build_android.sh"
+		}
+	]
+}

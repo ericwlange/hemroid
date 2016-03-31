@@ -1,0 +1,26 @@
+{
+    "version" : {
+        "major" : 3,
+        "minor" : 18,
+        "patch" : 0
+    },
+    "source" : {
+        "url" : "http://ftp.gnome.org/pub/gnome/sources/adwaita-icon-theme/3.18/adwaita-icon-theme-3.18.0.tar.xz",
+        "dir" : "adwaita-icon-theme-3.18.0"
+    },
+    "dependencies": [
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building adwaita-icon-theme for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

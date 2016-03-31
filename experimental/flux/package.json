@@ -1,0 +1,26 @@
+{
+    "version" : {
+        "major" : 1,
+        "minor" : 4,
+        "patch" : 4
+    },
+    "source" : {
+        "url" : "https://web.archive.org/web/20150323120731/http://www.directfb.org/downloads/Core/flux/flux-1.4.4.tar.gz",
+        "dir" : "flux-1.4.4"
+    },
+    "dependencies": [
+    ],
+    "patches" : [
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building flux for host",
+            "environment": "host",
+            "shell": "/bin/bash",
+            "script": "build_host.sh"
+        }
+    ]
+}
