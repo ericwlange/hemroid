@@ -1,0 +1,42 @@
+diff -Naur cairo-1.14.6/src/cairo-gl-device.c /Users/Eric/workspace/hemroid/vault/src/cairo-1.14.6/src/cairo-gl-device.c
+--- cairo-1.14.6/src/cairo-gl-device.c	2015-10-28 02:34:21.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/cairo-1.14.6/src/cairo-gl-device.c	2016-03-15 08:49:19.000000000 +0530
+@@ -236,8 +236,8 @@
+ 	! _cairo_gl_has_extension ("GL_ARB_pixel_buffer_object"))
+ 	return _cairo_error (CAIRO_STATUS_DEVICE_ERROR);
+ 
+-    if (is_gles && ! _cairo_gl_has_extension ("GL_EXT_texture_format_BGRA8888"))
+-	return _cairo_error (CAIRO_STATUS_DEVICE_ERROR);
++//    if (is_gles && ! _cairo_gl_has_extension ("GL_EXT_texture_format_BGRA8888"))
++//	return _cairo_error (CAIRO_STATUS_DEVICE_ERROR);
+ 
+     ctx->has_map_buffer =
+ 	is_desktop || (is_gles && _cairo_gl_has_extension ("GL_OES_mapbuffer"));
+diff -Naur cairo-1.14.6/src/cairo-gl-gradient-private.h /Users/Eric/workspace/hemroid/vault/src/cairo-1.14.6/src/cairo-gl-gradient-private.h
+--- cairo-1.14.6/src/cairo-gl-gradient-private.h	2015-10-28 02:34:22.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/cairo-1.14.6/src/cairo-gl-gradient-private.h	2016-03-07 09:40:57.000000000 +0530
+@@ -52,8 +52,8 @@
+ #include "cairo-gl.h"
+ 
+ #if CAIRO_HAS_GL_SURFACE
+-#include <GL/gl.h>
+-#include <GL/glext.h>
++#include <GLES/gl.h>
++#include <GLES/glext.h>
+ #elif CAIRO_HAS_GLESV2_SURFACE
+ #include <GLES2/gl2.h>
+ #include <GLES2/gl2ext.h>
+diff -Naur cairo-1.14.6/src/cairo-gl-private.h /Users/Eric/workspace/hemroid/vault/src/cairo-1.14.6/src/cairo-gl-private.h
+--- cairo-1.14.6/src/cairo-gl-private.h	2015-10-28 02:34:21.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/cairo-1.14.6/src/cairo-gl-private.h	2016-03-07 09:43:34.000000000 +0530
+@@ -61,8 +61,8 @@
+ #include <assert.h>
+ 
+ #if CAIRO_HAS_GL_SURFACE
+-#include <GL/gl.h>
+-#include <GL/glext.h>
++#include <GLES/gl.h>
++#include <GLES/glext.h>
+ #elif CAIRO_HAS_GLESV2_SURFACE
+ #include <GLES2/gl2.h>
+ #include <GLES2/gl2ext.h>

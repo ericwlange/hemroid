@@ -43,6 +43,7 @@
         }
     ],
     "patches" : [
+        "cairo-1.14.6.patch"
     ],
     "api" : {
         "min" : 9

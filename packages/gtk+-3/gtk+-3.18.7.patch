@@ -1,6 +1,6 @@
-diff -Naur gtk+-3.18.7/configure gtk+-3.18.7/configure
+diff -Naur gtk+-3.18.7/configure /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/configure
 --- gtk+-3.18.7/configure	2016-01-28 09:55:26.000000000 +0530
-+++ gtk+-3.18.7/configure	2016-02-02 08:32:11.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/configure	2016-03-07 08:24:08.000000000 +0530
 @@ -25016,7 +25016,7 @@
  if $PKG_CONFIG --exists $PANGO_PACKAGES ; then
          PANGO_CFLAGS=`$PKG_CONFIG --cflags $PANGO_PACKAGES`
@@ -10,9 +10,190 @@ diff -Naur gtk+-3.18.7/configure gtk+-3.18.7/configure
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PANGO_CFLAGS $PANGO_LIBS" >&5
  $as_echo "$PANGO_CFLAGS $PANGO_LIBS" >&6; }
  else
-diff -Naur gtk+-3.18.7/gdk/broadway/broadway-server.c gtk+-3.18.7/gdk/broadway/broadway-server.c
+diff -Naur gtk+-3.18.7/gdk/Makefile.am /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/Makefile.am
+--- gtk+-3.18.7/gdk/Makefile.am	2016-01-07 08:55:56.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/Makefile.am	2016-03-21 08:50:43.000000000 +0530
+@@ -90,7 +90,10 @@
+ 	gdkthreads.h				\
+ 	gdktypes.h				\
+ 	gdkvisual.h				\
+-	gdkwindow.h
++	gdkwindow.h \
++	gdkandroiddisplay.h \
++	gdkandroidevents.h \
++	gdkandroidscreen.h
+ 
+ deprecated_h_sources =				\
+ 	deprecated/gdkcolor.h
+@@ -116,7 +119,10 @@
+ 	gdkintl.h				\
+ 	gdkkeysprivate.h			\
+ 	gdkvisualprivate.h			\
+-	gdkx.h
++	gdkx.h \
++	gdkinput-android.h \
++	gdkprivate-android.h \
++	gdkwindow-android.h
+ 
+ deprecated_c_sources =				\
+ 	deprecated/gdkcolor.c
+@@ -153,7 +159,13 @@
+ 	gdkselection.c				\
+ 	gdkvisual.c				\
+ 	gdkwindow.c				\
+-	gdkwindowimpl.c
++	gdkwindowimpl.c \
++	gdkwindow-android.c \
++	gdkevents-android.c \
++    gdkscreen-android.c \
++    gdkdisplay-android.c \
++    gdkinput-android.c \
++    gdkjni.c
+ 
+ gdk_built_sources = 				\
+ 	gdkenumtypes.h				\
+diff -Naur gtk+-3.18.7/gdk/Makefile.in /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/Makefile.in
+--- gtk+-3.18.7/gdk/Makefile.in	2016-01-28 09:55:22.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/Makefile.in	2016-03-21 08:51:05.000000000 +0530
+@@ -203,7 +203,12 @@
+ 	libgdk_3_la-gdkproperty.lo libgdk_3_la-gdkrectangle.lo \
+ 	libgdk_3_la-gdkrgba.lo libgdk_3_la-gdkscreen.lo \
+ 	libgdk_3_la-gdkselection.lo libgdk_3_la-gdkvisual.lo \
+-	libgdk_3_la-gdkwindow.lo libgdk_3_la-gdkwindowimpl.lo
++	libgdk_3_la-gdkwindow.lo libgdk_3_la-gdkwindowimpl.lo \
++	libgdk_3_la-gdkwindow-android.lo \
++	libgdk_3_la-gdkevents-android.lo \
++	libgdk_3_la-gdkscreen-android.lo \
++	libgdk_3_la-gdkdisplay-android.lo \
++	libgdk_3_la-gdkinput-android.lo libgdk_3_la-gdkjni.lo
+ am__objects_4 = $(am__objects_1) $(am__objects_3) \
+ 	libgdk_3_la-gdkenumtypes.lo libgdk_3_la-gdkmarshalers.lo
+ am_libgdk_3_la_OBJECTS = $(am__objects_4)
+@@ -701,7 +706,10 @@
+ 	gdkthreads.h				\
+ 	gdktypes.h				\
+ 	gdkvisual.h				\
+-	gdkwindow.h
++	gdkwindow.h \
++	gdkandroiddisplay.h \
++	gdkandroidevents.h \
++	gdkandroidscreen.h
+ 
+ deprecated_h_sources = \
+ 	deprecated/gdkcolor.h
+@@ -727,7 +735,10 @@
+ 	gdkintl.h				\
+ 	gdkkeysprivate.h			\
+ 	gdkvisualprivate.h			\
+-	gdkx.h
++	gdkx.h \
++	gdkinput-android.h \
++	gdkprivate-android.h \
++	gdkwindow-android.h
+ 
+ deprecated_c_sources = \
+ 	deprecated/gdkcolor.c
+@@ -764,7 +775,13 @@
+ 	gdkselection.c				\
+ 	gdkvisual.c				\
+ 	gdkwindow.c				\
+-	gdkwindowimpl.c
++	gdkwindowimpl.c \
++	gdkwindow-android.c \
++	gdkevents-android.c \
++    gdkscreen-android.c \
++    gdkdisplay-android.c \
++    gdkinput-android.c \
++    gdkjni.c
+ 
+ gdk_built_sources = \
+ 	gdkenumtypes.h				\
+@@ -1038,10 +1055,12 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkdeprecated.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkdevice.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkdevicemanager.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkdisplay-android.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkdisplay.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkdisplaymanager.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkdnd.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkenumtypes.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkevents-android.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkevents.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkframeclock.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkframeclockidle.Plo@am__quote@
+@@ -1049,6 +1068,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkgl.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkglcontext.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkglobals.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkinput-android.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkjni.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkkeys.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkkeyuni.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkmarshalers.Plo@am__quote@
+@@ -1058,9 +1079,11 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkproperty.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkrectangle.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkrgba.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkscreen-android.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkscreen.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkselection.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkvisual.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkwindow-android.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkwindow.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgdk_3_la-gdkwindowimpl.Plo@am__quote@
+ 
+@@ -1309,6 +1332,48 @@
+ @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -c -o libgdk_3_la-gdkwindowimpl.lo `test -f 'gdkwindowimpl.c' || echo '$(srcdir)/'`gdkwindowimpl.c
+ 
++libgdk_3_la-gdkwindow-android.lo: gdkwindow-android.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -MT libgdk_3_la-gdkwindow-android.lo -MD -MP -MF $(DEPDIR)/libgdk_3_la-gdkwindow-android.Tpo -c -o libgdk_3_la-gdkwindow-android.lo `test -f 'gdkwindow-android.c' || echo '$(srcdir)/'`gdkwindow-android.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgdk_3_la-gdkwindow-android.Tpo $(DEPDIR)/libgdk_3_la-gdkwindow-android.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gdkwindow-android.c' object='libgdk_3_la-gdkwindow-android.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -c -o libgdk_3_la-gdkwindow-android.lo `test -f 'gdkwindow-android.c' || echo '$(srcdir)/'`gdkwindow-android.c
++
++libgdk_3_la-gdkevents-android.lo: gdkevents-android.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -MT libgdk_3_la-gdkevents-android.lo -MD -MP -MF $(DEPDIR)/libgdk_3_la-gdkevents-android.Tpo -c -o libgdk_3_la-gdkevents-android.lo `test -f 'gdkevents-android.c' || echo '$(srcdir)/'`gdkevents-android.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgdk_3_la-gdkevents-android.Tpo $(DEPDIR)/libgdk_3_la-gdkevents-android.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gdkevents-android.c' object='libgdk_3_la-gdkevents-android.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -c -o libgdk_3_la-gdkevents-android.lo `test -f 'gdkevents-android.c' || echo '$(srcdir)/'`gdkevents-android.c
++
++libgdk_3_la-gdkscreen-android.lo: gdkscreen-android.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -MT libgdk_3_la-gdkscreen-android.lo -MD -MP -MF $(DEPDIR)/libgdk_3_la-gdkscreen-android.Tpo -c -o libgdk_3_la-gdkscreen-android.lo `test -f 'gdkscreen-android.c' || echo '$(srcdir)/'`gdkscreen-android.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgdk_3_la-gdkscreen-android.Tpo $(DEPDIR)/libgdk_3_la-gdkscreen-android.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gdkscreen-android.c' object='libgdk_3_la-gdkscreen-android.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -c -o libgdk_3_la-gdkscreen-android.lo `test -f 'gdkscreen-android.c' || echo '$(srcdir)/'`gdkscreen-android.c
++
++libgdk_3_la-gdkdisplay-android.lo: gdkdisplay-android.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -MT libgdk_3_la-gdkdisplay-android.lo -MD -MP -MF $(DEPDIR)/libgdk_3_la-gdkdisplay-android.Tpo -c -o libgdk_3_la-gdkdisplay-android.lo `test -f 'gdkdisplay-android.c' || echo '$(srcdir)/'`gdkdisplay-android.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgdk_3_la-gdkdisplay-android.Tpo $(DEPDIR)/libgdk_3_la-gdkdisplay-android.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gdkdisplay-android.c' object='libgdk_3_la-gdkdisplay-android.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -c -o libgdk_3_la-gdkdisplay-android.lo `test -f 'gdkdisplay-android.c' || echo '$(srcdir)/'`gdkdisplay-android.c
++
++libgdk_3_la-gdkinput-android.lo: gdkinput-android.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -MT libgdk_3_la-gdkinput-android.lo -MD -MP -MF $(DEPDIR)/libgdk_3_la-gdkinput-android.Tpo -c -o libgdk_3_la-gdkinput-android.lo `test -f 'gdkinput-android.c' || echo '$(srcdir)/'`gdkinput-android.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgdk_3_la-gdkinput-android.Tpo $(DEPDIR)/libgdk_3_la-gdkinput-android.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gdkinput-android.c' object='libgdk_3_la-gdkinput-android.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -c -o libgdk_3_la-gdkinput-android.lo `test -f 'gdkinput-android.c' || echo '$(srcdir)/'`gdkinput-android.c
++
++libgdk_3_la-gdkjni.lo: gdkjni.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -MT libgdk_3_la-gdkjni.lo -MD -MP -MF $(DEPDIR)/libgdk_3_la-gdkjni.Tpo -c -o libgdk_3_la-gdkjni.lo `test -f 'gdkjni.c' || echo '$(srcdir)/'`gdkjni.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgdk_3_la-gdkjni.Tpo $(DEPDIR)/libgdk_3_la-gdkjni.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gdkjni.c' object='libgdk_3_la-gdkjni.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -c -o libgdk_3_la-gdkjni.lo `test -f 'gdkjni.c' || echo '$(srcdir)/'`gdkjni.c
++
+ libgdk_3_la-gdkenumtypes.lo: gdkenumtypes.c
+ @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgdk_3_la_CFLAGS) $(CFLAGS) -MT libgdk_3_la-gdkenumtypes.lo -MD -MP -MF $(DEPDIR)/libgdk_3_la-gdkenumtypes.Tpo -c -o libgdk_3_la-gdkenumtypes.lo `test -f 'gdkenumtypes.c' || echo '$(srcdir)/'`gdkenumtypes.c
+ @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgdk_3_la-gdkenumtypes.Tpo $(DEPDIR)/libgdk_3_la-gdkenumtypes.Plo
+diff -Naur gtk+-3.18.7/gdk/broadway/broadway-server.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/broadway/broadway-server.c
 --- gtk+-3.18.7/gdk/broadway/broadway-server.c	2016-01-07 08:55:56.000000000 +0530
-+++ gtk+-3.18.7/gdk/broadway/broadway-server.c	2016-02-02 23:23:20.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/broadway/broadway-server.c	2016-03-07 08:24:08.000000000 +0530
 @@ -829,7 +829,11 @@
    void *ptr;
    char *filename = NULL;
@@ -36,9 +217,9 @@ diff -Naur gtk+-3.18.7/gdk/broadway/broadway-server.c gtk+-3.18.7/gdk/broadway/b
  
    return ptr;
  
-diff -Naur gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c
+diff -Naur gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c
 --- gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c	2016-01-07 08:55:56.000000000 +0530
-+++ gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c	2016-02-02 23:33:18.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c	2016-03-07 08:24:08.000000000 +0530
 @@ -533,7 +533,11 @@
    void *ptr;
    int res;
@@ -74,3 +255,4028 @@ diff -Naur gtk+-3.18.7/gdk/broadway/gdkbroadway-server.c gtk+-3.18.7/gdk/broadwa
    else
      {
        char *filename = g_build_filename (g_get_tmp_dir (), data->name, NULL);
+diff -Naur gtk+-3.18.7/gdk/gdk.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdk.h
+--- gtk+-3.18.7/gdk/gdk.h	2016-01-07 08:55:56.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdk.h	2016-03-07 13:15:45.000000000 +0530
+@@ -57,6 +57,9 @@
+ #include <gdk/gdktypes.h>
+ #include <gdk/gdkvisual.h>
+ #include <gdk/gdkwindow.h>
++#include <gdk/gdkandroiddisplay.h>
++#include <gdk/gdkandroidevents.h>
++#include <gdk/gdkandroidscreen.h>
+ 
+ #ifndef GDK_DISABLE_DEPRECATED
+ #include <gdk/deprecated/gdkcolor.h>
+diff -Naur gtk+-3.18.7/gdk/gdkandroiddisplay.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkandroiddisplay.h
+--- gtk+-3.18.7/gdk/gdkandroiddisplay.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkandroiddisplay.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,54 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// ANativeWindow-based GDK display declaration
++
++#ifndef __GDK_ANDROID_DISPLAY_H__
++#define __GDK_ANDROID_DISPLAY_H__
++
++#if !defined (__GDK_H_INSIDE__) && !defined (GDK_COMPILATION)
++#error "Only <gdk/gdk.h> can be included directly."
++#endif
++
++#include <gdk/gdkversionmacros.h>
++#include <android_native_app_glue.h>
++
++G_BEGIN_DECLS
++
++typedef struct GdkAndroidDisplay GdkAndroidDisplay;
++typedef struct GdkAndroidDisplayClass GdkAndroidDisplayClass;
++
++#define GDK_TYPE_ANDROID_DISPLAY              (gdk_android_display_get_type())
++#define GDK_ANDROID_DISPLAY(object)           (G_TYPE_CHECK_INSTANCE_CAST ((object), GDK_TYPE_ANDROID_DISPLAY, GdkAndroidDisplay))
++#define GDK_ANDROID_DISPLAY_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), GDK_TYPE_ANDROID_DISPLAY, GdkAndroidDisplayClass))
++#define GDK_IS_ANDROID_DISPLAY(object)        (G_TYPE_CHECK_INSTANCE_TYPE ((object), GDK_TYPE_ANDROID_DISPLAY))
++
++GType gdk_android_display_get_type(void);
++
++gboolean gdk_android_init_display(struct android_app *app,
++                                  GError **error);
++gboolean gdk_android_term_display();
++struct android_app *_gdk_android_display_get_app(GdkDisplay *display);
++
++#define GDK_ANDROID_ERROR  g_quark_from_static_string ("gdk-android")
++
++enum GDKAndroidErrorCode
++{
++    GDK_ANDROID_ERROR_INIT = 1
++};
++
++GDK_AVAILABLE_IN_ALL
++const gchar *gdk_android_get_default_font();
++
++G_END_DECLS
++
++#endif /* __GDK_ANDROID_DISPLAY_H__ */
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkandroidevents.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkandroidevents.h
+--- gtk+-3.18.7/gdk/gdkandroidevents.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkandroidevents.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,34 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// Android<->GDK events conversion & interoperability interface
++
++#ifndef __GDK_ANDROID_EVENTS_H__
++#define __GDK_ANDROID_EVENTS_H__
++
++#if !defined (__GDK_H_INSIDE__) && !defined (GDK_COMPILATION)
++#error "Only <gdk/gdk.h> can be included directly."
++#endif
++
++#include <gdk/gdkversionmacros.h>
++#include <android_native_app_glue.h>
++
++G_BEGIN_DECLS
++
++GDK_AVAILABLE_IN_ALL
++gboolean gdk_android_process_events_until_display_ready(struct android_app *app);
++GDK_AVAILABLE_IN_ALL
++void gdk_android_setup_app_callbacks(struct android_app *state, void (*onStop)());
++
++G_END_DECLS
++
++#endif // __GDK_ANDROID_EVENTS_H__
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkandroidscreen.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkandroidscreen.h
+--- gtk+-3.18.7/gdk/gdkandroidscreen.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkandroidscreen.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,40 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// ANativeWindow-based GDK screen declaration
++
++#ifndef __GDK_ANDROID_SCREEN_H__
++#define __GDK_ANDROID_SCREEN_H__
++
++#if !defined (__GDK_H_INSIDE__) && !defined (GDK_COMPILATION)
++#error "Only <gdk/gdk.h> can be included directly."
++#endif
++
++#include <gdk/gdkversionmacros.h>
++#include <android_native_app_glue.h>
++
++G_BEGIN_DECLS
++
++#define GDK_TYPE_ANDROID_SCREEN              (gdk_android_screen_get_type ())
++#define GDK_ANDROID_SCREEN(object)           (G_TYPE_CHECK_INSTANCE_CAST ((object), GDK_TYPE_ANDROID_SCREEN, GdkAndroidScreen))
++#define GDK_ANDROID_SCREEN_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), GDK_TYPE_ANDROID_SCREEN, GdkAndroidScreenClass))
++#define GDK_IS_ANDROID_SCREEN(object)        (G_TYPE_CHECK_INSTANCE_TYPE ((object), GDK_TYPE_ANDROID_SCREEN))
++
++typedef struct GdkAndroidScreen GdkAndroidScreen;
++typedef struct GdkAndroidScreenClass GdkAndroidScreenClass;
++
++GDK_AVAILABLE_IN_ALL
++GType gdk_android_screen_get_type(void);
++
++G_END_DECLS
++
++#endif /* __GDK_ANDROID_SCREEN_H__ */
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkdisplay-android.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkdisplay-android.c
+--- gtk+-3.18.7/gdk/gdkdisplay-android.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkdisplay-android.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,496 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// ANativeWindow-based GDK display definition
++
++#include "config.h"
++
++#include <jni.h>
++
++#include <android/native_window.h>
++#include <android/native_activity.h>
++#include <android_native_app_glue.h>
++
++#include <cairo-gl.h>
++
++#include "gdk.h"
++#include "gdkvisualprivate.h"
++#include "gdkprivate-android.h"
++#include "gdkandroiddisplay.h"
++#include "gdkandroidscreen.h"
++#include "gdkwindow-android.h"
++#include "gdkinput-android.h"
++
++
++struct GdkAndroidDisplay *_gdk_display = NULL;
++struct GdkAndroidScreen  *_gdk_screen = NULL;
++
++extern void FcConfigSetupAndroidCacheDir(const char *dir); // defined in ../fonconfig/fcinit_android.c
++
++///////////////////////////////////////////////////////////////////////////////////////
++// Display
++
++struct GdkAndroidDisplayClass
++{
++    GdkDisplayClass display_class;
++};
++
++G_DEFINE_TYPE(GdkAndroidDisplay, gdk_android_display, GDK_TYPE_DISPLAY)
++
++static gulong gdk_android_display_get_next_serial(GdkDisplay *display)
++{
++	return 0;
++}
++
++static const gchar *gdk_android_display_get_name(GdkDisplay *display)
++{
++    return "ANativeWindow";
++}
++
++static GdkScreen *gdk_android_display_get_default_screen(GdkDisplay *display)
++{
++    g_return_val_if_fail (GDK_IS_ANDROID_DISPLAY(display), NULL);
++    return &_gdk_screen->screen;
++}
++
++
++static GdkWindow *gdk_android_display_get_default_group(GdkDisplay *display)
++{
++    g_return_val_if_fail (GDK_IS_ANDROID_DISPLAY(display), NULL);
++    return NULL;
++}
++
++static gboolean gdk_android_display_supports_selection_notification(GdkDisplay *display)
++{
++    return FALSE;
++}
++
++static gboolean gdk_android_display_request_selection_notification(GdkDisplay *display,
++						                                           GdkAtom     selection)
++
++{
++    return FALSE;
++}
++
++static gboolean gdk_android_display_supports_clipboard_persistence(GdkDisplay *display)
++{
++    return FALSE;
++}
++
++static void gdk_android_display_store_clipboard(GdkDisplay    *display,
++			                                    GdkWindow     *clipboard_window,
++			                                    guint32        time_,
++			                                    const GdkAtom *targets,
++			                                    gint           n_targets)
++{
++}
++
++static gboolean gdk_android_display_supports_shapes(GdkDisplay *display)
++{
++    return FALSE;
++}
++
++static gboolean gdk_android_display_supports_input_shapes(GdkDisplay *display)
++{
++    return FALSE;
++}
++
++static gboolean gdk_android_display_supports_composite(GdkDisplay *display)
++{
++  return FALSE;
++}
++
++static void gdk_android_display_beep(GdkDisplay *display)
++{
++    // TODO
++}
++
++static void gdk_android_display_flush(GdkDisplay * display)
++{
++    g_return_if_fail (GDK_IS_ANDROID_DISPLAY(display));
++
++    //g_info("flush called");
++
++    //cairo_gl_surface_swapbuffers(GDK_ANDROID_DISPLAY(display)->cairoSurface);
++}
++
++
++static void gdk_android_display_sync(GdkDisplay * display)
++{
++    g_return_if_fail(GDK_IS_ANDROID_DISPLAY(display));
++}
++
++static void gdk_android_display_dispose(GObject *object)
++{
++    G_OBJECT_CLASS(gdk_android_display_parent_class)->dispose(object);
++}
++
++static void gdk_android_display_finalize(GObject *object)
++{
++    GdkAndroidDisplay *d = GDK_ANDROID_DISPLAY(object);
++
++    if (d->defaultFont)
++        g_free(d->defaultFont);
++
++    if (d->cachePath)
++        g_free(d->cachePath);
++        
++    if (d->filesPath)
++        g_free(d->filesPath);
++
++    G_OBJECT_CLASS(gdk_android_display_parent_class)->finalize(object);
++}
++
++static void gdk_android_display_init(GdkAndroidDisplay *d)
++{
++    d->app = NULL;
++    d->eglDisplay = EGL_NO_DISPLAY;
++    d->eglContext = EGL_NO_CONTEXT;
++    d->eglSurface = EGL_NO_SURFACE;
++    d->cairoDevice = NULL;
++    d->cairoSurface = NULL;
++    d->defaultFont = NULL;
++    d->cachePath = NULL;
++    d->filesPath = NULL;
++    d->notificationBarHeight = 25;
++}
++
++
++static void gdk_android_display_before_process_all_updates(GdkDisplay  *display)
++{
++}
++
++static void gdk_android_display_after_process_all_updates(GdkDisplay  *display)
++{
++}
++static void gdk_android_display_notify_startup_complete(GdkDisplay  *display,
++                                                         const gchar *startup_id)
++{
++}
++
++static void gdk_android_display_event_data_copy(GdkDisplay    *display,
++                                                const GdkEvent *src,
++                                                GdkEvent       *dst)
++{
++}
++
++static void gdk_android_display_event_data_free(GdkDisplay *display,
++                                                GdkEvent *event)
++{
++}
++
++static void gdk_android_display_push_error_trap(GdkDisplay *display)
++{
++}
++
++static gint gdk_android_display_pop_error_trap(GdkDisplay *display,
++				                               gboolean    ignored)
++{
++    return 0;
++}
++
++static GList *_gdk_android_display_list_devices(GdkDisplay *dpy)
++{
++    g_debug("_gdk_android_display_list_devices is called");
++    return NULL;
++}
++
++static GdkCursor *_gdk_android_display_get_cursor_for_type(GdkDisplay *display,
++                                                           GdkCursorType cursor_type)
++{
++    g_debug("_gdk_android_display_get_cursor_for_type is called");
++    return NULL;
++}
++
++static GdkCursor *_gdk_android_display_get_cursor_for_name(GdkDisplay *display,
++                                                           const gchar *name)
++{
++    return NULL;
++}
++
++static GdkCursor *_gdk_android_display_get_cursor_for_surface(GdkDisplay *display,
++                                                              cairo_surface_t  *surface,
++                                                              gdouble x,
++                                                              gdouble y)
++{
++    return NULL;
++}
++
++static void _gdk_android_display_get_default_cursor_size(GdkDisplay *display,
++                                                         guint *width,
++                                                         guint *height)
++{
++    if (width)
++        *width = 1;
++    if (height)
++        *height = 0;
++}
++
++#define _gdk_android_display_get_maximal_cursor_size _gdk_android_display_get_default_cursor_size
++
++static gboolean _gdk_android_display_supports_cursor_alpha(GdkDisplay *display)
++{
++    return FALSE;
++}
++
++#define _gdk_android_display_supports_cursor_color _gdk_android_display_supports_cursor_alpha
++
++static GdkWindow *_gdk_android_display_get_selection_owner(GdkDisplay *display,
++                                                           GdkAtom selection)
++{
++    g_debug("_gdk_android_display_get_selection_owner is called");
++    return NULL;
++}
++
++static gboolean _gdk_android_display_set_selection_owner(GdkDisplay *display,
++                                                         GdkWindow  *owner,
++                                                         GdkAtom     selection,
++                                                         guint32     time,
++                                                         gboolean    send_event)
++{
++    g_debug("_gdk_android_display_set_selection_owner is called");
++    return FALSE;
++}
++
++static void _gdk_android_display_send_selection_notify(GdkDisplay   *display,
++                                                       GdkWindow    *requestor,
++                                                       GdkAtom       selection,
++                                                       GdkAtom       target,
++                                                       GdkAtom       property,
++                                                       guint32       time)
++{
++    g_debug("_gdk_android_display_send_selection_notify is called");
++}
++
++static gint _gdk_android_display_get_selection_property(GdkDisplay *display,
++                                                        GdkWindow  *requestor,
++                                                        guchar    **data,
++                                                        GdkAtom    *ret_type,
++                                                        gint       *ret_format)
++{
++    g_debug("_gdk_android_display_send_selection_notify is called");
++    return 0;
++}
++
++static void _gdk_android_display_convert_selection(GdkDisplay *display,
++                                                   GdkWindow *requestor,
++                                                   GdkAtom    selection,
++                                                   GdkAtom    target,
++                                                   guint32    time)
++{
++    g_debug("_gdk_android_display_convert_selection is called");
++}
++
++static gint _gdk_android_display_text_property_to_utf8_list(GdkDisplay    *display,
++                                                            GdkAtom        encoding,
++                                                            gint           format,
++                                                            const guchar  *text,
++                                                            gint           length,
++                                                            gchar       ***list)
++{
++    g_debug("_gdk_android_display_text_property_to_utf8_list is called");
++    return 0;
++}
++
++static gchar *_gdk_android_display_utf8_to_string_target(GdkDisplay  *display,
++                                                         const gchar *str)
++{
++    g_debug("_gdk_android_display_utf8_to_string_target is called");
++    return NULL;
++}
++
++static void gdk_android_display_class_init (GdkAndroidDisplayClass *klass)
++{
++    GObjectClass *object_class = G_OBJECT_CLASS(klass);
++    GdkDisplayClass *display_class = GDK_DISPLAY_CLASS(klass);
++
++    object_class->dispose = gdk_android_display_dispose;
++    object_class->finalize = gdk_android_display_finalize;
++
++    display_class->window_type = GDK_TYPE_ANDROID_WINDOW;
++
++    display_class->get_name = gdk_android_display_get_name;
++    display_class->get_default_screen = gdk_android_display_get_default_screen;
++    display_class->beep = gdk_android_display_beep;
++    display_class->sync = gdk_android_display_sync;
++    display_class->flush = gdk_android_display_flush;
++    display_class->has_pending = _gdk_android_display_has_pending;
++    display_class->queue_events = _gdk_android_display_queue_events;
++    display_class->get_default_group = gdk_android_display_get_default_group;
++
++    display_class->supports_selection_notification = gdk_android_display_supports_selection_notification;
++    display_class->request_selection_notification = gdk_android_display_request_selection_notification;
++    display_class->supports_clipboard_persistence = gdk_android_display_supports_clipboard_persistence;
++    display_class->store_clipboard = gdk_android_display_store_clipboard;
++    display_class->supports_shapes = gdk_android_display_supports_shapes;
++    display_class->supports_input_shapes = gdk_android_display_supports_input_shapes;
++    display_class->supports_composite = gdk_android_display_supports_composite;
++
++    display_class->list_devices = _gdk_android_display_list_devices;
++    display_class->get_cursor_for_type = _gdk_android_display_get_cursor_for_type;
++    display_class->get_cursor_for_name = _gdk_android_display_get_cursor_for_name;
++    display_class->get_cursor_for_surface = _gdk_android_display_get_cursor_for_surface;
++    display_class->get_default_cursor_size = _gdk_android_display_get_default_cursor_size;
++    display_class->get_maximal_cursor_size = _gdk_android_display_get_maximal_cursor_size;
++    display_class->supports_cursor_alpha = _gdk_android_display_supports_cursor_alpha;
++    display_class->supports_cursor_color = _gdk_android_display_supports_cursor_color;
++
++    display_class->before_process_all_updates = gdk_android_display_before_process_all_updates;
++    display_class->after_process_all_updates = gdk_android_display_after_process_all_updates;
++    display_class->get_next_serial = gdk_android_display_get_next_serial;
++    display_class->notify_startup_complete = gdk_android_display_notify_startup_complete;
++    display_class->event_data_copy = gdk_android_display_event_data_copy;
++    display_class->event_data_free = gdk_android_display_event_data_free;
++    display_class->create_window_impl = _gdk_android_display_create_window_impl;
++
++    display_class->get_keymap = _gdk_android_display_get_keymap;
++    display_class->push_error_trap = gdk_android_display_push_error_trap;
++    display_class->pop_error_trap = gdk_android_display_pop_error_trap;
++    display_class->get_selection_owner = _gdk_android_display_get_selection_owner;
++    display_class->set_selection_owner = _gdk_android_display_set_selection_owner;
++    display_class->send_selection_notify = _gdk_android_display_send_selection_notify;
++    display_class->get_selection_property = _gdk_android_display_get_selection_property;
++    display_class->convert_selection = _gdk_android_display_convert_selection;
++    display_class->text_property_to_utf8_list = _gdk_android_display_text_property_to_utf8_list;
++    display_class->utf8_to_string_target = _gdk_android_display_utf8_to_string_target;
++}
++
++gboolean gdk_android_init_display(struct android_app *app, GError **error)
++{
++    const EGLint attribs[] = {
++                                EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
++                                EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
++                                EGL_BLUE_SIZE, 8,
++                                EGL_GREEN_SIZE, 8,
++                                EGL_RED_SIZE, 8,
++                                EGL_NONE
++                             };
++    const EGLint ctxAttribs[] = {
++                                    // request a context using Open GL ES 2.0
++                                    EGL_CONTEXT_CLIENT_VERSION, 2,
++                                    EGL_NONE
++                                };
++    EGLint w, h, format;
++    EGLint numConfigs;
++    EGLConfig config;
++    GdkAndroidDisplay *d;
++    GdkAndroidScreen *s;
++
++    if (_gdk_display)
++        return TRUE;
++
++    d = _gdk_display = GDK_ANDROID_DISPLAY(g_object_new(GDK_TYPE_ANDROID_DISPLAY, NULL));
++    s = _gdk_screen =  GDK_ANDROID_SCREEN(g_object_new(GDK_TYPE_ANDROID_SCREEN, NULL));
++    d->app = app;
++
++    // Initialize EGL
++    d->eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
++
++    eglInitialize(d->eglDisplay, 0, 0);
++    eglChooseConfig(d->eglDisplay, attribs, &config, 1, &numConfigs);
++    eglGetConfigAttrib(d->eglDisplay, config, EGL_NATIVE_VISUAL_ID, &format);
++    ANativeWindow_setBuffersGeometry(app->window, 0, 0, format);
++
++    d->eglSurface = eglCreateWindowSurface(d->eglDisplay, config, app->window, NULL);
++    d->eglContext = eglCreateContext(d->eglDisplay, config, NULL, ctxAttribs);
++    eglSurfaceAttrib(d->eglDisplay, d->eglSurface, EGL_SWAP_BEHAVIOR, EGL_BUFFER_PRESERVED);
++
++    if (eglMakeCurrent(d->eglDisplay, d->eglSurface, d->eglSurface, d->eglContext) == EGL_FALSE)
++    {
++        g_set_error(error, GDK_ANDROID_ERROR, GDK_ANDROID_ERROR_INIT,
++                    "Unable to eglMakeCurrent at %s:%u",
++                    __FILE__, __LINE__);
++        return FALSE;
++    }
++    eglQuerySurface(d->eglDisplay, d->eglSurface, EGL_WIDTH, &w);
++    eglQuerySurface(d->eglDisplay, d->eglSurface, EGL_HEIGHT, &h);
++
++    g_info("%s - %dx%d (Window - %dx%d)", glGetString(GL_VERSION), w, h,
++           ANativeWindow_getWidth(app->window), ANativeWindow_getHeight(app->window));
++    g_info("%s", glGetString(GL_EXTENSIONS));
++
++    // Initialize GL state.
++    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
++
++    // Initialize Cairo
++    d->cairoDevice = cairo_egl_device_create(d->eglDisplay, d->eglContext);
++    if (cairo_device_status(d->cairoDevice))
++    {
++        g_set_error(error, GDK_ANDROID_ERROR, GDK_ANDROID_ERROR_INIT,
++                    "Could not create cairo_device: %s (%s:%u)",
++                    cairo_status_to_string(cairo_device_status(d->cairoDevice)),
++                    __FILE__, __LINE__);
++        return FALSE;
++    }
++    d->cairoSurface = cairo_gl_surface_create_for_egl(d->cairoDevice, d->eglSurface, w, h);
++    if (cairo_surface_status(d->cairoSurface))
++    {
++        g_set_error(error, GDK_ANDROID_ERROR, GDK_ANDROID_ERROR_INIT,
++                    "Could not create cairo_surface %s:%u: %s",
++                    __FILE__, __LINE__, cairo_status_to_string(cairo_surface_status(d->cairoSurface)));
++        return FALSE;
++    }
++
++    // screen
++    if (!gdk_android_init_screen(s, app->activity, error))
++        return FALSE;
++    if (!gdk_android_adjust_with_jni(s, d, app->activity, error))
++        return FALSE;
++
++
++    // input
++    gdk_android_input_init(&d->display);
++    gdk_android_events_init();
++
++    // font
++    // the following dpi -> sp conversion formula came from
++    // http://developer.android.com/design/style/typography.html
++    // TODO: respect user-defined global text scale here
++//    d->defaultFont = g_strdup_printf("Roboto %d", (int) (14.0 * s->screen.resolution / 160));
++    d->defaultFont = g_strdup_printf("Roboto 14");
++    FcConfigSetupAndroidCacheDir(d->cachePath); // d->cachePath is set by gdk_android_adjust_with_jni
++    char dir[128];
++    sprintf(dir, "%s/share", d->filesPath);
++    g_setenv("XDG_DATA_DIRS", dir, TRUE);
++
++    // finalize
++    (void) gdk_display_get_name(&d->display); // Precalculate display name
++    d->notificationBarHeight = (int) (s->ydpi * 25 / 160);
++    g_signal_emit_by_name(d, "opened");
++
++    return TRUE;
++}
++
++gboolean gdk_android_term_display()
++{
++    GdkAndroidDisplay *d = _gdk_display;
++
++    if (d->eglDisplay != EGL_NO_DISPLAY)
++    {
++        eglMakeCurrent(d->eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
++        if (d->eglContext != EGL_NO_CONTEXT)
++            eglDestroyContext(d->eglDisplay, d->eglContext);
++        if (d->eglSurface != EGL_NO_SURFACE)
++            eglDestroySurface(d->eglDisplay, d->eglSurface);
++        eglTerminate(d->eglDisplay);
++    }
++    d->eglDisplay = EGL_NO_DISPLAY;
++    d->eglContext = EGL_NO_CONTEXT;
++    d->eglSurface = EGL_NO_SURFACE;
++
++    return TRUE;
++}
++
++const gchar *gdk_android_get_default_font()
++{
++    return _gdk_display->defaultFont;
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkevents-android.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkevents-android.c
+--- gtk+-3.18.7/gdk/gdkevents-android.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkevents-android.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,301 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// Android->GDK events conversion code
++
++#include "config.h"
++
++#include <jni.h>
++
++#include <android/sensor.h>
++#include <android_native_app_glue.h>
++
++#include "gdk.h"
++#include "gdkdisplayprivate.h"
++#include "gdkprivate-android.h"
++#include "gdkandroiddisplay.h"
++#include "gdkinput-android.h"
++
++static void (*gdk_android_stop)(void) = NULL;
++static ASensorEventQueue *sensorEventQueue = NULL;
++static const ASensor* accelerometerSensor = NULL;
++
++
++static gboolean gdk_android_event_prepare(GSource *source, gint *timeout)
++{
++    gboolean retval;
++
++    gdk_threads_enter();
++
++    retval = _gdk_event_queue_find_first(GDK_DISPLAY(_gdk_display)) != NULL;
++    if (timeout)
++        *timeout = 100;
++
++    gdk_threads_leave();
++
++    return retval;
++}
++
++static gboolean gdk_android_event_check(GSource *source)
++{
++    gboolean retval;
++    struct android_app *app = _gdk_display->app;
++    int astate = app->activityState;
++
++    gdk_threads_enter();
++
++    retval = _gdk_event_queue_find_first(GDK_DISPLAY(_gdk_display)) != NULL;
++
++    if (!retval && astate != APP_CMD_PAUSE && astate != APP_CMD_STOP)
++    {
++        int ident, events;
++        struct android_poll_source *asource;
++        // Read all pending events.
++        while ((ident = ALooper_pollAll(0, NULL, &events, (void**) &asource)) >= 0)
++        {
++            // Process this event.
++            if (asource != NULL)
++                asource->process(app, asource);
++
++            if (ident == LOOPER_ID_USER)
++            {
++                if (sensorEventQueue != NULL)
++                {
++                    ASensorEvent event;
++                    while (ASensorEventQueue_getEvents(sensorEventQueue, &event, 1) > 0)
++                    {
++                        g_debug("sensor event received");
++                    }
++                }
++            }
++
++            if (app->destroyRequested != 0 && gdk_android_stop)
++            {
++                gdk_android_stop();
++                break;
++            }
++        }
++    }
++
++    gdk_threads_leave();
++
++    return retval;
++}
++
++static gboolean gdk_android_event_dispatch(GSource *source, GSourceFunc callback, gpointer user_data)
++{
++    GdkEvent *event;
++
++    gdk_threads_enter();
++
++    event = _gdk_event_unqueue(GDK_DISPLAY(_gdk_display));
++
++    if (event)
++    {
++        _gdk_event_emit(event);
++        gdk_event_free(event);
++    }
++
++    gdk_threads_leave();
++
++    return TRUE;
++}
++
++void gdk_android_events_init()
++{
++    static GSourceFuncs event_funcs = {
++        gdk_android_event_prepare,
++        gdk_android_event_check,
++        gdk_android_event_dispatch,
++        NULL
++    };
++
++    GSource *source = g_source_new(&event_funcs, sizeof(GSource));
++    g_source_set_name(source, "Android ALooper event source");
++    g_source_set_priority(source, GDK_PRIORITY_EVENTS);
++    g_source_set_can_recurse(source, TRUE);
++    g_source_attach(source, NULL);
++}
++
++gboolean _gdk_android_display_has_pending(GdkDisplay *display)
++{
++    g_debug("_gdk_android_display_has_pending is called");
++    return _gdk_event_queue_find_first(display) != NULL;
++}
++
++void _gdk_android_display_queue_events(GdkDisplay *display)
++{
++    int ident;
++    int events;
++    struct android_poll_source* source;
++    struct android_app *state = GDK_ANDROID_DISPLAY(display)->app;
++    // Read all pending events.
++    while ((ident = ALooper_pollAll(0, NULL, &events, (void**) &source)) >= 0)
++    {
++        // Process this event.
++        if (source != NULL)
++            source->process(state, source);
++
++        // Check if we are exiting.
++        if (state->destroyRequested != 0)
++        {
++            gdk_android_term_display();
++            return;
++        }
++    }
++}
++
++void gdk_android_handle_glue_cmd(struct android_app* app, int32_t cmd)
++{
++    GError *err = NULL;
++    //GTKAndroidInitPhase *engine = (GTKAndroidInitPhase *) app->userData;
++    switch (cmd)
++    {
++        case APP_CMD_SAVE_STATE:
++            // The system has asked us to save our current state.  Do so.
++            app->savedState = NULL;
++            app->savedStateSize = 0;
++            break;
++        case APP_CMD_INIT_WINDOW:
++            // The window is being shown, get it ready.
++            if (app->window != NULL && !gdk_android_init_display(app, &err))
++            {
++                g_error("%s", err->message);
++                g_error_free(err);
++            }
++            break;
++        case APP_CMD_TERM_WINDOW:
++            if (gdk_android_stop)
++                gdk_android_stop();
++            break;
++        case APP_CMD_PAUSE:
++        case APP_CMD_STOP:
++            if (gdk_android_stop)
++                gdk_android_stop();
++            break;
++        case APP_CMD_GAINED_FOCUS:
++            // When our app gains focus, we start monitoring the accelerometer.
++            if (accelerometerSensor != NULL)
++            {
++                ASensorEventQueue_enableSensor(sensorEventQueue, accelerometerSensor);
++                ASensorEventQueue_setEventRate(sensorEventQueue, accelerometerSensor, 0.5);
++            }
++            break;
++        case APP_CMD_LOST_FOCUS:
++            // When our app loses focus, we stop monitoring the accelerometer.
++            // This is to avoid consuming battery while not being used.
++            if (accelerometerSensor != NULL)
++                ASensorEventQueue_disableSensor(sensorEventQueue, accelerometerSensor);
++            break;
++
++    }
++}
++
++static void onLowMemory(ANativeActivity* activity) {
++    struct android_app* android_app = (struct android_app*)activity->instance;
++    g_info("LowMemory: %p\n", activity);
++    //android_app_write_cmd(android_app, APP_CMD_LOW_MEMORY);
++}
++
++static void onNativeWindowResized(ANativeActivity* activity, ANativeWindow* window) {
++    g_info("NativeWindowResized: %p -- %p\n", activity, window);
++    //android_app_write_cmd((struct android_app*)activity->instance, APP_CMD_WINDOW_RESIZED);
++}
++
++static void onNativeWindowRedrawNeeded(ANativeActivity* activity, ANativeWindow* window) {
++    g_info("NativeWindowRedrawNeeded: %p -- %p\n", activity, window);
++    //android_app_wait_redraw((struct android_app*)activity->instance);
++}
++
++static void onContentRectChanged(ANativeActivity* activity, const ARect* rect) {
++    g_info("ContentRectChanged: %p -- (%d,%d)-(%d,%d)\n", activity, rect->left,
++           rect->top, rect->right, rect->bottom);
++    //android_app_set_content_rect((struct android_app*)activity->instance, rect);
++}
++
++void gdk_android_setup_app_callbacks(struct android_app *state, void (*onStop)())
++{
++    if (0)
++    {
++        ASensorManager* sensorManager = NULL;
++
++        sensorManager = ASensorManager_getInstance();
++        accelerometerSensor = ASensorManager_getDefaultSensor(sensorManager,
++                                                              ASENSOR_TYPE_ACCELEROMETER);
++        sensorEventQueue = ASensorManager_createEventQueue(sensorManager, state->looper,
++                                                           LOOPER_ID_USER, NULL, NULL);
++    }
++
++    gdk_android_stop = onStop;
++
++    state->onAppCmd = gdk_android_handle_glue_cmd;
++    state->activity->callbacks->onNativeWindowResized = onNativeWindowResized;
++    state->activity->callbacks->onNativeWindowRedrawNeeded = onNativeWindowRedrawNeeded;
++    state->activity->callbacks->onContentRectChanged = onContentRectChanged;
++    state->activity->callbacks->onLowMemory = onLowMemory;
++    // TODO: consider overriding state->inputPollSource.process instead of the following
++    //       or should we even get rid of this native_app for good?
++    state->onInputEvent = android_handle_input;
++}
++
++gboolean gdk_android_process_events_until_display_ready(struct android_app *app)
++{
++    int ident;
++    int events;
++    struct android_poll_source* source;
++    while (1)
++    {
++        // Read all pending events.
++        while ((ident = ALooper_pollAll(0, NULL, &events, (void**)&source)) >= 0)
++        {
++            // Process this event.
++            if (source != NULL)
++                source->process(app, source);
++
++            // Check if we are exiting.
++            if (app->destroyRequested != 0)
++            {
++                gdk_android_term_display();
++                return FALSE;
++            }
++
++            if (_gdk_display)
++                return TRUE;
++        }
++    }
++}
++
++GdkKeymap *_gdk_android_display_get_keymap(GdkDisplay *display)
++{
++    g_debug("_gdk_android_display_get_keymap is called");
++    return NULL;
++}
++
++gboolean _gdk_android_window_simulate_key(GdkWindow      *window,
++                                          gint            x,
++                                          gint            y,
++                                          guint           keyval,
++                                          GdkModifierType modifiers,
++                                          GdkEventType    key_pressrelease)
++{
++    return FALSE;
++}
++
++gboolean _gdk_android_window_simulate_button(GdkWindow      *window,
++                                             gint            x,
++                                             gint            y,
++                                             guint           button, // 1..3
++                                             GdkModifierType modifiers,
++                                             GdkEventType    button_pressrelease)
++{
++    return FALSE;
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkinput-android.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkinput-android.c
+--- gtk+-3.18.7/gdk/gdkinput-android.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkinput-android.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,415 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// Inputs handlers and device manager
++
++#include "config.h"
++
++#include <jni.h>
++
++#include <android/native_activity.h>
++#include <android_native_app_glue.h>
++
++#include "gdk.h"
++#include "gdkvisualprivate.h"
++#include "gdkprivate-android.h"
++#include "gdkinput-android.h"
++#include "gdkdeviceprivate.h"
++
++GList            *_gdk_input_devices;
++
++//////////////////////////////////////////////////////////////////
++// device class
++
++typedef GdkDevice GdkAndroidDevice;
++
++typedef struct GdkAndroidDeviceClass
++{
++    GdkDeviceClass parent_class;
++} GdkAndroidDeviceClass;
++
++G_DEFINE_TYPE(GdkAndroidDevice, gdk_android_device, GDK_TYPE_DEVICE)
++
++#define GDK_TYPE_ANDROID_DEVICE         (gdk_android_device_get_type ())
++#define GDK_ANDROID_DEVICE(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), GDK_TYPE_ANDROID_DEVICE, GdkAndroidDevice))
++#define GDK_ANDROID_DEVICE_CLASS(c)     (G_TYPE_CHECK_CLASS_CAST ((c), GDK_TYPE_ANDROID_DEVICE, GdkAndroidDeviceClass))
++#define GDK_IS_ANDROID_DEVICE(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), GDK_TYPE_ANDROID_DEVICE))
++#define GDK_IS_ANDROID_DEVICE_CLASS(c)  (G_TYPE_CHECK_CLASS_TYPE ((c), GDK_TYPE_ANDROID_DEVICE))
++#define GDK_ANDROID_DEVICE_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), GDK_TYPE_ANDROID_DEVICE, GdkAndroidDeviceClass))
++
++static gboolean gdk_android_device_get_history(GdkDevice      *device,
++                                               GdkWindow      *window,
++                                               guint32         start,
++                                               guint32         stop,
++                                               GdkTimeCoord ***events,
++                                               gint           *n_events)
++{
++    return FALSE;
++}
++
++static void gdk_android_device_get_state(GdkDevice       *device,
++                                         GdkWindow       *window,
++                                         gdouble         *axes,
++                                         GdkModifierType *mask)
++{
++    gdouble x, y;
++
++    gdk_window_get_device_position_double(window, device, &x, &y, mask);
++    if (axes)
++    {
++        axes[0] = x;
++        axes[1] = y;
++    }
++}
++
++static void gdk_android_device_set_window_cursor(GdkDevice *device,
++                                                 GdkWindow *window,
++                                                 GdkCursor *cursor)
++{
++}
++
++static void gdk_android_device_warp(GdkDevice *device,
++                                    GdkScreen *screen,
++                                    gdouble    x,
++                                    gdouble    y)
++{
++}
++
++static void
++gdk_android_device_query_state (GdkDevice        *device,
++                                GdkWindow        *window,
++                                GdkWindow       **root_window,
++                                GdkWindow       **child_window,
++                                gdouble          *root_x,
++                                gdouble          *root_y,
++                                gdouble          *win_x,
++                                gdouble          *win_y,
++                                GdkModifierType  *mask)
++{
++    if (root_window)
++        *root_window = _gdk_screen->root_window;
++    if (child_window)
++        *child_window = NULL;
++    if (mask)
++        *mask = 0;
++    if (win_x)
++        *win_x = 0;
++    if (win_y)
++        *win_y = 0;
++    if (root_x)
++        *root_x = 0;
++    if (root_y)
++        *root_y = 0;
++}
++
++static GdkGrabStatus gdk_android_device_grab(GdkDevice    *device,
++                                             GdkWindow    *window,
++                                             gboolean      owner_events,
++                                             GdkEventMask  event_mask,
++                                             GdkWindow    *confine_to,
++                                             GdkCursor    *cursor,
++                                             guint32       time_)
++{
++    if(gdk_device_get_source(device) == GDK_SOURCE_KEYBOARD)
++    {
++        g_debug("gdk_android_device_grab: GDK_SOURCE_KEYBOARD");
++        /* Device is a keyboard */
++        return GDK_GRAB_SUCCESS;
++    }
++    g_debug("gdk_android_device_grab: other");
++    return GDK_GRAB_ALREADY_GRABBED;
++}
++
++static void gdk_android_device_ungrab(GdkDevice *device,
++                                      guint32    time_)
++{
++    GdkDisplay *display;
++    GdkDeviceGrabInfo *grab;
++
++    if (gdk_device_get_source (device) == GDK_SOURCE_KEYBOARD)
++    {
++        g_debug("gdk_android_device_ungrab: GDK_SOURCE_KEYBOARD");
++    }
++    else
++    {
++        g_debug("gdk_android_device_ungrab: other");
++    }
++}
++
++static GdkWindow *gdk_android_device_window_at_position(GdkDevice       *device,
++                                                        gdouble         *win_x,
++                                                        gdouble         *win_y,
++                                                        GdkModifierType *mask,
++                                                        gboolean         get_toplevel)
++{
++    g_debug("gdk_android_device_window_at_position");
++
++    if (win_x)
++        *win_x = 0;
++    if (win_y)
++        *win_y = 0;
++    if (mask)
++        *mask = 0;
++
++    return _gdk_screen->root_window;
++}
++
++static void gdk_android_device_select_window_events(GdkDevice    *device,
++                                                    GdkWindow    *window,
++                                                    GdkEventMask  event_mask)
++{
++    g_debug("gdk_android_device_select_window_events");
++}
++
++static void gdk_android_device_class_init(GdkAndroidDeviceClass *klass)
++{
++    GdkDeviceClass *device_class = GDK_DEVICE_CLASS(klass);
++
++    device_class->get_history = gdk_android_device_get_history;
++    device_class->get_state = gdk_android_device_get_state;
++    device_class->set_window_cursor = gdk_android_device_set_window_cursor;
++    device_class->warp = gdk_android_device_warp;
++    device_class->query_state = gdk_android_device_query_state;
++    device_class->grab = gdk_android_device_grab;
++    device_class->ungrab = gdk_android_device_ungrab;
++    device_class->window_at_position = gdk_android_device_window_at_position;
++    device_class->select_window_events = gdk_android_device_select_window_events;
++}
++
++static void gdk_android_device_init(GdkAndroidDevice *device_core)
++{
++    GdkDevice *device;
++
++    device = GDK_DEVICE(device_core);
++
++    _gdk_device_add_axis(device, GDK_NONE, GDK_AXIS_X, 0, 0, 1);
++    _gdk_device_add_axis(device, GDK_NONE, GDK_AXIS_Y, 0, 0, 1);
++}
++
++//////////////////////////////////////////////////////////////////
++// device manager class
++
++struct GdkDeviceManagerAndroidClass
++{
++    GdkDeviceManagerClass parent_class;
++};
++
++G_DEFINE_TYPE (GdkDeviceManagerAndroid, gdk_device_manager_android, GDK_TYPE_DEVICE_MANAGER)
++
++static GdkDevice *create_pointer(GdkDeviceManager *device_manager,
++                                 const char *name, GdkDeviceType type)
++{
++  return g_object_new(GDK_TYPE_ANDROID_DEVICE,
++                      "name", name,
++                      "type", type,
++                      "input-source", GDK_SOURCE_TOUCHSCREEN,
++                      "input-mode", GDK_MODE_SCREEN,
++                      "has-cursor", FALSE,
++                      "display", _gdk_display,
++                      "device-manager", device_manager,
++                      NULL);
++}
++
++static GdkDevice *create_keyboard(GdkDeviceManager *device_manager,
++                                  const char *name, GdkDeviceType type)
++{
++  return g_object_new(GDK_TYPE_ANDROID_DEVICE,
++                      "name", name,
++                      "type", type,
++                      "input-source", GDK_SOURCE_KEYBOARD,
++                      "input-mode", GDK_MODE_SCREEN,
++                      "has-cursor", FALSE,
++                      "display", _gdk_display,
++                      "device-manager", device_manager,
++                      NULL);
++}
++
++static void gdk_device_manager_android_init(GdkDeviceManagerAndroid *device_manager_android)
++{
++}
++
++static void gdk_device_manager_android_finalize(GObject *object)
++{
++  GdkDeviceManagerAndroid *device_manager;
++
++  device_manager = GDK_DEVICE_MANAGER_ANDROID(object);
++
++  g_object_unref(device_manager->pointer);
++  g_object_unref(device_manager->keyboard);
++
++  G_OBJECT_CLASS(gdk_device_manager_android_parent_class)->finalize(object);
++}
++
++static void gdk_device_manager_android_constructed(GObject *object)
++{
++    GdkDeviceManagerAndroid *device_manager = GDK_DEVICE_MANAGER_ANDROID(object);
++
++    device_manager->pointer = create_pointer(GDK_DEVICE_MANAGER(device_manager),
++                                             "Virtual Core Pointer",
++                                             GDK_DEVICE_TYPE_MASTER);
++
++    device_manager->keyboard = create_keyboard(GDK_DEVICE_MANAGER(device_manager),
++                                               "Virtual Core Keyboard",
++                                               GDK_DEVICE_TYPE_MASTER);
++    _gdk_device_set_associated_device(device_manager->pointer, device_manager->keyboard);
++    _gdk_device_set_associated_device(device_manager->keyboard, device_manager->pointer);
++}
++
++static GList *gdk_device_manager_android_list_devices(GdkDeviceManager *device_manager,
++                                                      GdkDeviceType     type)
++{
++    GdkDeviceManagerAndroid *adm;
++    GList *devices = NULL, *l;
++
++    adm = (GdkDeviceManagerAndroid *) device_manager;
++
++    if (type == GDK_DEVICE_TYPE_MASTER)
++    {
++        devices = g_list_prepend(devices, adm->keyboard);
++        devices = g_list_prepend(devices, adm->pointer);
++    }
++    else
++    {
++        // none
++    }
++
++    return g_list_reverse(devices);
++}
++
++static GdkDevice *gdk_device_manager_android_get_client_pointer(GdkDeviceManager *device_manager)
++{
++    GdkDeviceManagerAndroid *adm = (GdkDeviceManagerAndroid *) device_manager;
++    return adm->pointer;
++}
++
++static void gdk_device_manager_android_class_init(GdkDeviceManagerAndroidClass *klass)
++{
++    GdkDeviceManagerClass *device_manager_class = GDK_DEVICE_MANAGER_CLASS(klass);
++    GObjectClass *object_class = G_OBJECT_CLASS(klass);
++
++    object_class->finalize = gdk_device_manager_android_finalize;
++    object_class->constructed = gdk_device_manager_android_constructed;
++    device_manager_class->list_devices = gdk_device_manager_android_list_devices;
++    device_manager_class->get_client_pointer = gdk_device_manager_android_get_client_pointer;
++}
++
++//////////////////////////////////////////////////////////////////
++// other public functions
++
++GList *gdk_android_display_list_devices(GdkDisplay *dpy)
++{
++    g_return_val_if_fail(dpy == (GdkDisplay *) _gdk_display, NULL);
++
++    return _gdk_input_devices;
++}
++
++void gdk_android_input_init(GdkDisplay *display)
++{
++    GdkDeviceManagerAndroid *device_manager;
++
++    device_manager = g_object_new(GDK_TYPE_DEVICE_MANAGER_ANDROID,
++                                  "display", display,
++                                  NULL);
++    display->device_manager = GDK_DEVICE_MANAGER(device_manager);
++
++    display->core_pointer = device_manager->pointer;
++
++    _gdk_input_devices = g_list_append(NULL, display->core_pointer);
++}
++
++static void gdk_android_queue_event(GdkEvent *event)
++{
++    _gdk_event_queue_append(&_gdk_display->display, event);
++}
++
++static void generate_motion_event(GdkEventType type, AInputEvent *aevent, GdkEvent *crossingEvent)
++{
++    GdkEvent *ev = gdk_event_new(type);
++    GdkDeviceManagerAndroid *devManager;
++
++    devManager = GDK_DEVICE_MANAGER_ANDROID(gdk_display_get_device_manager(&_gdk_display->display));
++
++    if (crossingEvent)
++    {
++        ev->button.x = crossingEvent->crossing.x;
++        ev->button.y = crossingEvent->crossing.y;
++        ev->button.x_root = crossingEvent->crossing.x_root;
++        ev->button.y_root = crossingEvent->crossing.y_root;
++        ev->button.window = crossingEvent->crossing.window;
++        ev->button.time = crossingEvent->crossing.time;
++    }
++    else
++    {
++        ev->button.x = (gint16) AMotionEvent_getX(aevent, 0);
++        ev->button.y = (gint16) AMotionEvent_getY(aevent, 0);
++        ev->button.x_root = ev->button.x;
++        ev->button.y_root = ev->button.y;
++        ev->button.window = _gdk_android_find_window_for_screen_pos(&ev->button.x, &ev->button.y);
++        ev->button.time = AMotionEvent_getEventTime(aevent);
++    }
++    g_object_ref(ev->button.window);
++    ev->button.axes = NULL;
++    ev->button.state = GDK_BUTTON1_MASK;
++    ev->button.button = GDK_BUTTON_PRIMARY;
++    gdk_event_set_device(ev, devManager->pointer);
++    //gdk_event_set_source_device(event, device_manager->system_pointer);
++
++    gdk_android_queue_event(ev);
++}
++
++
++GdkEvent *create_crossing_event(GdkEventType type, AInputEvent *aevent)
++{
++    GdkEvent *ev = gdk_event_new(type);
++    GdkDeviceManagerAndroid *devManager;
++
++    devManager = GDK_DEVICE_MANAGER_ANDROID(gdk_display_get_device_manager(&_gdk_display->display));
++
++    ev->crossing.x = (gint16) AMotionEvent_getX(aevent, 0);
++    ev->crossing.y = (gint16) AMotionEvent_getY(aevent, 0);
++    ev->crossing.x_root = ev->crossing.x;
++    ev->crossing.y_root = ev->crossing.y;
++    ev->crossing.window = _gdk_android_find_window_for_screen_pos(&ev->crossing.x, &ev->crossing.y);
++    g_object_ref(ev->crossing.window);
++    ev->crossing.time = AMotionEvent_getEventTime(aevent);
++    gdk_event_set_device(ev, devManager->pointer);
++    //gdk_event_set_source_device(event, device_manager->system_pointer);
++
++    return ev;
++}
++
++int32_t android_handle_input(struct android_app *app, AInputEvent *event)
++{
++    GdkEvent *crossingEvent = NULL;
++    if (AInputEvent_getType(event) == AMOTION_EVENT_AXIS_PRESSURE)
++    {
++        switch(AMotionEvent_getAction(event))
++        {
++        case AMOTION_EVENT_ACTION_DOWN:
++            crossingEvent = create_crossing_event(GDK_ENTER_NOTIFY, event);
++            gdk_android_queue_event(crossingEvent);
++            generate_motion_event(GDK_BUTTON_PRESS, event, crossingEvent);
++            break;
++        case AMOTION_EVENT_ACTION_UP:
++            crossingEvent = create_crossing_event(GDK_LEAVE_NOTIFY, event);
++            generate_motion_event(GDK_BUTTON_RELEASE, event, crossingEvent);
++            gdk_android_queue_event(crossingEvent);
++            break;
++        case AMOTION_EVENT_ACTION_MOVE:
++            generate_motion_event(GDK_MOTION_NOTIFY, event, crossingEvent);
++            break;
++        default:
++            break;
++        }
++    }
++    return 0;
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkinput-android.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkinput-android.h
+--- gtk+-3.18.7/gdk/gdkinput-android.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkinput-android.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,49 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// Inputs handlers and device manager
++
++#ifndef __GDK_INPUT_ANDROID_H__
++#define __GDK_INPUT_ANDROID_H__
++
++#include <gdk/gdkdevicemanagerprivate.h>
++
++G_BEGIN_DECLS
++
++#define GDK_TYPE_DEVICE_MANAGER_ANDROID         (gdk_device_manager_android_get_type ())
++#define GDK_DEVICE_MANAGER_ANDROID(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), GDK_TYPE_DEVICE_MANAGER_ANDROID, GdkDeviceManagerAndroid))
++#define GDK_DEVICE_MANAGER_ANDROID_CLASS(c)     (G_TYPE_CHECK_CLASS_CAST ((c), GDK_TYPE_DEVICE_MANAGER_ANDROID, GdkDeviceManagerAndroidClass))
++#define GDK_IS_DEVICE_MANAGER_ANDROID(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), GDK_TYPE_DEVICE_MANAGER_ANDROID))
++#define GDK_IS_DEVICE_MANAGER_ANDROID_CLASS(c)  (G_TYPE_CHECK_CLASS_TYPE ((c), GDK_TYPE_DEVICE_MANAGER_ANDROID))
++#define GDK_DEVICE_MANAGER_ANDROID_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), GDK_TYPE_DEVICE_MANAGER_ANDROID, GdkDeviceManagerAndroidClass))
++
++typedef struct GdkDeviceManagerAndroid
++{
++    GdkDeviceManager parent_object;
++    // Master Devices
++    GdkDevice *pointer;
++    GdkDevice *keyboard;
++} GdkDeviceManagerAndroid;
++typedef struct GdkDeviceManagerAndroidClass GdkDeviceManagerAndroidClass;
++
++GType gdk_device_manager_android_get_type (void) G_GNUC_CONST;
++
++void gdk_android_input_init(GdkDisplay *display);
++GList *gdk_android_display_list_devices(GdkDisplay *dpy);
++
++struct AInputEvent;
++int32_t android_handle_input(struct android_app *app, struct AInputEvent *event);
++
++
++G_END_DECLS
++
++#endif // __GDK_INPUT_ANDROID_H__
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkjni.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkjni.c
+--- gtk+-3.18.7/gdk/gdkjni.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkjni.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,119 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// ANativeWindow-based GDK visual and screen definitions
++
++#include "config.h"
++
++#include <jni.h>
++
++#include <android/native_activity.h>
++#include <android_native_app_glue.h>
++
++#include "gdk.h"
++#include "gdkvisualprivate.h"
++#include "gdkprivate-android.h"
++#include "gdkandroidscreen.h"
++#include "gdkandroiddisplay.h"
++
++
++#define JNI_ASSERT if (jni->ExceptionCheck(pjni)) \
++    { \
++        g_set_error(error, GDK_ANDROID_ERROR, GDK_ANDROID_ERROR_INIT, \
++                    "JNI exception at %s:%u", __FILE__, __LINE__); \
++        return FALSE; \
++    }
++
++#define JNI_GET_METHOD(clazz, name, sig) \
++    methId = jni->GetMethodID(pjni, clazz, name, sig); \
++    JNI_ASSERT
++
++
++gboolean gdk_android_adjust_with_jni(GdkAndroidScreen *scr, GdkAndroidDisplay *disp,
++                                     ANativeActivity *act, GError **error)
++{
++    JNIEnv *pjni, jni;
++    jmethodID methId;
++    jobject wm, display, displayMetrics, cacheDir, filesDir;
++    jclass activityClass, windowManagerClass, displayClass, displayMetricsClass, fileClass;
++    jfieldID fldId;
++    jstring jpath, jfilespath;
++    const char* cachePath;
++    const char* filesPath;
++
++    (*act->vm)->AttachCurrentThread(act->vm, &pjni, NULL);
++    jni = (*pjni);
++
++    activityClass = jni->GetObjectClass(pjni, act->clazz); JNI_ASSERT
++
++    // DPI
++    JNI_GET_METHOD(activityClass, "getWindowManager", "()Landroid/view/WindowManager;");
++    wm = jni->CallObjectMethod(pjni, act->clazz, methId); JNI_ASSERT
++
++    windowManagerClass = jni->FindClass(pjni, "android/view/WindowManager"); JNI_ASSERT
++
++    JNI_GET_METHOD(windowManagerClass, "getDefaultDisplay", "()Landroid/view/Display;");
++    display = jni->CallObjectMethod(pjni, wm, methId); JNI_ASSERT
++
++    displayClass = jni->FindClass(pjni, "android/view/Display"); JNI_ASSERT
++    displayMetricsClass = jni->FindClass(pjni, "android/util/DisplayMetrics"); JNI_ASSERT
++
++    JNI_GET_METHOD(displayMetricsClass, "<init>", "()V");
++    displayMetrics = jni->NewObject(pjni, displayMetricsClass, methId); JNI_ASSERT
++
++    JNI_GET_METHOD(displayClass, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
++    jni->CallVoidMethod(pjni, display, methId, displayMetrics); JNI_ASSERT
++
++    fldId = jni->GetFieldID(pjni, displayMetricsClass, "xdpi", "F"); JNI_ASSERT
++    scr->xdpi = jni->GetFloatField(pjni, displayMetrics, fldId); JNI_ASSERT
++    scr->screen.resolution = scr->xdpi;
++
++    fldId = jni->GetFieldID(pjni, displayMetricsClass, "ydpi", "F"); JNI_ASSERT
++    scr->ydpi = jni->GetFloatField(pjni, displayMetrics, fldId); JNI_ASSERT
++
++    g_debug("xdpi = %f, ydpi = %f", scr->xdpi, scr->ydpi);
++
++    // cache DIR
++    JNI_GET_METHOD(activityClass, "getCacheDir", "()Ljava/io/File;");
++    cacheDir = jni->CallObjectMethod(pjni, act->clazz, methId); JNI_ASSERT
++    fileClass = jni->FindClass(pjni, "java/io/File"); JNI_ASSERT
++    JNI_GET_METHOD(fileClass, "getAbsolutePath", "()Ljava/lang/String;");
++    jpath = (jstring) jni->CallObjectMethod(pjni, cacheDir, methId); JNI_ASSERT
++    cachePath = jni->GetStringUTFChars(pjni, jpath, NULL);
++    disp->cachePath = g_strdup(cachePath);
++
++    g_debug("cachePath = %s", disp->cachePath);
++    
++    // files DIR
++    g_debug("getting filesPath");
++    JNI_GET_METHOD(activityClass, "getFilesDir", "()Ljava/io/File;");
++    filesDir = jni->CallObjectMethod(pjni, act->clazz, methId); JNI_ASSERT
++    fileClass = jni->FindClass(pjni, "java/io/File"); JNI_ASSERT
++    JNI_GET_METHOD(fileClass, "getAbsolutePath", "()Ljava/lang/String;");
++    jfilespath = (jstring) jni->CallObjectMethod(pjni, filesDir, methId); JNI_ASSERT
++    filesPath = jni->GetStringUTFChars(pjni, jfilespath, NULL);
++    disp->filesPath = g_strdup(filesPath);
++
++    g_debug("filesPath = %s", disp->filesPath);
++
++    // Delete objects
++    jni->ReleaseStringUTFChars(pjni, jpath, cachePath);
++    jni->ReleaseStringUTFChars(pjni, jfilespath, filesPath);
++    jni->DeleteLocalRef(pjni, displayMetrics);
++    jni->DeleteLocalRef(pjni, display);
++    jni->DeleteLocalRef(pjni, wm);
++    jni->DeleteLocalRef(pjni, cacheDir);
++    jni->DeleteLocalRef(pjni, filesDir);
++    (*act->vm)->DetachCurrentThread(act->vm);
++    
++    return TRUE;
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkprivate-android.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkprivate-android.h
+--- gtk+-3.18.7/gdk/gdkprivate-android.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkprivate-android.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,104 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// ANativeWindow-based GDK display and screen definitions
++
++#ifndef __GDK_PRIVATE_ANDROID_H__
++#define __GDK_PRIVATE_ANDROID_H__
++
++#include "config.h"
++
++#include <EGL/egl.h>
++#include <GLES/gl.h>
++
++#include <gdk/gdkprivate.h>
++#include <gdk/gdkcursorprivate.h>
++
++#include "gdkinternals.h"
++#include "gdkdisplayprivate.h"
++#include "gdkscreenprivate.h"
++
++struct ANativeActivity;
++
++struct GdkAndroidDisplay
++{
++    GdkDisplay display;
++    struct android_app *app;
++    EGLDisplay eglDisplay;
++    EGLContext eglContext;
++    EGLSurface eglSurface;
++    cairo_device_t *cairoDevice;
++    cairo_surface_t *cairoSurface;
++    gchar *defaultFont;
++    gchar *cachePath;
++    gint notificationBarHeight;
++    gchar *filesPath;
++};
++
++struct GdkAndroidScreen
++{
++    GdkScreen screen;
++    GdkVisual *visual;
++    GdkWindow *root_window;
++    gfloat xdpi;
++    gfloat ydpi;
++};
++
++extern struct GdkAndroidDisplay *_gdk_display;
++extern struct GdkAndroidScreen  *_gdk_screen;
++
++
++
++gboolean _gdk_android_display_has_pending(GdkDisplay *display);
++void _gdk_android_display_queue_events(GdkDisplay *display);
++
++
++GdkWindow *_gdk_windowing_window_init       (GdkScreen *screen);
++void _gdk_android_display_create_window_impl(GdkDisplay    *display,
++                                             GdkWindow     *window,
++                                             GdkWindow     *real_parent,
++                                             GdkScreen     *screen,
++                                             GdkEventMask   event_mask,
++                                             GdkWindowAttr *attributes,
++                                             gint           attributes_mask);
++
++void       _gdk_push_modal_window   (GdkWindow *window);
++void       _gdk_remove_modal_window (GdkWindow *window);
++GdkWindow *_gdk_modal_current       (void);
++gboolean   _gdk_modal_blocked       (GdkWindow *window);
++
++GdkWindow *_gdk_android_root(void);
++gboolean gdk_android_init_screen(struct GdkAndroidScreen *scr, struct ANativeActivity *act,
++                                 GError **error);
++
++gboolean gdk_android_adjust_with_jni(struct GdkAndroidScreen *scr, struct GdkAndroidDisplay *desk,
++                                     struct ANativeActivity *act, GError **error);
++void gdk_android_events_init();
++
++GdkWindow *_gdk_android_find_window_for_screen_pos(gdouble *x, gdouble *y);
++
++GdkKeymap *_gdk_android_display_get_keymap(GdkDisplay *display);
++gboolean _gdk_android_window_simulate_key(GdkWindow      *window,
++                                          gint            x,
++                                          gint            y,
++                                          guint           keyval,
++                                          GdkModifierType modifiers,
++                                          GdkEventType    key_pressrelease);
++gboolean _gdk_android_window_simulate_button(GdkWindow      *window,
++                                             gint            x,
++                                             gint            y,
++                                             guint           button, // 1..3
++                                             GdkModifierType modifiers,
++                                             GdkEventType    button_pressrelease);
++
++
++#endif // __GDK_PRIVATE_ANDROID_H__
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkscreen-android.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkscreen-android.c
+--- gtk+-3.18.7/gdk/gdkscreen-android.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkscreen-android.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,328 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// ANativeWindow-based GDK visual and screen definitions
++
++#include "config.h"
++
++#include <jni.h>
++
++#include <android/native_window.h>
++#include <android/native_activity.h>
++#include <android_native_app_glue.h>
++
++#include <cairo-gl.h>
++
++#include "gdk.h"
++#include "gdkvisualprivate.h"
++#include "gdkprivate-android.h"
++#include "gdkandroiddisplay.h"
++#include "gdkandroidscreen.h"
++#include "gdkwindow-android.h"
++
++
++enum { COLOR_DEPTH = 32 };
++
++///////////////////////////////////////////////////////////////////////////////////////
++// Visual
++
++static gint _gdk_android_screen_visual_get_best_depth(GdkScreen *screen)
++{
++    return COLOR_DEPTH;
++}
++
++static void _gdk_android_screen_query_depths(GdkScreen  *screen,
++                                             gint      **depths,
++                                             gint       *count)
++{
++    static gint static_depths[] = { COLOR_DEPTH };
++
++    *count = G_N_ELEMENTS(static_depths);
++    *depths = static_depths;
++}
++
++static GdkVisualType _gdk_android_screen_visual_get_best_type(GdkScreen *screen)
++{
++    return GDK_VISUAL_TRUE_COLOR;
++}
++
++static void _gdk_android_screen_query_visual_types(GdkScreen      *screen,
++                                                   GdkVisualType **visual_types,
++                                                   gint           *count)
++{
++    static GdkVisualType static_visual_types[] = { GDK_VISUAL_TRUE_COLOR };
++
++    *count = G_N_ELEMENTS(static_visual_types);
++    *visual_types = static_visual_types;
++}
++
++static GdkVisual *_gdk_android_screen_visual_get_best(GdkScreen *screen)
++{
++    return GDK_ANDROID_SCREEN(screen)->visual;
++}
++
++static GdkVisual *_gdk_android_screen_visual_get_best_with_depth(GdkScreen *screen,
++                                                                 gint       depth)
++{
++    return GDK_ANDROID_SCREEN(screen)->visual;
++}
++
++static GdkVisual *_gdk_android_screen_visual_get_best_with_type(GdkScreen *screen,
++                                                                GdkVisualType  visual_type)
++{
++    return GDK_ANDROID_SCREEN(screen)->visual;
++}
++
++static GdkVisual *_gdk_android_screen_visual_get_best_with_both(GdkScreen     *screen,
++                                                                gint           depth,
++                                                                GdkVisualType  visual_type)
++{
++    return GDK_ANDROID_SCREEN(screen)->visual;
++}
++
++#define _gdk_android_screen_get_system_visual _gdk_android_screen_visual_get_best
++
++static GList *_gdk_android_screen_list_visuals(GdkScreen *screen)
++{
++    return g_list_append(NULL, GDK_ANDROID_SCREEN(screen)->visual);
++}
++
++static GdkVisual *gdk_android_visual_new(GdkAndroidScreen *screen)
++{
++    GdkVisual *visual = g_object_new(GDK_TYPE_VISUAL, NULL);
++    visual->screen = &screen->screen;
++    visual->type = _gdk_android_screen_visual_get_best_type(visual->screen);
++    visual->depth = _gdk_android_screen_visual_get_best_depth(visual->screen);
++
++    return visual;
++}
++
++///////////////////////////////////////////////////////////////////////////////////////
++// Screen
++
++struct GdkAndroidScreenClass
++{
++    GdkScreenClass parent_class;
++};
++
++G_DEFINE_TYPE(GdkAndroidScreen, gdk_android_screen, GDK_TYPE_SCREEN)
++
++static void gdk_android_screen_init(GdkAndroidScreen *display)
++{
++}
++
++static GdkDisplay *gdk_android_screen_get_display(GdkScreen *screen)
++{
++    return &_gdk_display->display;
++}
++
++static gint gdk_android_screen_get_width(GdkScreen *screen)
++{
++    gint rv;
++    eglQuerySurface(_gdk_display->eglDisplay, _gdk_display->eglSurface, EGL_WIDTH, &rv);
++    return rv;
++}
++
++static gint gdk_android_screen_get_height(GdkScreen *screen)
++{
++    gint rv;
++    eglQuerySurface(_gdk_display->eglDisplay, _gdk_display->eglSurface, EGL_HEIGHT, &rv);
++    return rv;
++}
++
++#define JNI_ASSERT(jni) if (jni->ExceptionCheck(pjni)) \
++    { \
++        g_set_error(error, GDK_ANDROID_ERROR, GDK_ANDROID_ERROR_INIT, \
++                    "JNI exception at %s:%u", __FILE__, __LINE__); \
++        return FALSE; \
++    }
++
++gboolean gdk_android_init_screen(GdkAndroidScreen *scr, ANativeActivity *act, GError **error)
++{
++    scr->visual = gdk_android_visual_new(scr);
++    scr->root_window = _gdk_windowing_window_init(&scr->screen);
++    return TRUE;
++}
++
++GdkWindow *_gdk_android_root(void)
++{
++    if (!_gdk_screen)
++        return NULL;
++    return _gdk_screen->root_window;
++}
++
++static gint gdk_android_screen_get_width_mm(GdkScreen *screen)
++{
++    g_debug("width: %gmm", (double) gdk_screen_get_width(screen) / _gdk_screen->xdpi * 25.4);
++    return (double) gdk_screen_get_width(screen) / _gdk_screen->xdpi * 25.4;
++}
++
++static gint gdk_android_screen_get_height_mm (GdkScreen *screen)
++{
++    g_debug("height: %gmm", (double) gdk_screen_get_height (screen) / _gdk_screen->ydpi * 25.4);
++    return (double) gdk_screen_get_height (screen) / _gdk_screen->ydpi * 25.4;
++}
++
++static GdkWindow *gdk_android_screen_get_root_window(GdkScreen *screen)
++{
++    return GDK_ANDROID_SCREEN(screen)->root_window;
++}
++
++static gint gdk_android_screen_get_n_monitors(GdkScreen *screen)
++{
++    return 1;
++}
++
++static gint gdk_android_screen_get_primary_monitor(GdkScreen *screen)
++{
++    return 0;
++}
++
++static gint gdk_android_screen_get_monitor_width_mm(GdkScreen *screen, gint num_monitor)
++{
++    return gdk_android_screen_get_width_mm(screen);
++}
++
++static gint gdk_android_screen_get_monitor_height_mm(GdkScreen *screen, gint num_monitor)
++{
++    return gdk_android_screen_get_height_mm(screen);
++}
++
++static gchar *gdk_android_screen_get_monitor_plug_name (GdkScreen *screen, gint num_monitor)
++{
++    return g_strdup("android display");
++}
++
++static void gdk_android_screen_get_monitor_geometry(GdkScreen    *screen,
++                                                    gint          num_monitor,
++                                                    GdkRectangle *dest)
++{
++    g_return_if_fail(screen == (GdkScreen *)_gdk_screen);
++
++    dest->x = 0;
++    dest->y = 0;
++    dest->width = gdk_android_screen_get_width(screen);
++    dest->height = gdk_android_screen_get_height(screen);
++}
++
++static GdkVisual *gdk_android_screen_get_rgba_visual(GdkScreen *screen)
++{
++    g_return_val_if_fail(screen == (GdkScreen *)_gdk_screen, NULL);
++
++    return NULL;
++}
++
++static gint gdk_android_screen_get_number(GdkScreen *screen)
++{
++    return 0;
++}
++
++static gchar *gdk_android_screen_make_display_name(GdkScreen *screen)
++{
++    return g_strdup(gdk_display_get_name(&_gdk_display->display));
++}
++
++static GdkWindow *gdk_android_screen_get_active_window(GdkScreen *screen)
++{
++    g_return_val_if_fail (GDK_IS_SCREEN(screen), NULL);
++
++    return NULL;
++}
++
++static GList *gdk_android_screen_get_window_stack(GdkScreen *screen)
++{
++    g_return_val_if_fail (GDK_IS_SCREEN(screen), NULL);
++
++    return NULL;
++}
++
++static gboolean gdk_android_screen_is_composited(GdkScreen *screen)
++{
++    g_return_val_if_fail(GDK_IS_SCREEN(screen), FALSE);
++
++    return FALSE;
++}
++
++static void gdk_android_screen_finalize(GObject *object)
++{
++    GdkAndroidScreen *s = GDK_ANDROID_SCREEN(object);
++
++    if (s->root_window)
++        g_object_unref(s->root_window);
++
++    g_object_unref(s->visual);
++}
++
++static void gdk_android_screen_dispose(GObject *object)
++{
++    GdkAndroidScreen *s = GDK_ANDROID_SCREEN(object);
++
++    if (s->root_window)
++        _gdk_window_destroy(s->root_window, FALSE);
++
++    G_OBJECT_CLASS(gdk_android_screen_parent_class)->dispose(object);
++}
++
++static gboolean _gdk_android_screen_get_setting(GdkScreen   *screen,
++                                                const gchar *name,
++                                                GValue      *value)
++{
++    g_return_val_if_fail(GDK_IS_ANDROID_SCREEN(screen), FALSE);
++
++    if (strcmp("gtk-theme-name", name) == 0)
++    {
++        g_value_set_string(value, "Android");
++        return TRUE;
++    }
++
++    return FALSE;
++}
++
++static void gdk_android_screen_class_init(GdkAndroidScreenClass *klass)
++{
++  GObjectClass *object_class = G_OBJECT_CLASS(klass);
++  GdkScreenClass *screen_class = GDK_SCREEN_CLASS(klass);
++
++  object_class->dispose = gdk_android_screen_dispose;
++  object_class->finalize = gdk_android_screen_finalize;
++
++  screen_class->get_display = gdk_android_screen_get_display;
++  screen_class->get_width = gdk_android_screen_get_width;
++  screen_class->get_height = gdk_android_screen_get_height;
++  screen_class->get_width_mm = gdk_android_screen_get_width_mm;
++  screen_class->get_height_mm = gdk_android_screen_get_height_mm;
++  screen_class->get_number = gdk_android_screen_get_number;
++  screen_class->get_root_window = gdk_android_screen_get_root_window;
++  screen_class->get_n_monitors = gdk_android_screen_get_n_monitors;
++  screen_class->get_primary_monitor = gdk_android_screen_get_primary_monitor;
++  screen_class->get_monitor_width_mm = gdk_android_screen_get_monitor_width_mm;
++  screen_class->get_monitor_height_mm = gdk_android_screen_get_monitor_height_mm;
++  screen_class->get_monitor_plug_name = gdk_android_screen_get_monitor_plug_name;
++  screen_class->get_monitor_geometry = gdk_android_screen_get_monitor_geometry;
++  screen_class->get_monitor_workarea = gdk_android_screen_get_monitor_geometry;
++  screen_class->get_system_visual = _gdk_android_screen_get_system_visual;
++  screen_class->get_rgba_visual = gdk_android_screen_get_rgba_visual;
++  screen_class->is_composited = gdk_android_screen_is_composited;
++  screen_class->make_display_name = gdk_android_screen_make_display_name;
++  screen_class->get_active_window = gdk_android_screen_get_active_window;
++  screen_class->get_window_stack = gdk_android_screen_get_window_stack;
++  screen_class->get_setting = _gdk_android_screen_get_setting;
++  screen_class->visual_get_best_depth = _gdk_android_screen_visual_get_best_depth;
++  screen_class->visual_get_best_type = _gdk_android_screen_visual_get_best_type;
++  screen_class->visual_get_best = _gdk_android_screen_visual_get_best;
++  screen_class->visual_get_best_with_depth = _gdk_android_screen_visual_get_best_with_depth;
++  screen_class->visual_get_best_with_type = _gdk_android_screen_visual_get_best_with_type;
++  screen_class->visual_get_best_with_both = _gdk_android_screen_visual_get_best_with_both;
++  screen_class->query_depths = _gdk_android_screen_query_depths;
++  screen_class->query_visual_types = _gdk_android_screen_query_visual_types;
++  screen_class->list_visuals = _gdk_android_screen_list_visuals;
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkwindow-android.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkwindow-android.c
+--- gtk+-3.18.7/gdk/gdkwindow-android.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkwindow-android.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,1216 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++// The initial implementation was based on gdk's gdkwindow-*.c files code
++// which is licensed under LGPLv2.1 terms
++//
++// ANativeWindow-based GDK window definitions
++
++#define GDK_DEBUG_MISC_OR_EVENTS (GDK_DEBUG_MISC|GDK_DEBUG_EVENTS)
++
++#include "config.h"
++#include <stdlib.h>
++
++#include "gdk.h"
++#include "gdkwindowimpl.h"
++#include "gdkprivate-android.h"
++#include "gdkdeviceprivate.h"
++#include "gdkenumtypes.h"
++#include "gdkdisplayprivate.h"
++#include "gdkvisualprivate.h"
++#include "gdkinput-android.h"
++#include "gdkwindow-android.h"
++
++#include <cairo-gl.h>
++
++static GSList *modal_window_stack = NULL;
++static GSList *toplevel_stack = NULL;
++
++static const cairo_user_data_key_t gdk_android_cairo_key;
++
++struct GdkAndroidWindow
++{
++    GdkWindow parent;
++};
++
++struct GdkAndroidWindowClass
++{
++    GdkWindowClass parent;
++};
++
++G_DEFINE_TYPE (GdkAndroidWindow, gdk_android_window, GDK_TYPE_WINDOW)
++
++static void gdk_android_window_init(GdkAndroidWindow *window)
++{
++}
++
++static void gdk_android_window_finalize(GObject *object)
++{
++    GdkWindow *window = GDK_WINDOW(object);
++    G_OBJECT_CLASS(gdk_android_window_parent_class)->finalize(object);
++}
++
++static void gdk_android_window_class_init(GdkAndroidWindowClass *klass)
++{
++    GObjectClass *objectClass = G_OBJECT_CLASS(klass);
++    objectClass->finalize = gdk_android_window_finalize;
++}
++
++G_DEFINE_TYPE(GdkWindowImplAndroid, gdk_window_impl_android, GDK_TYPE_WINDOW_IMPL)
++
++static void gdk_window_impl_android_init(GdkWindowImplAndroid *impl)
++{
++    impl->inside_end_paint = FALSE;
++}
++
++static void gdk_window_impl_android_finalize(GObject *object)
++{
++    G_OBJECT_CLASS(gdk_window_impl_android_parent_class)->finalize(object);
++}
++
++
++GdkWindow *_gdk_windowing_window_init(GdkScreen *screen)
++{
++    GdkWindow *window;
++    GdkWindowImplAndroid *impl;
++
++    window = _gdk_display_create_window(&_gdk_display->display);
++
++    window->impl = g_object_new(GDK_TYPE_WINDOW_IMPL_ANDROID, NULL);
++    impl = GDK_WINDOW_IMPL_ANDROID(window->impl);
++    impl->wrapper = window;
++
++    window->impl_window = window;
++    window->visual = gdk_screen_get_system_visual(screen);
++
++    window->window_type = GDK_WINDOW_ROOT;
++    window->depth = window->visual->depth;
++    window->x = window->y = 0;
++    window->abs_x = window->abs_y = 0;
++    window->width  = gdk_screen_get_width(screen);
++    window->height = gdk_screen_get_height(screen);
++    window->viewable = TRUE;
++
++    return window;
++}
++
++static const gchar *get_default_title(void)
++{
++    const char *title = g_get_application_name();
++    if (!title)
++        title = g_get_prgname();
++
++    return title;
++}
++
++void _gdk_android_display_create_window_impl(GdkDisplay    *display,
++                                             GdkWindow     *window,
++                                             GdkWindow     *real_parent,
++                                             GdkScreen     *screen,
++                                             GdkEventMask   event_mask,
++                                             GdkWindowAttr *attributes,
++                                             gint           attributes_mask)
++{
++    GdkWindowImplAndroid *impl;
++    const gchar *title;
++    gint window_width, window_height;
++
++    impl = g_object_new(GDK_TYPE_WINDOW_IMPL_ANDROID, NULL);
++    impl->wrapper = GDK_WINDOW(window);
++    window->impl = GDK_WINDOW_IMPL(impl);
++
++    toplevel_stack = g_slist_prepend(toplevel_stack, window);
++
++    impl->override_redirect = (attributes_mask & GDK_WA_NOREDIR) != 0
++                            && !!attributes->override_redirect;
++
++    if (attributes_mask & GDK_WA_TITLE)
++        title = attributes->title;
++    else
++        title = get_default_title();
++
++    if (!title || !*title)
++        title = "";
++
++    impl->native_event_mask = GDK_STRUCTURE_MASK | event_mask;
++
++    if (attributes_mask & GDK_WA_TYPE_HINT)
++        gdk_window_set_type_hint(window, attributes->type_hint);
++
++    GDK_NOTE(MISC_OR_EVENTS, gdk_window_set_title(window, title));
++
++    if(attributes_mask & GDK_WA_CURSOR)
++        gdk_window_set_cursor (window, attributes->cursor);
++
++    window->x = 0;
++    window->y = _gdk_display->notificationBarHeight;
++
++
++}
++
++static void gdk_android_window_destroy(GdkWindow *window,
++                                       gboolean   recursing,
++                                       gboolean   foreign_destroy)
++{
++    GdkWindowImplAndroid *window_impl = GDK_WINDOW_IMPL_ANDROID(window->impl);
++    GSList *tmp;
++
++    g_return_if_fail(GDK_IS_WINDOW(window));
++  
++    GDK_NOTE(MISC, g_debug("gdk_android_window_destroy\n"));
++
++    // Remove ourself from the toplevel stack
++    if (toplevel_stack)
++    {
++        tmp = g_slist_find(toplevel_stack, window);
++        if (tmp != NULL)
++            toplevel_stack = g_slist_delete_link(toplevel_stack, tmp);
++    }
++
++    // Remove ourself from the modal stack
++    _gdk_remove_modal_window(window);
++
++    if (!recursing && !foreign_destroy)
++    {
++        window->destroyed = TRUE;
++    }
++}
++
++static gboolean gdk_android_window_resize_cairo_surface(GdkWindow       *window,
++                                                        cairo_surface_t *surface,
++                                                        gint             width,
++                                                        gint             height)
++{
++    return FALSE;
++}
++
++static void gdk_android_window_destroy_foreign(GdkWindow *window)
++{
++    g_warning("gdk_android_window_destroy_foreign is not supposed to be called on Android!");
++    gdk_window_hide (window);
++    gdk_window_reparent(window, NULL, 0, 0);
++}
++
++GdkWindow *_gdk_android_find_window_for_screen_pos(gdouble *x, gdouble *y)
++{
++    GSList *l;
++
++    for (l = toplevel_stack; l != NULL; l = l->next)
++    {
++        GdkWindow *w = l->data;
++
++        if (   *x >= w->x && *x <= (w->x + w->width)
++            && *y >= w->y && *y <= (w->y + w->height))
++        {
++            gdouble cx = *x - w->x, cy = *y - w->y;
++            GList *cl = gdk_window_peek_children(w);
++            for (; cl != NULL; cl = cl->next)
++            {
++                GdkWindow *cw = cl->data;
++                if (   cx >= cw->x && cx <= (cw->x + cw->width)
++                    && cy >= cw->y && cy <= (cw->y + cw->height))
++                {
++                    w = cw;
++                    cx -= cw->x;
++                    cy -= cw->y;
++                    return cw;
++                }
++            }
++            *x -= cx;
++            *y -= cy;
++            GDK_NOTE(EVENTS, g_debug("found window for event %p @ (%g, %g)", w, cx, cy));
++            return w;
++        }
++    }
++
++    return NULL;
++}
++
++
++static void gdk_android_window_destroy_notify(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++
++    if (!GDK_WINDOW_DESTROYED(window))
++    {
++        _gdk_window_destroy(window, TRUE);
++    }
++  
++    g_object_unref(window);
++}
++
++static void gdk_android_window_show(GdkWindow *window, gboolean already_mapped)
++{
++    GdkEvent *event = NULL;
++    GdkWindowImplAndroid *impl;
++    GdkDeviceManagerAndroid *devManager;
++    GdkDisplay *display;
++    GList *node;
++
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    impl = GDK_WINDOW_IMPL_ANDROID(window->impl);
++    display = &_gdk_display->display;
++    devManager = GDK_DEVICE_MANAGER_ANDROID(gdk_display_get_device_manager(display));
++
++    // don't know if this does anything meaning. just copying these 3 lines from wayland
++    //_gdk_make_event(window, GDK_MAP, NULL, FALSE);
++    //event = _gdk_make_event(window, GDK_VISIBILITY_NOTIFY, NULL, FALSE);
++    //event->visibility.state = GDK_VISIBILITY_UNOBSCURED;
++
++    // GDK_ENTER_NOTIFY
++    event = gdk_event_new(GDK_ENTER_NOTIFY);
++    event->crossing.window = g_object_ref(window);
++    gdk_event_set_device(event, devManager->pointer);
++    event->crossing.subwindow = NULL;
++    event->crossing.time = (guint32) (g_get_monotonic_time () / 1000);
++    event->crossing.mode = GDK_CROSSING_NORMAL;
++    event->crossing.detail = GDK_NOTIFY_ANCESTOR;
++    event->crossing.focus = TRUE;
++    event->crossing.state = 0;
++
++    node = _gdk_event_queue_append(display, event);
++    _gdk_windowing_got_event(display, node, event, _gdk_display_get_next_serial(display));
++}
++
++static void gdk_android_window_hide(GdkWindow *window)
++{
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_debug("gdk_android_window_hide is called");
++}
++
++static void gdk_android_window_withdraw(GdkWindow *window)
++{
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    gdk_window_hide (window);
++}
++
++static void gdk_android_window_move(GdkWindow *window, gint x, gint y)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    window->x = x;
++    window->y = y;
++}
++
++static void gdk_android_window_resize(GdkWindow *window, gint width, gint height)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    window->width = width;
++    window->height = height;
++}
++
++static void gdk_android_window_move_resize(GdkWindow *window,
++                                           gboolean   with_move,
++                                           gint       x,
++                                           gint       y,
++                                           gint       width,
++                                           gint       height)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    if (with_move)
++    {
++        window->x = x;
++        window->y = y;
++    }
++    window->width = width;
++    window->height = height;
++}
++
++static gboolean gdk_android_window_reparent(GdkWindow *window,
++                                            GdkWindow *parent,
++                                            gint       x,
++                                            gint       y)
++{
++    GdkWindowImplAndroid *impl;
++    GdkWindow *old_parent;
++
++    g_return_val_if_fail(GDK_IS_WINDOW(window), FALSE);
++    if (GDK_WINDOW_DESTROYED(window))
++        return FALSE;
++
++    old_parent = window->parent;
++    if (!parent)
++        parent = _gdk_android_root();
++    window->parent = parent;
++
++    impl = GDK_WINDOW_IMPL_ANDROID(window->impl);
++
++    if (old_parent)
++        old_parent->children = g_list_remove(old_parent->children, window);
++
++    parent->children = g_list_prepend(parent->children, window);
++
++    return FALSE;
++}
++
++static void gdk_android_window_raise(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    // g_debug("gdk_android_window_raise is called");
++}
++
++static void gdk_android_window_lower(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    // g_debug("gdk_android_window_lower is called");
++}
++
++static void gdk_android_window_set_urgency_hint(GdkWindow *window,
++                                                gboolean   urgent)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_debug("gdk_android_window_set_urgency_hint is called");
++}
++
++static gboolean get_effective_window_decorations(GdkWindow       *window,
++                                                 GdkWMDecoration *decoration)
++{
++    g_debug("get_effective_window_decorations is called");
++
++    return FALSE;
++}
++
++static void gdk_android_window_set_geometry_hints(GdkWindow         *window,
++                                                  const GdkGeometry *geometry,
++                                                  GdkWindowHints     geom_mask)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    //g_debug("gdk_android_window_set_geometry_hints is called");
++}
++
++static void gdk_android_window_set_title(GdkWindow *window, const gchar *title)
++{
++    g_debug("gdk_android_window_set_title is called");
++    if (title)
++        GDK_NOTE(MISC_OR_EVENTS, g_free((char *) title));
++}
++
++static void gdk_android_window_set_role(GdkWindow *window, const gchar *role)
++{
++    g_debug("gdk_android_window_set_role is called");
++}
++
++static void gdk_android_window_set_transient_for(GdkWindow *window, GdkWindow *parent)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_debug("gdk_android_window_set_transient_for is called");
++}
++
++void _gdk_push_modal_window(GdkWindow *window)
++{
++    modal_window_stack = g_slist_prepend(modal_window_stack, window);
++}
++
++void _gdk_remove_modal_window(GdkWindow *window)
++{
++    GSList *tmp;
++
++    g_return_if_fail (window != NULL);
++
++    if (modal_window_stack == NULL)
++        return;
++
++    tmp = g_slist_find(modal_window_stack, window);
++    if (tmp != NULL)
++    {
++        modal_window_stack = g_slist_delete_link (modal_window_stack, tmp);
++    }
++}
++
++gboolean _gdk_modal_blocked(GdkWindow *window)
++{
++    GSList *l;
++    gboolean found_any = FALSE;
++
++    for (l = modal_window_stack; l != NULL; l = l->next)
++    {
++        GdkWindow *modal = l->data;
++
++        if (modal == window)
++            return FALSE;
++
++        if (GDK_WINDOW_IS_MAPPED(modal))
++            found_any = TRUE;
++    }
++
++    return found_any;
++}
++
++GdkWindow *_gdk_modal_current(void)
++{
++    GSList *l;
++
++    for (l = modal_window_stack; l != NULL; l = l->next)
++    {
++        GdkWindow *modal = l->data;
++
++        if (GDK_WINDOW_IS_MAPPED (modal))
++            return modal;
++    }
++
++    return NULL;
++}
++
++static void gdk_android_window_set_background(GdkWindow *window, cairo_pattern_t *pattern)
++{
++}
++
++static void gdk_android_window_set_device_cursor(GdkWindow *window,
++                                                 GdkDevice *device,
++                                                 GdkCursor *cursor)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    //g_debug("gdk_android_window_set_device_cursor is called");
++}
++
++static void gdk_android_window_get_geometry(GdkWindow *window,
++                                            gint      *x,
++                                            gint      *y,
++                                            gint      *width,
++                                            gint      *height)
++{
++    if (!window)
++        window = _gdk_android_root();
++
++    *x = window->x;
++    *y = window->y;
++    *width = window->width;
++    *height = window->height;
++}
++
++static void gdk_android_window_get_root_coords(GdkWindow *window,
++                                               gint       x,
++                                               gint       y,
++                                               gint      *root_x,
++                                               gint      *root_y)
++{
++    *root_x = 0;
++    *root_y = 0;
++}
++
++static void gdk_android_window_restack_under(GdkWindow *window, GList *native_siblings)
++{
++}
++
++static void gdk_android_window_restack_toplevel(GdkWindow *window, GdkWindow *sibling,
++                                                gboolean   above)
++{
++}
++
++static void gdk_android_window_get_frame_extents(GdkWindow *window, GdkRectangle *rect)
++{
++    g_return_if_fail (GDK_IS_WINDOW(window));
++    g_return_if_fail (rect != NULL);
++
++    rect->x = 0;
++    rect->y = 0;
++    rect->width = 1;
++    rect->height = 1;
++
++    g_debug("gdk_android_window_get_frame_extents is called");
++}
++
++static gboolean gdk_window_android_get_device_state(GdkWindow       *window,
++                                                    GdkDevice       *device,
++                                                    gdouble         *x,
++                                                    gdouble         *y,
++                                                    GdkModifierType *mask)
++{
++    GdkWindow *child;
++
++    g_return_val_if_fail(window == NULL || GDK_IS_WINDOW (window), FALSE);
++
++    GDK_DEVICE_GET_CLASS(device)->query_state(device, window, NULL, &child,
++                                              NULL, NULL, x, y, mask);
++    return (child != NULL);
++}
++
++static GdkEventMask gdk_android_window_get_events(GdkWindow *window)
++{
++    GdkWindowImplAndroid *impl;
++
++    if (GDK_WINDOW_DESTROYED(window))
++        return 0;
++
++    impl = GDK_WINDOW_IMPL_ANDROID(window->impl);
++
++    return impl->native_event_mask;
++}
++
++static void gdk_android_window_set_events(GdkWindow *window, GdkEventMask event_mask)
++{
++    GdkWindowImplAndroid *impl;
++
++    impl = GDK_WINDOW_IMPL_ANDROID(window->impl);
++
++    impl->native_event_mask = GDK_STRUCTURE_MASK | event_mask;
++}
++
++static void gdk_android_window_set_override_redirect(GdkWindow *window, gboolean override_redirect)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++
++    GDK_WINDOW_IMPL_ANDROID(window->impl)->override_redirect = !!override_redirect;
++}
++
++static void gdk_android_window_set_accept_focus(GdkWindow *window, gboolean accept_focus)
++{
++    g_return_if_fail (GDK_IS_WINDOW(window));
++
++    accept_focus = accept_focus != FALSE;
++
++    if (window->accept_focus != accept_focus)
++        window->accept_focus = accept_focus;
++}
++
++static void gdk_android_window_set_focus_on_map (GdkWindow *window, gboolean focus_on_map)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++
++    focus_on_map = focus_on_map != FALSE;
++
++    if (window->focus_on_map != focus_on_map)
++        window->focus_on_map = focus_on_map;
++}
++
++static void gdk_android_window_set_icon_list(GdkWindow *window, GList *pixbufs)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    //g_warning("gdk_android_window_set_icon_list is called");
++}
++
++static void gdk_android_window_set_icon_name(GdkWindow *window, const gchar *name)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_warning("gdk_android_window_set_icon_name is called");
++}
++
++static GdkWindow *gdk_android_window_get_group(GdkWindow *window)
++{
++    g_return_val_if_fail(GDK_IS_WINDOW (window), NULL);
++    g_return_val_if_fail(GDK_WINDOW_TYPE(window) != GDK_WINDOW_CHILD, NULL);
++
++    if (GDK_WINDOW_DESTROYED(window))
++        return NULL;
++  
++    g_warning("gdk_window_get_group not is called");
++
++    return NULL;
++}
++
++static void gdk_android_window_set_group(GdkWindow *window, GdkWindow *leader)
++{
++    g_return_if_fail(GDK_IS_WINDOW (window));
++    g_return_if_fail(GDK_WINDOW_TYPE (window) != GDK_WINDOW_CHILD);
++    g_return_if_fail(leader == NULL || GDK_IS_WINDOW (leader));
++
++    if (GDK_WINDOW_DESTROYED (window) || GDK_WINDOW_DESTROYED (leader))
++        return;
++  
++    g_warning("gdk_window_set_group is called");
++}
++
++static GQuark get_functions_quark()
++{
++    static GQuark quark = 0;
++
++    if (!quark)
++        quark = g_quark_from_static_string ("gdk-window-functions");
++
++    return quark;
++}
++
++static void update_system_menu(GdkWindow *window)
++{
++    GdkWMFunction* functions_set;
++
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    functions_set = g_object_get_qdata(G_OBJECT(window), get_functions_quark());
++
++    g_warning("update_system_menu is called");
++}
++
++static GQuark get_decorations_quark()
++{
++    static GQuark quark = 0;
++
++    if (!quark)
++        quark = g_quark_from_static_string("gdk-window-decorations");
++
++    return quark;
++}
++
++static void gdk_android_window_set_decorations(GdkWindow *window, GdkWMDecoration decorations)
++{
++    GdkWMDecoration* decorations_copy;
++
++    g_return_if_fail(GDK_IS_WINDOW(window));
++
++    decorations_copy = g_malloc (sizeof (GdkWMDecoration));
++    *decorations_copy = decorations;
++    g_object_set_qdata_full(G_OBJECT(window), get_decorations_quark(), decorations_copy, g_free);
++}
++
++static gboolean gdk_android_window_get_decorations(GdkWindow       *window,
++                                                   GdkWMDecoration *decorations)
++{
++    GdkWMDecoration* decorations_set;
++  
++    g_return_val_if_fail(GDK_IS_WINDOW(window), FALSE);
++
++    decorations_set = g_object_get_qdata(G_OBJECT(window), get_decorations_quark());
++    if (decorations_set)
++        *decorations = *decorations_set;
++
++    return (decorations_set != NULL);
++}
++
++static void gdk_android_window_set_functions (GdkWindow *window, GdkWMFunction functions)
++{
++    GdkWMFunction* functions_copy;
++
++    g_return_if_fail(GDK_IS_WINDOW(window));
++  
++    functions_copy = g_malloc (sizeof (GdkWMFunction));
++    *functions_copy = functions;
++    g_object_set_qdata_full(G_OBJECT (window), get_functions_quark (), functions_copy, g_free);
++
++    update_system_menu(window);
++}
++
++
++static gboolean gdk_android_window_set_static_gravities(GdkWindow *window, gboolean use_static)
++{
++    g_return_val_if_fail(GDK_IS_WINDOW(window), FALSE);
++
++    return !use_static;
++}
++
++static void gdk_android_window_begin_resize_drag(GdkWindow     *window,
++                                                 GdkWindowEdge  edge,
++                                                 GdkDevice     *device,
++                                                 gint           button,
++                                                 gint           root_x,
++                                                 gint           root_y,
++                                                 guint32        timestamp)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_debug("unsupported gdk_android_window_begin_resize_drag is called");
++}
++
++static void gdk_android_window_begin_move_drag(GdkWindow *window,
++                                               GdkDevice *device,
++                                               gint       button,
++                                               gint       root_x,
++                                               gint       root_y,
++                                               guint32    timestamp)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_debug("unsupported gdk_android_window_begin_move_drag is called");
++}
++
++
++static void gdk_android_window_iconify(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_warning("unsupported gdk_android_window_iconify is called");
++}
++
++static void gdk_android_window_deiconify(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    //g_warning("unsupported gdk_android_window_deiconify is called");
++}
++
++static void gdk_android_window_stick(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    // g_debug("unsupported gdk_android_window_stick is called");
++}
++
++static void gdk_android_window_unstick(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    // g_debug("unsupported gdk_android_window_unstick is called");
++}
++
++static void gdk_android_window_maximize(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    gdk_window_move_resize(window, 0, _gdk_display->notificationBarHeight,
++                           gdk_screen_get_width(&_gdk_screen->screen),
++                           gdk_screen_get_height(&_gdk_screen->screen)
++                           - _gdk_display->notificationBarHeight);
++}
++
++static void gdk_android_window_unmaximize(GdkWindow *window)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    // g_debug("unsupported gdk_android_window_unmaximize is called");
++}
++
++static void gdk_android_window_fullscreen(GdkWindow *window)
++{
++    gdk_android_window_maximize(window);
++
++}
++
++static void gdk_android_window_unfullscreen(GdkWindow *window)
++{
++    gdk_android_window_unmaximize(window);
++
++    gdk_synthesize_window_state(window, GDK_WINDOW_STATE_FULLSCREEN, 0);
++}
++
++static void gdk_android_window_set_keep_above(GdkWindow *window, gboolean setting)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    //g_debug("unsupported gdk_android_window_set_keep_above is called");
++}
++
++static void gdk_android_window_set_keep_below(GdkWindow *window, gboolean setting)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    //g_debug("unsupported gdk_android_window_set_keep_below is called");
++}
++
++static void gdk_android_window_focus(GdkWindow *window, guint32 timestamp)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    //g_debug("unsupported gdk_android_window_focus is called");
++}
++
++static void gdk_android_window_set_modal_hint(GdkWindow *window, gboolean modal)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++  
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    if (modal == window->modal_hint)
++        return;
++
++    window->modal_hint = modal;
++
++    if (modal)
++    {
++        _gdk_push_modal_window(window);
++        gdk_window_raise(window);
++    }
++    else
++    {
++        _gdk_remove_modal_window(window);
++    }
++}
++
++static void gdk_android_window_set_skip_taskbar_hint(GdkWindow *window, gboolean skips_taskbar)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_debug("unsupported gdk_android_window_set_skip_taskbar_hint is called");
++}
++
++static void gdk_android_window_set_skip_pager_hint(GdkWindow *window, gboolean skips_pager)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++
++    g_debug("unsupported gdk_android_window_set_skip_pager_hint is called");
++}
++
++static void gdk_android_window_set_type_hint(GdkWindow *window, GdkWindowTypeHint hint)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    GDK_WINDOW_IMPL_ANDROID(window->impl)->type_hint = hint;
++}
++
++static GdkWindowTypeHint gdk_android_window_get_type_hint(GdkWindow *window)
++{
++    g_return_val_if_fail(GDK_IS_WINDOW(window), GDK_WINDOW_TYPE_HINT_NORMAL);
++  
++    if (GDK_WINDOW_DESTROYED (window))
++        return GDK_WINDOW_TYPE_HINT_NORMAL;
++
++    return GDK_WINDOW_IMPL_ANDROID(window->impl)->type_hint;
++}
++
++static void gdk_android_window_shape_combine_region(GdkWindow       *window,
++                                                    const cairo_region_t *shape_region,
++                                                    gint             offset_x,
++                                                    gint             offset_y)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_debug("unsupported gdk_android_window_shape_combine_region is called");
++}
++
++static void gdk_android_window_set_opacity(GdkWindow *window, gdouble opacity)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    if (opacity != 1.0)
++        g_warning("gdk_android_window_set_opacity: unsupported opacity value %g", opacity);
++}
++
++static cairo_region_t *gdk_android_window_get_shape(GdkWindow *window)
++{
++    g_return_val_if_fail(GDK_IS_WINDOW(window), NULL);
++    if (GDK_WINDOW_DESTROYED(window))
++        return NULL;
++
++    cairo_rectangle_int_t rect = {
++                                    window->x,
++                                    window->y,
++                                    window->width,
++                                    window->height
++                                 };
++
++    return cairo_region_create_rectangle(&rect);
++}
++
++static gboolean _gdk_android_window_queue_antiexpose(GdkWindow *window, cairo_region_t *area)
++{
++    return FALSE;
++}
++
++static void gdk_android_input_shape_combine_region(GdkWindow *window,
++                                                   const cairo_region_t *shape_region,
++                                                   gint offset_x,
++                                                   gint offset_y)
++{
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    g_debug("unsupported gdk_android_input_shape_combine_region is called");
++}
++
++static void gdk_android_window_process_updates_recurse(GdkWindow *window, cairo_region_t *region)
++{
++    _gdk_window_process_updates_recurse(window, region);
++}
++
++static void gdk_android_cairo_surface_destroy(void *data)
++{
++    GdkWindowImplAndroid *impl = data;
++
++    if (impl->inside_end_paint)
++    {
++        cairo_gl_surface_swapbuffers(_gdk_display->cairoSurface);
++        impl->inside_end_paint = FALSE;
++    }
++
++    impl->cairo_surface = NULL;
++}
++
++static cairo_surface_t *gdk_android_ref_cairo_surface(GdkWindow *window)
++{
++    GdkWindowImplAndroid *impl;
++
++    g_return_val_if_fail(GDK_IS_WINDOW(window), NULL);
++    if (GDK_WINDOW_DESTROYED(window))
++        return NULL;
++
++    impl = GDK_WINDOW_IMPL_ANDROID(window->impl);
++
++    if (impl->cairo_surface)
++        cairo_surface_reference(impl->cairo_surface);
++    else
++    {
++        impl->cairo_surface =
++            cairo_surface_create_for_rectangle(_gdk_display->cairoSurface, window->x, window->y,
++                                               window->width, window->height);
++
++        cairo_surface_set_user_data(impl->cairo_surface, &gdk_android_cairo_key,
++                                    impl, gdk_android_cairo_surface_destroy);
++    }
++
++//    {
++//        cairo_t *cr;
++//
++//        cr = cairo_create(_gdk_display->cairoSurface); // impl->cairo_surface);
++//        if (cairo_status(cr))
++//        {
++//            g_error("Could not create cairo object %s:%u: %s",
++//                    __FILE__, __LINE__, cairo_status_to_string(cairo_status(cr)));
++//            return FALSE;
++//        }
++//        //eglMakeCurrent(display, surface, surface, context);
++//
++//        cairo_set_line_width(cr, 9);
++//        cairo_set_source_rgb(cr, 0.69, 0.69, 0);
++//
++//        cairo_translate(cr, 250, 250);
++//        cairo_arc(cr, 0, 0, 250, 0, 2 * 3.1415927);
++//        cairo_stroke_preserve(cr);
++//
++//        cairo_set_source_rgb(cr, 0.9, 0.4, 0.3);
++//        cairo_fill(cr);
++//        cairo_restore(cr);
++//
++//        cairo_destroy(cr);
++//
++//        g_debug("some test drawn!");
++//    }
++
++    return impl->cairo_surface;
++}
++
++
++static void gdk_window_impl_android_end_paint(GdkWindow *window)
++{
++    GdkWindowImplAndroid *impl;
++
++    g_return_if_fail(GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED(window))
++        return;
++
++    impl = GDK_WINDOW_IMPL_ANDROID(window->impl);
++    // this would be used later in gdk_android_cairo_surface_destroy
++    // to avoid some unnecessary buffer swapping
++    impl->inside_end_paint = TRUE;
++}
++
++static GdkDragProtocol _gdk_android_window_get_drag_protocol(GdkWindow *window, GdkWindow **target)
++{
++    GdkDragProtocol protocol = GDK_DRAG_PROTO_NONE;
++    //protocol = GDK_DRAG_PROTO_LOCAL;
++
++    if (target)
++        *target = NULL;
++
++    return protocol;
++}
++
++void _gdk_android_window_register_dnd(GdkWindow *window)
++{
++}
++
++GdkDragContext *_gdk_android_window_drag_begin(GdkWindow *window,
++                                               GdkDevice *device,
++                                               GList     *targets)
++{
++    return NULL;
++}
++
++gint _gdk_android_window_get_property(GdkWindow   *window,
++                                      GdkAtom      property,
++                                      GdkAtom      type,
++                                      gulong       offset,
++                                      gulong       length,
++                                      gint         pdelete,
++                                      GdkAtom     *actual_property_type,
++                                      gint        *actual_format_type,
++                                      gint        *actual_length,
++                                      guchar     **data)
++{
++    g_return_val_if_fail (GDK_IS_WINDOW(window), FALSE);
++
++    if (GDK_WINDOW_DESTROYED (window))
++        return FALSE;
++
++    g_debug("unsupported _gdk_android_window_get_property is called");
++
++    return FALSE;
++}
++
++void _gdk_android_window_change_property(GdkWindow    *window,
++                                         GdkAtom       property,
++                                         GdkAtom       type,
++                                         gint          format,
++                                         GdkPropMode   mode,
++                                         const guchar *data,
++                                         gint          nelements)
++{
++    g_return_if_fail (GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED (window))
++        return;
++
++    g_debug("unsupported _gdk_android_window_change_property is called");
++}
++
++void _gdk_android_window_delete_property(GdkWindow *window, GdkAtom property)
++{
++    g_return_if_fail (GDK_IS_WINDOW(window));
++    if (GDK_WINDOW_DESTROYED (window))
++        return;
++
++    g_debug("unsupported _gdk_android_window_delete_property is called");
++}
++
++static void gdk_window_impl_android_class_init(GdkWindowImplAndroidClass *klass)
++{
++  GObjectClass *object_class = G_OBJECT_CLASS(klass);
++  GdkWindowImplClass *impl_class = GDK_WINDOW_IMPL_CLASS(klass);
++
++  //parent_class = g_type_class_peek_parent(klass);
++
++  object_class->finalize = gdk_window_impl_android_finalize;
++  
++  impl_class->ref_cairo_surface = gdk_android_ref_cairo_surface;
++
++  impl_class->show = gdk_android_window_show;
++  impl_class->hide = gdk_android_window_hide;
++  impl_class->withdraw = gdk_android_window_withdraw;
++  impl_class->set_events = gdk_android_window_set_events;
++  impl_class->get_events = gdk_android_window_get_events;
++  impl_class->raise = gdk_android_window_raise;
++  impl_class->lower = gdk_android_window_lower;
++  impl_class->restack_under = gdk_android_window_restack_under;
++  impl_class->restack_toplevel = gdk_android_window_restack_toplevel;
++  impl_class->move_resize = gdk_android_window_move_resize;
++  impl_class->set_background = gdk_android_window_set_background;
++  impl_class->reparent = gdk_android_window_reparent;
++  impl_class->set_device_cursor = gdk_android_window_set_device_cursor;
++  impl_class->get_geometry = gdk_android_window_get_geometry;
++  impl_class->get_device_state = gdk_window_android_get_device_state;
++  impl_class->get_root_coords = gdk_android_window_get_root_coords;
++
++  impl_class->shape_combine_region = gdk_android_window_shape_combine_region;
++  impl_class->input_shape_combine_region = gdk_android_input_shape_combine_region;
++  //impl_class->set_static_gravities = gdk_android_window_set_static_gravities;
++  impl_class->queue_antiexpose = _gdk_android_window_queue_antiexpose;
++  impl_class->destroy = gdk_android_window_destroy;
++  impl_class->destroy_foreign = gdk_android_window_destroy_foreign;
++  //impl_class->resize_cairo_surface = gdk_android_window_resize_cairo_surface;
++  impl_class->get_shape = gdk_android_window_get_shape;
++  impl_class->end_paint = gdk_window_impl_android_end_paint;
++
++  impl_class->focus = gdk_android_window_focus;
++  impl_class->set_type_hint = gdk_android_window_set_type_hint;
++  impl_class->get_type_hint = gdk_android_window_get_type_hint;
++  impl_class->set_modal_hint = gdk_android_window_set_modal_hint;
++  impl_class->set_skip_taskbar_hint = gdk_android_window_set_skip_taskbar_hint;
++  impl_class->set_skip_pager_hint = gdk_android_window_set_skip_pager_hint;
++  impl_class->set_urgency_hint = gdk_android_window_set_urgency_hint;
++  impl_class->set_geometry_hints = gdk_android_window_set_geometry_hints;
++  impl_class->set_title = gdk_android_window_set_title;
++  impl_class->set_role = gdk_android_window_set_role;
++  impl_class->set_transient_for = gdk_android_window_set_transient_for;
++  impl_class->get_frame_extents = gdk_android_window_get_frame_extents;
++  impl_class->set_override_redirect = gdk_android_window_set_override_redirect;
++  impl_class->set_accept_focus = gdk_android_window_set_accept_focus;
++  impl_class->set_focus_on_map = gdk_android_window_set_focus_on_map;
++  impl_class->set_icon_list = gdk_android_window_set_icon_list;
++  impl_class->set_icon_name = gdk_android_window_set_icon_name;
++  impl_class->iconify = gdk_android_window_iconify;
++  impl_class->deiconify = gdk_android_window_deiconify;
++  impl_class->stick = gdk_android_window_stick;
++  impl_class->unstick = gdk_android_window_unstick;
++  impl_class->maximize = gdk_android_window_maximize;
++  impl_class->unmaximize = gdk_android_window_unmaximize;
++  impl_class->fullscreen = gdk_android_window_fullscreen;
++  impl_class->unfullscreen = gdk_android_window_unfullscreen;
++  impl_class->set_keep_above = gdk_android_window_set_keep_above;
++  impl_class->set_keep_below = gdk_android_window_set_keep_below;
++  impl_class->get_group = gdk_android_window_get_group;
++  impl_class->set_group = gdk_android_window_set_group;
++  impl_class->set_decorations = gdk_android_window_set_decorations;
++  impl_class->get_decorations = gdk_android_window_get_decorations;
++  impl_class->set_functions = gdk_android_window_set_functions;
++
++  impl_class->begin_resize_drag = gdk_android_window_begin_resize_drag;
++  impl_class->begin_move_drag = gdk_android_window_begin_move_drag;
++  impl_class->set_opacity = gdk_android_window_set_opacity;
++  impl_class->destroy_notify = gdk_android_window_destroy_notify;
++  impl_class->get_drag_protocol = _gdk_android_window_get_drag_protocol;
++  impl_class->register_dnd = _gdk_android_window_register_dnd;
++  impl_class->drag_begin = _gdk_android_window_drag_begin;
++  impl_class->process_updates_recurse = gdk_android_window_process_updates_recurse;
++  impl_class->simulate_key = _gdk_android_window_simulate_key;
++  impl_class->simulate_button = _gdk_android_window_simulate_button;
++  impl_class->get_property = _gdk_android_window_get_property;
++  impl_class->change_property = _gdk_android_window_change_property;
++  impl_class->delete_property = _gdk_android_window_delete_property;
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gdk/gdkwindow-android.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkwindow-android.h
+--- gtk+-3.18.7/gdk/gdkwindow-android.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gdk/gdkwindow-android.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,80 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++// The initial implementation was based on gdk's gdkwindow-*.h files code
++// which is licensed under LGPLv2.1 terms
++//
++// ANativeWindow-based GDK window declarations
++
++#ifndef __GDK_WINDOW_ANDROID_H__
++#define __GDK_WINDOW_ANDROID_H__
++
++#include "gdkprivate-android.h"
++#include "gdk/gdkwindowimpl.h"
++#include "gdk/gdkcursor.h"
++
++
++G_BEGIN_DECLS
++
++/* Window implementation for Android
++ */
++
++typedef struct GdkWindowImplAndroid GdkWindowImplAndroid;
++typedef struct GdkWindowImplAndroidClass GdkWindowImplAndroidClass;
++
++#define GDK_TYPE_WINDOW_IMPL_ANDROID              (gdk_window_impl_android_get_type())
++#define GDK_WINDOW_IMPL_ANDROID(object)           (G_TYPE_CHECK_INSTANCE_CAST((object), GDK_TYPE_WINDOW_IMPL_ANDROID, GdkWindowImplAndroid))
++#define GDK_WINDOW_IMPL_ANDROID_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), GDK_TYPE_WINDOW_IMPL_ANDROID, GdkWindowImplAndroidClass))
++#define GDK_IS_WINDOW_IMPL_ANDROID(object)        (G_TYPE_CHECK_INSTANCE_TYPE((object), GDK_TYPE_WINDOW_IMPL_ANDROID))
++#define GDK_IS_WINDOW_IMPL_ANDROID_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE((klass), GDK_TYPE_WINDOW_IMPL_ANDROID))
++#define GDK_WINDOW_IMPL_ANDROID_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GDK_TYPE_WINDOW_IMPL_ANDROID, GdkWindowImplAndroidClass))
++
++struct GdkWindowImplAndroid
++{
++    GdkWindowImpl parent;
++
++    GdkWindow *wrapper;
++
++    cairo_surface_t *cairo_surface;
++    guint override_redirect;
++    GdkEventMask native_event_mask;
++    GdkWindowTypeHint type_hint;
++    gboolean inside_end_paint;
++};
++ 
++struct GdkWindowImplAndroidClass 
++{
++    GdkWindowImplClass parent;
++};
++
++GType gdk_window_impl_android_get_type();
++
++#define GDK_TYPE_ANDROID_WINDOW              (gdk_android_window_get_type ())
++#define GDK_ANDROID_WINDOW(object)           (G_TYPE_CHECK_INSTANCE_CAST ((object), GDK_TYPE_ANDROID_WINDOW, GdkWin32Window))
++#define GDK_ANDROID_WINDOW_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), GDK_TYPE_ANDROID_WINDOW, GdkWin32WindowClass))
++#define GDK_IS_ANDROID_WINDOW(object)        (G_TYPE_CHECK_INSTANCE_TYPE ((object), GDK_TYPE_ANDROID_WINDOW))
++#define GDK_IS_ANDROID_WINDOW_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GDK_TYPE_ANDROID_WINDOW))
++#define GDK_ANDROID_WINDOW_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), GDK_TYPE_ANDROID_WINDOW, GdkWin32WindowClass))
++
++#ifdef GDK_COMPILATION
++typedef struct GdkAndroidWindow GdkAndroidWindow;
++#else
++typedef GdkWindow GdkAndroidWindow;
++#endif
++typedef struct GdkAndroidWindowClass GdkAndroidWindowClass;
++
++GDK_AVAILABLE_IN_ALL
++GType gdk_android_window_get_type(void);
++
++
++G_END_DECLS
++
++#endif /* __GDK_WINDOW_ANDROID_H__ */
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gtk/Makefile.am /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/Makefile.am
+--- gtk+-3.18.7/gtk/Makefile.am	2016-01-07 08:55:56.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/Makefile.am	2016-03-21 08:50:43.000000000 +0530
+@@ -316,7 +316,8 @@
+ 	gtkwidget.h		\
+ 	gtkwidgetpath.h		\
+ 	gtkwindow.h		\
+-	gtkwindowgroup.h
++	gtkwindowgroup.h \
++	gtkandroid.h
+ 
+ if OS_UNIX
+ gtk_unix_print_public_h_sources = 	\
+@@ -531,7 +532,9 @@
+ 	gtkwidgetprivate.h	\
+ 	gtkwin32themeprivate.h	\
+ 	gtkwindowprivate.h	\
+-	gtktreemenu.h
++	gtktreemenu.h \
++	gtkandroidassets.h \
++	gtkandroidprivate.h
+ 
+ # GTK+ C sources to build the library from
+ gtk_base_c_sources = 		\
+@@ -644,7 +647,6 @@
+ 	gtkcssparser.c		\
+ 	gtkcsspathnode.c	\
+ 	gtkcsspositionvalue.c	\
+-	gtkcssprovider.c	\
+ 	gtkcssrepeatvalue.c	\
+ 	gtkcssrgbavalue.c	\
+ 	gtkcsssection.c 	\
+@@ -865,7 +867,10 @@
+ 	gtkwidgetpath.c		\
+ 	gtkwindow.c		\
+ 	gtkwindowgroup.c	\
+-	gtkwin32theme.c
++	gtkwin32theme.c \
++	gtkainit.c \
++	gtkcssprovider_hack.c \
++	gtkandroidassets.c
+ 
+ if USE_QUARTZ
+ gtk_base_c_sources += 		\
+diff -Naur gtk+-3.18.7/gtk/Makefile.in /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/Makefile.in
+--- gtk+-3.18.7/gtk/Makefile.in	2016-01-28 09:55:24.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/Makefile.in	2016-03-21 08:51:23.000000000 +0530
+@@ -327,12 +327,12 @@
+ 	gtkcssinheritvalue.c gtkcssinitialvalue.c gtkcsskeyframes.c \
+ 	gtkcsslookup.c gtkcssmatcher.c gtkcssnode.c \
+ 	gtkcssnodedeclaration.c gtkcssnumbervalue.c gtkcssparser.c \
+-	gtkcsspathnode.c gtkcsspositionvalue.c gtkcssprovider.c \
+-	gtkcssrepeatvalue.c gtkcssrgbavalue.c gtkcsssection.c \
+-	gtkcssselector.c gtkcssstringvalue.c gtkcssstyle.c \
+-	gtkcssshadowsvalue.c gtkcssshadowvalue.c \
+-	gtkcssshorthandproperty.c gtkcssshorthandpropertyimpl.c \
+-	gtkcssstaticstyle.c gtkcssstylefuncs.c gtkcssstyleproperty.c \
++	gtkcsspathnode.c gtkcsspositionvalue.c gtkcssrepeatvalue.c \
++	gtkcssrgbavalue.c gtkcsssection.c gtkcssselector.c \
++	gtkcssstringvalue.c gtkcssstyle.c gtkcssshadowsvalue.c \
++	gtkcssshadowvalue.c gtkcssshorthandproperty.c \
++	gtkcssshorthandpropertyimpl.c gtkcssstaticstyle.c \
++	gtkcssstylefuncs.c gtkcssstyleproperty.c \
+ 	gtkcssstylepropertyimpl.c gtkcsstransformvalue.c \
+ 	gtkcsstransientnode.c gtkcsstransition.c gtkcsstypedvalue.c \
+ 	gtkcssunsetvalue.c gtkcsstypes.c gtkcssvalue.c \
+@@ -396,7 +396,8 @@
+ 	gtktreesortable.c gtktreestore.c gtktreeview.c \
+ 	gtktreeviewcolumn.c gtktypebuiltins.c gtkvolumebutton.c \
+ 	gtkviewport.c gtkwidget.c gtkwidgetpath.c gtkwindow.c \
+-	gtkwindowgroup.c gtkwin32theme.c gtkclipboard-quartz.c \
++	gtkwindowgroup.c gtkwin32theme.c gtkainit.c \
++	gtkcssprovider_hack.c gtkandroidassets.c gtkclipboard-quartz.c \
+ 	gtkdnd-quartz.c gtkclipboard.c gtkdnd.c \
+ 	gtkcustompaperunixdialog.c gtkpagesetupunixdialog.c \
+ 	gtkprinter.c gtkprinteroption.c gtkprinteroptionset.c \
+@@ -616,7 +617,7 @@
+ 	libgtk_3_la-gtkcssnumbervalue.lo libgtk_3_la-gtkcssparser.lo \
+ 	libgtk_3_la-gtkcsspathnode.lo \
+ 	libgtk_3_la-gtkcsspositionvalue.lo \
+-	libgtk_3_la-gtkcssprovider.lo libgtk_3_la-gtkcssrepeatvalue.lo \
++	libgtk_3_la-gtkcssrepeatvalue.lo \
+ 	libgtk_3_la-gtkcssrgbavalue.lo libgtk_3_la-gtkcsssection.lo \
+ 	libgtk_3_la-gtkcssselector.lo libgtk_3_la-gtkcssstringvalue.lo \
+ 	libgtk_3_la-gtkcssstyle.lo libgtk_3_la-gtkcssshadowsvalue.lo \
+@@ -753,7 +754,9 @@
+ 	libgtk_3_la-gtkviewport.lo libgtk_3_la-gtkwidget.lo \
+ 	libgtk_3_la-gtkwidgetpath.lo libgtk_3_la-gtkwindow.lo \
+ 	libgtk_3_la-gtkwindowgroup.lo libgtk_3_la-gtkwin32theme.lo \
+-	$(am__objects_4) $(am__objects_5)
++	libgtk_3_la-gtkainit.lo libgtk_3_la-gtkcssprovider_hack.lo \
++	libgtk_3_la-gtkandroidassets.lo $(am__objects_4) \
++	$(am__objects_5)
+ am__objects_7 = libgtk_3_la-gtkcustompaperunixdialog.lo \
+ 	libgtk_3_la-gtkpagesetupunixdialog.lo \
+ 	libgtk_3_la-gtkprinter.lo libgtk_3_la-gtkprinteroption.lo \
+@@ -1775,7 +1778,8 @@
+ 	gtkwidget.h		\
+ 	gtkwidgetpath.h		\
+ 	gtkwindow.h		\
+-	gtkwindowgroup.h
++	gtkwindowgroup.h \
++	gtkandroid.h
+ 
+ @OS_UNIX_TRUE@gtk_unix_print_public_h_sources = \
+ @OS_UNIX_TRUE@	gtkpagesetupunixdialog.h	\
+@@ -1882,9 +1886,9 @@
+ 	gtktogglebuttonprivate.h gtktoolbarprivate.h \
+ 	gtktoolpaletteprivate.h gtktooltipprivate.h gtktreedatalist.h \
+ 	gtktreeprivate.h gtkwidgetprivate.h gtkwin32themeprivate.h \
+-	gtkwindowprivate.h gtktreemenu.h $(am__append_5) \
+-	$(am__append_7) $(am__append_10) $(am__append_14) \
+-	$(am__append_16)
++	gtkwindowprivate.h gtktreemenu.h gtkandroidassets.h \
++	gtkandroidprivate.h $(am__append_5) $(am__append_7) \
++	$(am__append_10) $(am__append_14) $(am__append_16)
+ 
+ # GTK+ C sources to build the library from
+ gtk_base_c_sources = $(a11y_c_sources) $(deprecated_c_sources) \
+@@ -1924,12 +1928,12 @@
+ 	gtkcssinheritvalue.c gtkcssinitialvalue.c gtkcsskeyframes.c \
+ 	gtkcsslookup.c gtkcssmatcher.c gtkcssnode.c \
+ 	gtkcssnodedeclaration.c gtkcssnumbervalue.c gtkcssparser.c \
+-	gtkcsspathnode.c gtkcsspositionvalue.c gtkcssprovider.c \
+-	gtkcssrepeatvalue.c gtkcssrgbavalue.c gtkcsssection.c \
+-	gtkcssselector.c gtkcssstringvalue.c gtkcssstyle.c \
+-	gtkcssshadowsvalue.c gtkcssshadowvalue.c \
+-	gtkcssshorthandproperty.c gtkcssshorthandpropertyimpl.c \
+-	gtkcssstaticstyle.c gtkcssstylefuncs.c gtkcssstyleproperty.c \
++	gtkcsspathnode.c gtkcsspositionvalue.c gtkcssrepeatvalue.c \
++	gtkcssrgbavalue.c gtkcsssection.c gtkcssselector.c \
++	gtkcssstringvalue.c gtkcssstyle.c gtkcssshadowsvalue.c \
++	gtkcssshadowvalue.c gtkcssshorthandproperty.c \
++	gtkcssshorthandpropertyimpl.c gtkcssstaticstyle.c \
++	gtkcssstylefuncs.c gtkcssstyleproperty.c \
+ 	gtkcssstylepropertyimpl.c gtkcsstransformvalue.c \
+ 	gtkcsstransientnode.c gtkcsstransition.c gtkcsstypedvalue.c \
+ 	gtkcssunsetvalue.c gtkcsstypes.c gtkcssvalue.c \
+@@ -1993,7 +1997,8 @@
+ 	gtktreesortable.c gtktreestore.c gtktreeview.c \
+ 	gtktreeviewcolumn.c gtktypebuiltins.c gtkvolumebutton.c \
+ 	gtkviewport.c gtkwidget.c gtkwidgetpath.c gtkwindow.c \
+-	gtkwindowgroup.c gtkwin32theme.c $(am__append_3) \
++	gtkwindowgroup.c gtkwin32theme.c gtkainit.c \
++	gtkcssprovider_hack.c gtkandroidassets.c $(am__append_3) \
+ 	$(am__append_4)
+ nodist_gtk_c_sources = $(gtk_dbus_built_sources)
+ gtk_c_sources = $(gtk_base_c_sources) $(am__append_6) $(am__append_8) \
+@@ -2774,7 +2779,9 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkactionobservable.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkactionobserver.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkadjustment.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkainit.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkallocatedbitmask.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkandroidassets.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkappchooser.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkappchooserbutton.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkappchooserdialog.Plo@am__quote@
+@@ -2868,7 +2875,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkcssparser.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkcsspathnode.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkcsspositionvalue.Plo@am__quote@
+-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkcssprovider.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkcssprovider_hack.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkcssrepeatvalue.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkcssrgbavalue.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgtk_3_la-gtkcsssection.Plo@am__quote@
+@@ -4876,13 +4883,6 @@
+ @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -c -o libgtk_3_la-gtkcsspositionvalue.lo `test -f 'gtkcsspositionvalue.c' || echo '$(srcdir)/'`gtkcsspositionvalue.c
+ 
+-libgtk_3_la-gtkcssprovider.lo: gtkcssprovider.c
+-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -MT libgtk_3_la-gtkcssprovider.lo -MD -MP -MF $(DEPDIR)/libgtk_3_la-gtkcssprovider.Tpo -c -o libgtk_3_la-gtkcssprovider.lo `test -f 'gtkcssprovider.c' || echo '$(srcdir)/'`gtkcssprovider.c
+-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgtk_3_la-gtkcssprovider.Tpo $(DEPDIR)/libgtk_3_la-gtkcssprovider.Plo
+-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gtkcssprovider.c' object='libgtk_3_la-gtkcssprovider.lo' libtool=yes @AMDEPBACKSLASH@
+-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -c -o libgtk_3_la-gtkcssprovider.lo `test -f 'gtkcssprovider.c' || echo '$(srcdir)/'`gtkcssprovider.c
+-
+ libgtk_3_la-gtkcssrepeatvalue.lo: gtkcssrepeatvalue.c
+ @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -MT libgtk_3_la-gtkcssrepeatvalue.lo -MD -MP -MF $(DEPDIR)/libgtk_3_la-gtkcssrepeatvalue.Tpo -c -o libgtk_3_la-gtkcssrepeatvalue.lo `test -f 'gtkcssrepeatvalue.c' || echo '$(srcdir)/'`gtkcssrepeatvalue.c
+ @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgtk_3_la-gtkcssrepeatvalue.Tpo $(DEPDIR)/libgtk_3_la-gtkcssrepeatvalue.Plo
+@@ -6430,6 +6430,27 @@
+ @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -c -o libgtk_3_la-gtkwin32theme.lo `test -f 'gtkwin32theme.c' || echo '$(srcdir)/'`gtkwin32theme.c
+ 
++libgtk_3_la-gtkainit.lo: gtkainit.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -MT libgtk_3_la-gtkainit.lo -MD -MP -MF $(DEPDIR)/libgtk_3_la-gtkainit.Tpo -c -o libgtk_3_la-gtkainit.lo `test -f 'gtkainit.c' || echo '$(srcdir)/'`gtkainit.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgtk_3_la-gtkainit.Tpo $(DEPDIR)/libgtk_3_la-gtkainit.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gtkainit.c' object='libgtk_3_la-gtkainit.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -c -o libgtk_3_la-gtkainit.lo `test -f 'gtkainit.c' || echo '$(srcdir)/'`gtkainit.c
++
++libgtk_3_la-gtkcssprovider_hack.lo: gtkcssprovider_hack.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -MT libgtk_3_la-gtkcssprovider_hack.lo -MD -MP -MF $(DEPDIR)/libgtk_3_la-gtkcssprovider_hack.Tpo -c -o libgtk_3_la-gtkcssprovider_hack.lo `test -f 'gtkcssprovider_hack.c' || echo '$(srcdir)/'`gtkcssprovider_hack.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgtk_3_la-gtkcssprovider_hack.Tpo $(DEPDIR)/libgtk_3_la-gtkcssprovider_hack.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gtkcssprovider_hack.c' object='libgtk_3_la-gtkcssprovider_hack.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -c -o libgtk_3_la-gtkcssprovider_hack.lo `test -f 'gtkcssprovider_hack.c' || echo '$(srcdir)/'`gtkcssprovider_hack.c
++
++libgtk_3_la-gtkandroidassets.lo: gtkandroidassets.c
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -MT libgtk_3_la-gtkandroidassets.lo -MD -MP -MF $(DEPDIR)/libgtk_3_la-gtkandroidassets.Tpo -c -o libgtk_3_la-gtkandroidassets.lo `test -f 'gtkandroidassets.c' || echo '$(srcdir)/'`gtkandroidassets.c
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgtk_3_la-gtkandroidassets.Tpo $(DEPDIR)/libgtk_3_la-gtkandroidassets.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gtkandroidassets.c' object='libgtk_3_la-gtkandroidassets.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -c -o libgtk_3_la-gtkandroidassets.lo `test -f 'gtkandroidassets.c' || echo '$(srcdir)/'`gtkandroidassets.c
++
+ libgtk_3_la-gtkclipboard-quartz.lo: gtkclipboard-quartz.c
+ @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgtk_3_la_CFLAGS) $(CFLAGS) -MT libgtk_3_la-gtkclipboard-quartz.lo -MD -MP -MF $(DEPDIR)/libgtk_3_la-gtkclipboard-quartz.Tpo -c -o libgtk_3_la-gtkclipboard-quartz.lo `test -f 'gtkclipboard-quartz.c' || echo '$(srcdir)/'`gtkclipboard-quartz.c
+ @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgtk_3_la-gtkclipboard-quartz.Tpo $(DEPDIR)/libgtk_3_la-gtkclipboard-quartz.Plo
+diff -Naur gtk+-3.18.7/gtk/gtk.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtk.h
+--- gtk+-3.18.7/gtk/gtk.h	2016-01-07 08:55:56.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtk.h	2016-03-07 13:56:16.000000000 +0530
+@@ -232,6 +232,7 @@
+ #include <gtk/gtkwidgetpath.h>
+ #include <gtk/gtkwindow.h>
+ #include <gtk/gtkwindowgroup.h>
++#include <gtk/gtkandroid.h>
+ 
+ #ifndef GTK_DISABLE_DEPRECATED
+ #include <gtk/deprecated/gtkarrow.h>
+diff -Naur gtk+-3.18.7/gtk/gtkadummyobject.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkadummyobject.c
+--- gtk+-3.18.7/gtk/gtkadummyobject.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkadummyobject.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,77 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// Various dummy classes/functions to shut the linker up
++
++#include "config.h"
++
++#include <gtk/gtk.h>
++
++#include "gtkmountoperationprivate.h"
++#include "gtkmountoperation.h"
++#include "gtkprintoperation.h"
++#include "gtkprintoperationpreview.h"
++#include "gtkprivate.h"
++
++
++///////////////////////////////////////////////////////////////////////////////////////
++// GtkMountOperation
++
++G_DEFINE_TYPE(GtkMountOperation, gtk_mount_operation, G_TYPE_MOUNT_OPERATION)
++
++static void gtk_mount_operation_class_init(GtkMountOperationClass *klass)
++{
++}
++
++static void gtk_mount_operation_init(GtkMountOperation *obj)
++{
++}
++
++GMountOperation *gtk_mount_operation_new(GtkWindow *parent)
++{
++    return g_object_new (GTK_TYPE_MOUNT_OPERATION, "parent", parent, NULL);
++}
++
++///////////////////////////////////////////////////////////////////////////////////////
++// GtkPrintOperation & GtkPrintOperationPreview
++
++GQuark gtk_print_error_quark(void)
++{
++    return g_quark_from_static_string ("gtk-print-error-quark");
++}
++
++G_DEFINE_TYPE(GtkPrintOperation, gtk_print_operation, GTK_TYPE_PRINT_OPERATION)
++
++static void gtk_print_operation_class_init(GtkPrintOperationClass *klass)
++{
++}
++
++static void gtk_print_operation_init(GtkPrintOperation *obj)
++{
++}
++
++GType gtk_print_operation_preview_get_type(void)
++{
++    static volatile gsize typeId = 0;
++    if (g_once_init_enter(&typeId))
++    {
++        GType tId = g_type_register_static_simple(G_TYPE_INTERFACE,
++                                       g_intern_static_string("GtkPrintOperationPreview"),
++                                       sizeof(GtkPrintOperationPreviewIface),
++                                       (GClassInitFunc) NULL,
++                                       0,
++                                       (GInstanceInitFunc) NULL,
++                                       (GTypeFlags) 0);
++        g_once_init_leave (&typeId, tId);
++    }
++    return typeId;
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gtk/gtkainit.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkainit.c
+--- gtk+-3.18.7/gtk/gtkainit.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkainit.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,164 @@
++// Copyright 2014-2015 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// Core android initialization functions
++
++#include "config.h"
++
++#include <stdlib.h>
++
++#include <jni.h>
++#include <gtk/gtk.h>
++
++#include <android/sensor.h>
++#include <android/log.h>
++#include <android_native_app_glue.h>
++
++#include "gtkandroid.h"
++#include "gdkandroiddisplay.h"
++#include "gdkandroidevents.h"
++#include "gtkandroidprivate.h"
++
++struct android_app *_gtk_android_glue_app = NULL;
++
++////////////////////////////////////////////////////////////////////////////////////
++// logging
++
++static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
++                        const gchar *message, gpointer user_data)
++{
++    android_LogPriority priority = ANDROID_LOG_VERBOSE;
++    if (log_level & G_LOG_LEVEL_ERROR)
++        priority = ANDROID_LOG_FATAL;
++    else if (log_level & G_LOG_LEVEL_CRITICAL)
++        priority = ANDROID_LOG_ERROR;
++    else if (log_level & G_LOG_LEVEL_WARNING)
++        priority = ANDROID_LOG_WARN;
++    else if (log_level & G_LOG_LEVEL_INFO || log_level & G_LOG_LEVEL_MESSAGE)
++        priority = ANDROID_LOG_INFO;
++    else if (log_level & G_LOG_LEVEL_DEBUG)
++        priority = ANDROID_LOG_DEBUG;
++    __android_log_print(priority, log_domain, "%s", message);
++}
++
++
++///////////////////////////////////////////////////////////////////////////////////
++// locale
++
++// Android NDK doesn't really support any locale except "C"
++char *setlocale(int category, const char *locale)
++{
++    static const char C_LOCALE_SETTING[] = "C";
++    return (char*) C_LOCALE_SETTING;
++}
++
++///////////////////////////////////////////////////////////////////////////////////
++// window event handlers & initialization
++
++static void (*default_gtk_window_class_constructed)(GObject *object) = NULL;
++
++void android_gtk_window_class_constructed(GObject *object)
++{
++    GtkWindow *w = GTK_WINDOW(object);
++
++    if (default_gtk_window_class_constructed)
++        (*default_gtk_window_class_constructed)(object);
++
++    gtk_window_set_has_resize_grip(w, FALSE);
++}
++
++static void adjust_default_font()
++{
++    GtkSettings *settings = gtk_settings_get_default();
++    const gchar *font = gdk_android_get_default_font();
++    g_assert(settings != NULL);
++
++    if (font)
++    {
++        gtk_settings_set_string_property(settings, "gtk-font-name", font, "gtk_android_init");
++        g_info("Default GTK+ font is set to '%s'", font);
++    }
++}
++
++static gtk_window_tweak_class()
++{
++    GObjectClass *objClass = G_OBJECT_CLASS(g_type_class_ref(GTK_TYPE_WINDOW));
++
++    if (objClass->constructed != android_gtk_window_class_constructed)
++    {
++        default_gtk_window_class_constructed = objClass->constructed;
++        objClass->constructed = android_gtk_window_class_constructed;
++    }
++}
++
++static void (*defaultActivityDestroyHandler)(ANativeActivity* activity) = NULL;
++
++static void onActivityDestroy(ANativeActivity* activity)
++{
++    // wait until the native_app is detached
++    defaultActivityDestroyHandler(activity);
++    // and kill this process
++    exit(0);
++}
++
++///////////////////////////////////////////////////////////////////////////////////
++// public API
++
++// Prepares basic infrastructure needed by gtk+ applications.
++// Call this function at the beginning of your android_main
++// instead of *gtk_init* which would be used on other platforms
++void gtk_android_init(struct android_app *state)
++{
++//  Let's not do this right now
++//    app_dummy(); // Make sure glue isn't stripped.
++
++    _gtk_android_glue_app = state;
++
++    g_log_set_default_handler(log_handler, NULL);
++
++    gdk_android_setup_app_callbacks(state, gtk_main_quit);
++    gdk_android_process_events_until_display_ready(state);
++
++    gtk_window_tweak_class();
++
++    gtk_init(NULL, NULL);
++
++    // g_object_get(settings, "gtk-font-name", &font_name, NULL);
++    adjust_default_font();
++}
++
++void gtk_android_exit(struct android_app *state)
++{
++    int ident;
++    int events;
++    struct android_poll_source* source;
++
++    // replace onDestroy handler to terminate the process AFTER everything is unloaded
++    if (!defaultActivityDestroyHandler)
++    {
++        defaultActivityDestroyHandler = state->activity->callbacks->onDestroy;
++        state->activity->callbacks->onDestroy = onActivityDestroy;
++    }
++
++    ANativeActivity_finish(state->activity);
++
++    while (!state->destroyRequested)
++    {
++        // Read all pending events.
++        while ((ident = ALooper_pollAll(0, NULL, &events, (void**)&source)) >= 0)
++        {
++            // Process this event.
++            if (source != NULL)
++                source->process(state, source);
++        }
++    }
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gtk/gtkandroid.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkandroid.h
+--- gtk+-3.18.7/gtk/gtkandroid.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkandroid.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,36 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// Core android initialization functions
++
++#ifndef __GTK_ANDROID_H__
++#define __GTK_ANDROID_H__
++
++#if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
++#error "Only <gtk/gtk.h> can be included directly."
++#endif
++
++#include <gtk/gtkentry.h>
++
++#include <android_native_app_glue.h>
++
++// Prepares basic infrastructure needed by gtk+ applications.
++// Call this function at the beginning of your android_main
++// instead of *gtk_init* which would be used on other platforms
++GDK_AVAILABLE_IN_ALL
++void gtk_android_init(struct android_app *state);
++
++// Finished the activity and makes sure it is properly unloaded
++GDK_AVAILABLE_IN_ALL
++void gtk_android_exit(struct android_app *state);
++
++#endif // __GTK_ANDROID_H__
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gtk/gtkandroidassets.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkandroidassets.c
+--- gtk+-3.18.7/gtk/gtkandroidassets.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkandroidassets.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,114 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// gfileutils-like Android "assets" accessors
++
++#include <gtk/gtk.h>
++
++#include "gtkandroidprivate.h"
++#include "gtkandroidassets.h"
++
++
++///////////////////////////////////////////////////////////////////////
++// class implementations
++
++struct GAAssetFile
++{
++    GObject parent_instance;
++
++    AAsset* asset;
++};
++
++struct GAAssetFileClass
++{
++    GObjectClass parent_class;
++};
++
++static void g_aasset_file_file_iface_init(GFileIface *iface);
++
++G_DEFINE_TYPE_WITH_CODE(GAAssetFile, g_aasset_file, G_TYPE_OBJECT,
++                        G_IMPLEMENT_INTERFACE(G_TYPE_FILE, g_aasset_file_file_iface_init))
++
++static void g_aasset_file_finalize(GObject *object)
++{
++    GAAssetFile *aaf = G_AASSET_FILE(object);
++
++    AAsset_close(aaf->asset);
++
++    G_OBJECT_CLASS(g_aasset_file_parent_class)->finalize(object);
++}
++
++static void g_aasset_file_class_init(GAAssetFileClass *klass)
++{
++    GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
++
++    gobject_class->finalize = g_aasset_file_finalize;
++}
++
++static void g_aasset_file_init(GAAssetFile *resource)
++{
++}
++
++static GFileInputStream *g_aasset_file_read(GFile         *file,
++                                            GCancellable  *cancellable,
++                                            GError       **error)
++{
++    GAAssetFile *aaf = G_AASSET_FILE(file);
++    GInputStream *stream;
++
++    stream = g_memory_input_stream_new_from_data(AAsset_getBuffer(aaf->asset),
++                                                 AAsset_getLength(aaf->asset),
++                                                 NULL);
++
++    // TODO: get rid of this hack in future
++    return (GFileInputStream *) stream;
++}
++
++static void g_aasset_file_file_iface_init(GFileIface *iface)
++{
++    iface->read_fn = g_aasset_file_read;
++}
++
++///////////////////////////////////////////////////////////////////////
++// public interface
++
++gboolean g_aasset_test(const gchar *filename, GFileTest test)
++{
++    if (test & G_FILE_TEST_EXISTS && g_str_has_prefix(filename, "assets/"))
++    {
++        AAssetManager* assetManager = _gtk_android_glue_app->activity->assetManager;
++        AAsset* asset =  AAssetManager_open(assetManager, filename + strlen("assets/"), AASSET_MODE_BUFFER);
++        if (!asset)
++            return FALSE;
++        AAsset_close(asset);
++        return TRUE;
++    }
++    return g_file_test(filename, test);
++}
++
++GFile *g_aasset_as_GFile_for_path(const char *path)
++{
++    GAAssetFile *aaf;
++    AAsset* asset;
++    AAssetManager* assetManager = _gtk_android_glue_app->activity->assetManager;
++
++    g_return_val_if_fail(path != NULL, NULL);
++    g_return_val_if_fail(g_str_has_prefix(path, "assets/"), NULL);
++
++    asset =  AAssetManager_open(assetManager, path + strlen("assets/"), AASSET_MODE_BUFFER);
++    g_return_val_if_fail(asset != NULL, NULL);
++
++    aaf = g_object_new(G_TYPE_AASSET_FILE, NULL);
++    aaf->asset = asset;
++
++    return G_FILE(aaf);
++}
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gtk/gtkandroidassets.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkandroidassets.h
+--- gtk+-3.18.7/gtk/gtkandroidassets.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkandroidassets.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,39 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// gfileutils-like Android "assets" accessors
++
++#ifndef __GTK_ANDROID_ASSETS_H__
++#define __GTK_ANDROID_ASSETS_H__
++
++#include "config.h"
++
++#include <gio/gio.h>
++
++#define G_TYPE_AASSET_FILE         (g_aasset_file_get_type ())
++#define G_AASSET_FILE(o)           (G_TYPE_CHECK_INSTANCE_CAST((o), G_TYPE_AASSET_FILE, GAAssetFile))
++#define G_AASSET_FILE_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_AASSET_FILE, GAAssetFileClass))
++#define G_IS_AASSET_FILE(o)        (G_TYPE_CHECK_INSTANCE_TYPE((o), G_TYPE_AASSET_FILE))
++#define G_IS_AASSET_FILE_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE((k), G_TYPE_AASSET_FILE))
++#define G_AASSET_FILE_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS((o), G_TYPE_AASSET_FILE, GAAssetFileClass))
++
++typedef struct GAAssetFile        GAAssetFile;
++typedef struct GAAssetFileClass   GAAssetFileClass;
++
++GType g_aasset_file_get_type(void);
++
++gboolean g_aasset_test(const gchar *filename, GFileTest test);
++
++GFile *g_aasset_as_GFile_for_path(const char *path);
++
++
++#endif // __GTK_ANDROID_ASSETS_H__
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gtk/gtkandroidprivate.h /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkandroidprivate.h
+--- gtk+-3.18.7/gtk/gtkandroidprivate.h	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkandroidprivate.h	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,22 @@
++// Copyright 2014 The GTK+Android Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://p2lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++//
++// Author(s): Evgeny Sologubov
++//
++// Core android initialization functions
++
++#ifndef __GTK_ANDROID_PRIVATE_H__
++#define __GTK_ANDROID_PRIVATE_H__
++
++#include <gtkandroid.h>
++
++extern struct android_app *_gtk_android_glue_app;
++
++#endif // __GTK_ANDROID_PRIVATE_H__
+\ No newline at end of file
+diff -Naur gtk+-3.18.7/gtk/gtkcssprovider_hack.c /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkcssprovider_hack.c
+--- gtk+-3.18.7/gtk/gtkcssprovider_hack.c	1970-01-01 05:30:00.000000000 +0530
++++ /Users/Eric/workspace/hemroid/vault/src/gtk+-3.18.7/gtk/gtkcssprovider_hack.c	2016-03-21 08:50:43.000000000 +0530
+@@ -0,0 +1,9 @@
++// This is a hack to gtkcssprovider.c, so it would use Android application ASSETS
++// instead of the local files system
++
++#include "gtkandroidassets.h"
++
++#define g_file_test g_aasset_test
++#define g_file_new_for_path g_aasset_as_GFile_for_path
++
++#include "gtkcssprovider.c"
+\ No newline at end of file

@@ -128,7 +128,7 @@ diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/Platform.h webkitgtk-2.10.7/Source/WT
  
 diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake	2016-01-29 21:59:32.000000000 +0530
-+++ webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake	2016-02-25 21:30:51.000000000 +0530
++++ webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake	2016-03-06 16:44:40.000000000 +0530
 @@ -15,7 +15,7 @@
      ${GLIB_GIO_LIBRARIES}
      ${GLIB_GOBJECT_LIBRARIES}
@@ -192,16 +192,73 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp
      bool isPOT(1UL << log2size == size);
 diff -Naur webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake	2016-01-29 21:59:32.000000000 +0530
-+++ webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake	2016-02-26 08:19:26.000000000 +0530
-@@ -512,7 +512,7 @@
-     ${GTK_INCLUDE_DIRS}
-     ${GDK_INCLUDE_DIRS}
++++ webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake	2016-03-13 21:31:18.000000000 +0530
+@@ -201,7 +201,7 @@
+     platform/text/hyphen/HyphenationLibHyphen.cpp
  )
+ 
+-list(APPEND WebCorePlatformGTK_SOURCES
++list(APPEND WebCore_SOURCES
+     editing/gtk/EditorGtk.cpp
+ 
+     page/gtk/DragControllerGtk.cpp
+@@ -264,6 +264,8 @@
+ set(WebCore_USER_AGENT_SCRIPTS_DEPENDENCIES ${WEBCORE_DIR}/platform/gtk/RenderThemeGtk.cpp)
+ 
+ list(APPEND WebCore_LIBRARIES
++    ${GTK_LIBRARIES}
++    ${GDK_LIBRARIES}
+     ${ATK_LIBRARIES}
+     ${CAIRO_LIBRARIES}
+     ${ENCHANT_LIBRARIES}
+@@ -294,6 +296,8 @@
+ )
+ 
+ list(APPEND WebCore_SYSTEM_INCLUDE_DIRECTORIES
++    ${GTK_INCLUDE_DIRS}
++    ${GDK_INCLUDE_DIRS}
+     ${ATK_INCLUDE_DIRS}
+     ${CAIRO_INCLUDE_DIRS}
+     ${ENCHANT_INCLUDE_DIRS}
+@@ -501,22 +505,22 @@
+     )
+ endif ()
+ 
+-add_library(WebCorePlatformGTK ${WebCore_LIBRARY_TYPE} ${WebCorePlatformGTK_SOURCES})
+-add_dependencies(WebCorePlatformGTK WebCore)
+-WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebCorePlatformGTK)
+-target_include_directories(WebCorePlatformGTK PRIVATE
+-    ${WebCore_INCLUDE_DIRECTORIES}
+-)
+-target_include_directories(WebCorePlatformGTK SYSTEM PRIVATE
+-    ${WebCore_SYSTEM_INCLUDE_DIRECTORIES}
+-    ${GTK_INCLUDE_DIRS}
+-    ${GDK_INCLUDE_DIRS}
+-)
 -target_link_libraries(WebCorePlatformGTK
-+target_link_libraries(WebCorePlatformGTK -Wl,--unresolved-symbols=ignore-in-object-files
-     ${WebCore_LIBRARIES}
-     ${GTK_LIBRARIES}
-     ${GDK_LIBRARIES}
+-    ${WebCore_LIBRARIES}
+-    ${GTK_LIBRARIES}
+-    ${GDK_LIBRARIES}
+-)
++#add_library(WebCorePlatformGTK ${WebCore_LIBRARY_TYPE} ${WebCorePlatformGTK_SOURCES})
++#add_dependencies(WebCorePlatformGTK WebCore)
++#WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebCorePlatformGTK)
++#target_include_directories(WebCorePlatformGTK PRIVATE
++#    ${WebCore_INCLUDE_DIRECTORIES}
++#)
++#target_include_directories(WebCorePlatformGTK SYSTEM PRIVATE
++#    ${WebCore_SYSTEM_INCLUDE_DIRECTORIES}
++#    ${GTK_INCLUDE_DIRS}
++#    ${GDK_INCLUDE_DIRS}
++#)
++#target_link_libraries(WebCorePlatformGTK -Wl,--unresolved-symbols=ignore-in-object-files
++#    ${WebCore_LIBRARIES}
++#    ${GTK_LIBRARIES}
++#    ${GDK_LIBRARIES}
++#)
+ 
+ include_directories(
+     ${WebCore_INCLUDE_DIRECTORIES}
 diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp
 --- webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp	2015-07-22 18:07:57.000000000 +0530
 +++ webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp	2016-02-25 08:25:04.000000000 +0530
@@ -525,6 +582,35 @@ diff -Naur webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp we
  
      RefPtr<SharedMemory> instance = adoptRef(new SharedMemory());
      instance->m_data = data;
+diff -Naur webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake
+--- webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-01-29 21:59:33.000000000 +0530
++++ webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-03-13 19:30:22.000000000 +0530
+@@ -570,7 +570,7 @@
+ 
+ list(APPEND WebKit2_LIBRARIES
+     GObjectDOMBindings
+-    WebCorePlatformGTK
++#    WebCorePlatformGTK
+     ${GTK_UNIX_PRINT_LIBRARIES}
+ )
+ 
+@@ -595,6 +595,16 @@
+     endif ()
+ endif ()
+ 
++list(APPEND WebKit2_LIBRARIES
++    gthread-2.0
++    pangoft2-1.0
++    epoxy
++    pixman-1
++    ffi
++    stdc++
++    icudata
++)
++
+ ADD_WHOLE_ARCHIVE_TO_LIBRARIES(WebKit2_LIBRARIES)
+ 
+ set(WebKit2_MARSHAL_LIST ${WEBKIT2_DIR}/UIProcess/API/gtk/webkit2marshal.list)
 diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp
 --- webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp	2016-01-28 14:25:09.000000000 +0530
 +++ webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp	2016-02-25 08:32:40.000000000 +0530
@@ -541,3 +627,126 @@ diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp webkitgtk-2.10.
          return result;
      }
      
+diff -Naur webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt
+--- webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt	2016-01-28 14:25:09.000000000 +0530
++++ webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt	2016-03-06 19:56:51.000000000 +0530
+@@ -57,7 +57,7 @@
+ include_directories(${MiniBrowser_INCLUDE_DIRECTORIES})
+ include_directories(SYSTEM ${MiniBrowser_SYSTEM_INCLUDE_DIRECTORIES})
+ add_executable(MiniBrowser ${MiniBrowser_SOURCES})
+-target_link_libraries(MiniBrowser ${MiniBrowser_LIBRARIES})
++target_link_libraries(MiniBrowser ${MiniBrowser_LIBRARIES} -pie)
+ set_target_properties(MiniBrowser PROPERTIES FOLDER "Tools")
+ 
+ install(TARGETS MiniBrowser DESTINATION "${EXEC_INSTALL_DIR}")
+diff -Naur webkitgtk-2.10.7/Tools/MiniBrowser/gtk/main.c webkitgtk-2.10.7/Tools/MiniBrowser/gtk/main.c
+--- webkitgtk-2.10.7/Tools/MiniBrowser/gtk/main.c	2016-01-29 21:59:33.000000000 +0530
++++ webkitgtk-2.10.7/Tools/MiniBrowser/gtk/main.c	2016-03-19 15:50:17.000000000 +0530
+@@ -33,6 +33,8 @@
+ #include <string.h>
+ #include <webkit2/webkit2.h>
+ 
++#include <android_native_app_glue.h>
++
+ #define MINI_BROWSER_ERROR (miniBrowserErrorQuark())
+ 
+ static const gchar **uriArguments = NULL;
+@@ -259,9 +261,78 @@
+     }
+ }
+ 
+-int main(int argc, char *argv[])
++static void hello(GtkWidget *widget, gpointer data)
++{
++    GtkWidget *box = (GtkWidget *) data;
++    GtkWidget *label = gtk_label_new("Hello!");
++    gtk_container_add(GTK_CONTAINER(box), label);
++    gtk_widget_show(label);
++}
++
++static void quit_gtk(GtkWidget *widget, gpointer data)
+ {
+-    gtk_init(&argc, &argv);
++    g_info("quit!");
++    gtk_main_quit();
++}
++
++//int main(int argc, char *argv[])
++void android_main(struct android_app *state)
++{
++/*
++    GtkWidget *window, *vbox, *hbox, *halign, *valign,
++              *edit, *button, *label;
++
++    //g_usleep(15 * 1000000);
++    app_dummy();
++    gtk_android_init(state);
++
++    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
++    gtk_window_maximize(GTK_WINDOW(window));
++
++    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 25);
++    valign = gtk_alignment_new(0, 1, 0, 0);
++    gtk_container_add(GTK_CONTAINER(vbox), valign);
++    gtk_container_add(GTK_CONTAINER(window), vbox);
++
++    //edit = gtk_entry_new();
++    //gtk_entry_set_text(GTK_ENTRY(edit), "Hello world");
++    //gtk_container_add(GTK_CONTAINER(vbox), edit);
++
++    button = gtk_button_new_with_label("Say Hello");
++    gtk_widget_set_size_request(button, 200, 100);
++    gtk_container_add(GTK_CONTAINER(vbox), button);
++    g_signal_connect(button, "clicked", G_CALLBACK(hello), vbox);
++
++    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
++
++    button = gtk_button_new_with_label("Quit");
++    gtk_widget_set_size_request(button, 200, 100);
++    gtk_container_add(GTK_CONTAINER(hbox), button);
++    g_signal_connect(button, "clicked", G_CALLBACK(quit_gtk), NULL);
++
++    halign = gtk_alignment_new(1, 0, 0, 0);
++    gtk_container_add(GTK_CONTAINER(halign), hbox);
++
++    gtk_box_pack_end(GTK_BOX(vbox), halign, FALSE, FALSE, 0);
++
++    //g_signal_connect_swapped(G_OBJECT(window), "destroy",
++    //    G_CALLBACK(gtk_main_quit), G_OBJECT(window));
++
++    gtk_widget_show_all(window);
++
++    gtk_main();
++
++    // Finish the activity and makes sure it is properly unloaded
++    gtk_android_exit(state);
++*/
++//    gtk_init(&argc, &argv);
++    char *args[] = {"MiniBrowser"};
++    char **argv = args;
++    int argc = 1;
++    
++    app_dummy();
++    
++    gtk_android_init(state);
+ #if ENABLE_DEVELOPER_MODE
+     g_setenv("WEBKIT_INJECTED_BUNDLE_PATH", WEBKIT_INJECTED_BUNDLE_PATH, FALSE);
+ #endif
+@@ -286,7 +357,7 @@
+         g_error_free(error);
+         g_option_context_free(context);
+ 
+-        return 1;
++        goto done;
+     }
+     g_option_context_free (context);
+ 
+@@ -307,5 +378,7 @@
+ 
+     gtk_main();
+ 
+-    return 0;
++done:
++    gtk_android_exit(state);
++//    return 0;
+ }
