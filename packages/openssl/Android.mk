@@ -1,11 +1,12 @@
 LOCAL_PATH := $(call my-dir)
+VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 # crypto
 include $(CLEAR_VARS)
 
 LOCAL_MODULE        := crypto
-LOCAL_SRC_FILES     := ../../$(TARGET_ARCH_ABI)/lib/libcrypto.a
-LOCAL_EXPORT_CFLAGS := -I$(LOCAL_PATH)/../../$(TARGET_ARCH_ABI)/include/openssl
+LOCAL_SRC_FILES     := $(VAULT_PATH)/lib/libcrypto.a
+LOCAL_EXPORT_CFLAGS := -I$(LOCAL_PATH)/$(VAULT_PATH)/include/openssl
 
 include $(PREBUILT_STATIC_LIBRARY)
 
@@ -13,7 +14,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE        := ssl
-LOCAL_SRC_FILES     := ../../$(TARGET_ARCH_ABI)/lib/libssl.a
-LOCAL_EXPORT_CFLAGS := -I$(LOCAL_PATH)/../../$(TARGET_ARCH_ABI)/include/openssl
+LOCAL_SRC_FILES     := $(VAULT_PATH)/lib/libssl.a
+LOCAL_EXPORT_CFLAGS := -I$(LOCAL_PATH)/$(VAULT_PATH)/include/openssl
 
 include $(PREBUILT_STATIC_LIBRARY)

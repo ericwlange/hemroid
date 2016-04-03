@@ -1,19 +1,23 @@
 LOCAL_PATH := $(call my-dir)
+VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE        	:= enchant
-LOCAL_SRC_FILES     	:= ../../$(TARGET_ARCH_ABI)/lib/libenchant.so
+LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libenchant.so
 LOCAL_SHARED_LIBRARIES 	:= glib libffi
-LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/../../$(TARGET_ARCH_ABI)/include
+LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include
 LOCAL_LDLIBS 			:= -lz -lm
-LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/../../$(TARGET_ARCH_ABI)/lib -l$(LOCAL_MODULE)
+LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -l$(LOCAL_MODULE)
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)
 	$(shell mkdir -p src/main/java/org/liquidplayer/hemroid)
-	$(shell cp -r $(LOCAL_PATH)/../../java/Enchant.java src/main/java/org/liquidplayer/hemroid)
+	$(shell cp -r $(LOCAL_PATH)/../enchant/java/Enchant.java src/main/java/org/liquidplayer/hemroid)
 $(LOCAL_MODULE)_JavaInterface:
 	$(eval EXPORT_JAVA_INTERFACE += new Enchant(context);)
+$(LOCAL_PATH)/$(LOCAL_SRC_FILES):
+	$(LOCAL_PATH)/../../hemroid install --abi=$(TARGET_ARCH_ABI) enchant
+libraries: $(LOCAL_PATH)/$(LOCAL_SRC_FILES)
 
-include $(PREBUILT_SHARED_LIBRARY)
+include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 
 $(call import-module, glib-2)

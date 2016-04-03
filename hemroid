@@ -504,6 +504,7 @@ class Install(Options):
         self._quiet = False
         self._verbose = False
         RM  = require('rm', 'RM')
+        CP  = require('cp', 'CP')
         
         self._apis = get_available_apis()
 
@@ -588,6 +589,7 @@ class Install(Options):
                             self.perform_steps(pkg,abi,self._api,sandbox)
                             Remove(['--quiet','--abi='+abi,pkg],loc=dest)
                             self.install_repo(pkg,abi,self._api,dest)
+                            
                         if not self._quiet:
                             print "[" + abi + "] " + \
                                 "Package '" + pkg + "' installed at " + dest
