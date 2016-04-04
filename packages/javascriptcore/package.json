@@ -1,0 +1,42 @@
+{
+    "version" : {
+        "major" : 2,
+        "minor" : 10,
+        "patch" : 7
+    },
+    "source" : {
+        "url" : "http://webkitgtk.org/releases/webkitgtk-2.10.7.tar.xz",
+        "dir" : "webkitgtk-2.10.7"
+    },
+    "dependencies": [
+        {
+            "package" : "icu",
+            "version" : {
+                "major" : 56,
+                "minor" : 1
+            }
+        },
+        {
+            "package" : "glib-2",
+            "version" : {
+                "major" : 2,
+                "minor" : 46,
+                "patch" : 2
+            }
+        }
+    ],
+    "patches" : [
+        "../webkitgtk+/webkitgtk-2.10.7.patch"
+    ],
+    "api" : {
+        "min" : 9
+    },
+    "steps": [
+        {
+            "message": "Building javascriptcore for android",
+            "environment": "cross",
+            "shell": "/bin/bash",
+            "script": "build_android.sh"
+        }
+    ]
+}

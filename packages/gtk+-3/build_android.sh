@@ -21,7 +21,7 @@ export LDFLAGS="${LDFLAGS} -L${PWD}/fakelib"
 export LIBS="${LIBS} -lpangocairo-1.0 -lpangoft2-1.0 -lgthread-2.0 -lfontconfig"
 export LIBS="${LIBS} -lxml2 -lharfbuzz -lstdc++ -lgnustl_shared -lfreetype -lpng16 -lz"
 export LIBS="${LIBS} -lcairo -lpixman-1 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lffi -lm"
-export LIBS="${LIBS} -landroid -llog"
+export LIBS="${LIBS} -lEGL -lGLESv2 -landroid -llog"
 
 ${SRCDIR}/configure --build=x86_64-unknown-linux-gnu --host=${PREFIX} --prefix=${OUTPUT} \
     --enable-static --enable-x11-backend=no --enable-broadway-backend=yes --disable-cups

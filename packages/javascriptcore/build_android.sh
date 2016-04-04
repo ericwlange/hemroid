@@ -19,11 +19,11 @@ case ${HOST} in
         ;;
 esac
 
-cmake -DCMAKE_TOOLCHAIN_FILE=${PKGDIR}/android.toolchain.cmake \
+cmake -DCMAKE_TOOLCHAIN_FILE=${PKGDIR}/../webkitgtk+/android.toolchain.cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DANDROID_STANDALONE_TOOLCHAIN=${PLATFORM}/.. \
     -DANDROID_STL=gnustl_shared \
-    -DPORT=GTK \
+    -DPORT=JSC \
     -DCMAKE_FIND_ROOT_PATH=${SANDBOX} \
     -DSANDBOX=${SANDBOX} \
     -DOTHER_INCLUDE_DIRS=${ANDROID_NDK}/sources/android/native_app_glue \
@@ -34,8 +34,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=${PKGDIR}/android.toolchain.cmake \
     -DCMAKE_INSTALL_PREFIX=${OUTPUT} \
     -DPKG_CONFIG_EXECUTABLE=`which pkg-config` \
     -DENABLE_JIT=${JIT} \
-    -DENABLE_INTROSPECTION=OFF \
-    -DENABLE_MINIBROWSER=OFF \
-    -DENABLE_GEOLOCATION=OFF -DENABLE_SPELLCHECK=ON \
     ${SRCDIR}
 make -j8 install
+
+

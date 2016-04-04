@@ -1,7 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
-ifneq (,$(filter 64,$(TARGET_ARCH_ABI)))
+ifneq (,$(findstring 64,$(TARGET_ARCH_ABI)))
 	LIB64=lib64
 else
 	LIB64=lib
