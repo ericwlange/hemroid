@@ -1,3 +1,104 @@
+diff -Naur webkitgtk-2.10.7/CMakeLists.txt webkitgtk-2.10.7/CMakeLists.txt
+--- webkitgtk-2.10.7/CMakeLists.txt	2016-01-29 21:59:31.000000000 +0530
++++ webkitgtk-2.10.7/CMakeLists.txt	2016-04-03 17:04:48.000000000 +0530
+@@ -41,7 +41,7 @@
+ # -----------------------------------------------------------------------------
+ # Determine which port will be built
+ # -----------------------------------------------------------------------------
+-set(ALL_PORTS Efl GTK AppleWin WinCairo Mac)
++set(ALL_PORTS Efl GTK AppleWin WinCairo Mac JSC)
+ set(PORT "NOPORT" CACHE STRING "choose which WebKit port to build (one of ${ALL_PORTS})")
+ 
+ list(FIND ALL_PORTS ${PORT} RET)
+diff -Naur webkitgtk-2.10.7/Source/CMakeLists.txt webkitgtk-2.10.7/Source/CMakeLists.txt
+--- webkitgtk-2.10.7/Source/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
++++ webkitgtk-2.10.7/Source/CMakeLists.txt	2016-04-03 17:14:19.000000000 +0530
+@@ -10,7 +10,9 @@
+ 
+ add_subdirectory(JavaScriptCore)
+ 
+-add_subdirectory(WebCore)
++if (ENABLE_WEBCORE)
++    add_subdirectory(WebCore)
++endif ()
+ 
+ if (WIN32 AND ENABLE_GRAPHICS_CONTEXT_3D)
+     add_subdirectory(ThirdParty/ANGLE)
+@@ -36,8 +38,10 @@
+ WEBKIT_SET_EXTRA_COMPILER_FLAGS(bmalloc ${ADDITIONAL_COMPILER_FLAGS})
+ WEBKIT_SET_EXTRA_COMPILER_FLAGS(WTF ${ADDITIONAL_COMPILER_FLAGS})
+ WEBKIT_SET_EXTRA_COMPILER_FLAGS(JavaScriptCore ${ADDITIONAL_COMPILER_FLAGS})
+-WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebCoreTestSupport ${ADDITIONAL_COMPILER_FLAGS})
+-WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebCore ${ADDITIONAL_COMPILER_FLAGS})
++if (ENABLE_WEBCORE)
++    WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebCoreTestSupport ${ADDITIONAL_COMPILER_FLAGS})
++    WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebCore ${ADDITIONAL_COMPILER_FLAGS})
++endif()
+ 
+ if (ENABLE_WEBKIT)
+     WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebKit ${ADDITIONAL_COMPILER_FLAGS})
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt
+--- webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-04-03 21:18:39.000000000 +0530
+@@ -752,7 +752,11 @@
+     ${JAVASCRIPTCORE_DIR}/llint/LLIntOffsetsExtractor.cpp
+     ${DERIVED_SOURCES_JAVASCRIPTCORE_DIR}/LLIntDesiredOffsets.h ${DERIVED_SOURCES_JAVASCRIPTCORE_DIR}/Bytecodes.h
+ )
+-target_link_libraries(LLIntOffsetsExtractor WTF)
++if ( MIPS OR MIPS64 )
++    target_link_libraries(LLIntOffsetsExtractor WTF -L${SANDBOX}/lib ffi gmodule-2.0 icudata)
++else ()
++    target_link_libraries(LLIntOffsetsExtractor WTF)
++endif ()
+ 
+ # The build system will execute asm.rb every time LLIntOffsetsExtractor's mtime is newer than
+ # LLIntAssembly.h's mtime. The problem we have here is: asm.rb has some built-in optimization
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake
+--- webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake	1970-01-01 05:30:00.000000000 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake	2016-04-03 17:11:19.000000000 +0530
+@@ -0,0 +1,42 @@
++set(JavaScriptCore_OUTPUT_NAME javascriptcoregtk-${WEBKITGTK_API_VERSION})
++
++configure_file(javascriptcoregtk.pc.in ${CMAKE_BINARY_DIR}/Source/JavaScriptCore/javascriptcoregtk-${WEBKITGTK_API_VERSION}.pc @ONLY)
++configure_file(JavaScriptCore.gir.in ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.gir @ONLY)
++
++add_custom_command(
++    OUTPUT ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.typelib
++    DEPENDS ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.gir
++    COMMAND ${INTROSPECTION_COMPILER} ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.gir -o ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.typelib
++)
++
++install(FILES "${CMAKE_BINARY_DIR}/Source/JavaScriptCore/javascriptcoregtk-${WEBKITGTK_API_VERSION}.pc"
++        DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
++)
++
++install(FILES API/JavaScript.h
++              API/JSBase.h
++              API/JSContextRef.h
++              API/JSObjectRef.h
++              API/JSStringRef.h
++              API/JSValueRef.h
++              API/WebKitAvailability.h
++        DESTINATION "${WEBKITGTK_HEADER_INSTALL_DIR}/JavaScriptCore"
++)
++
++if (ENABLE_INTROSPECTION)
++    install(FILES ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.gir
++            DESTINATION ${INTROSPECTION_INSTALL_GIRDIR}
++    )
++    install(FILES ${CMAKE_BINARY_DIR}/JavaScriptCore-${WEBKITGTK_API_VERSION}.typelib
++            DESTINATION ${INTROSPECTION_INSTALL_TYPELIBDIR}
++    )
++endif ()
++
++add_definitions(-DSTATICALLY_LINKED_WITH_WTF)
++
++list(APPEND JavaScriptCore_LIBRARIES
++    ${GLIB_LIBRARIES}
++)
++list(APPEND JavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES
++    ${GLIB_INCLUDE_DIRS}
++)
 diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp
 --- webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp	2016-01-29 21:59:32.000000000 +0530
 +++ webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp	2016-02-25 21:42:09.000000000 +0530
@@ -54,6 +155,22 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp webkitg
      return JSValue::encode(jsDoubleNumber(log2(exec->argument(0).toNumber(exec))));
  }
  
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt
+--- webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-04-03 21:37:34.000000000 +0530
+@@ -21,7 +21,11 @@
+ WEBKIT_WRAP_SOURCELIST(${JSC_SOURCES})
+ include_directories(./ ${JavaScriptCore_INCLUDE_DIRECTORIES})
+ add_executable(jsc ${JSC_SOURCES})
+-target_link_libraries(jsc ${JSC_LIBRARIES})
++if ( MIPS OR MIPS64 )
++    target_link_libraries(jsc ${JSC_LIBRARIES} -L${SANDBOX}/lib ffi gmodule-2.0 icudata)
++else ()
++    target_link_libraries(jsc ${JSC_LIBRARIES})
++endif ()
+ set_target_properties(jsc PROPERTIES FOLDER "JavaScriptCore")
+ 
+ if (JSC_OUTPUT_NAME)
 diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake	2013-08-03 21:40:38.000000000 +0530
 +++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake	2016-02-25 08:25:04.000000000 +0530
@@ -70,6 +187,120 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake webkit
  list(APPEND JSC_LIBRARIES
      ${GLIB_LIBRARIES}
  )
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake
+--- webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake	1970-01-01 05:30:00.000000000 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake	2016-04-03 17:20:47.000000000 +0530
+@@ -0,0 +1,12 @@
++include_directories(./ ${JavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES})
++
++string(REPLACE "-fpic" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
++string(REPLACE "-fPIC" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
++
++set_source_files_properties(../jsc.cpp PROPERTIES COMPILE_FLAGS -fpic)
++
++SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -pie" )
++
++list(APPEND JSC_LIBRARIES
++    ${GLIB_LIBRARIES}
++)
+diff -Naur webkitgtk-2.10.7/Source/PlatformJSC.cmake webkitgtk-2.10.7/Source/PlatformJSC.cmake
+--- webkitgtk-2.10.7/Source/PlatformJSC.cmake	1970-01-01 05:30:00.000000000 +0530
++++ webkitgtk-2.10.7/Source/PlatformJSC.cmake	2016-04-03 17:12:13.000000000 +0530
+@@ -0,0 +1,94 @@
++# This allows exposing a 'gir' target which builds all GObject introspection files.
++if (ENABLE_INTROSPECTION)
++    add_custom_target(gir ALL DEPENDS ${GObjectIntrospectionTargets})
++endif ()
++
++list(APPEND DocumentationDependencies
++    GObjectDOMBindings
++    WebKit2
++    "${CMAKE_SOURCE_DIR}/Source/WebKit2/UIProcess/API/gtk/docs/webkit2gtk-docs.sgml"
++    "${CMAKE_SOURCE_DIR}/Source/WebKit2/UIProcess/API/gtk/docs/webkit2gtk-${WEBKITGTK_API_VERSION}-sections.txt"
++)
++
++if (ENABLE_GTKDOC)
++    install(DIRECTORY ${CMAKE_BINARY_DIR}/Documentation/webkit2gtk-${WEBKITGTK_API_VERSION}/html/
++            DESTINATION "${CMAKE_INSTALL_DATADIR}/gtk-doc/html/webkit2gtk-${WEBKITGTK_API_VERSION}"
++    )
++    install(DIRECTORY ${CMAKE_BINARY_DIR}/Documentation/webkitdomgtk-${WEBKITGTK_API_VERSION}/html/
++            DESTINATION "${CMAKE_INSTALL_DATADIR}/gtk-doc/html/webkitdomgtk-${WEBKITGTK_API_VERSION}"
++    )
++endif ()
++
++macro(ADD_GTKDOC_GENERATOR _stamp_name _extra_args)
++    add_custom_command(
++        OUTPUT "${CMAKE_BINARY_DIR}/${_stamp_name}"
++        DEPENDS ${DocumentationDependencies}
++        COMMAND CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS} ${CMAKE_SOURCE_DIR}/Tools/gtk/generate-gtkdoc ${_extra_args}
++        COMMAND touch ${_stamp_name}
++        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
++    )
++endmacro()
++
++add_gtkdoc_generator("docs-build.stamp" "")
++if (ENABLE_GTKDOC)
++    add_custom_target(gtkdoc ALL DEPENDS "${CMAKE_BINARY_DIR}/docs-build.stamp")
++elseif (NOT ENABLED_COMPILER_SANITIZERS AND NOT CMAKE_CROSSCOMPILING)
++    add_custom_target(gtkdoc DEPENDS "${CMAKE_BINARY_DIR}/docs-build.stamp")
++
++    # Add a default build step which check that documentation does not have any warnings
++    # or errors. This is useful to prevent breaking documentation inadvertently during
++    # the course of development.
++    if (DEVELOPER_MODE)
++        add_gtkdoc_generator("docs-build-no-html.stamp" "--skip-html")
++        add_custom_target(gtkdoc-no-html ALL DEPENDS "${CMAKE_BINARY_DIR}/docs-build-no-html.stamp")
++    endif ()
++endif ()
++
++add_custom_target(check
++    COMMAND ${TOOLS_DIR}/Scripts/run-gtk-tests
++    COMMAND ${TOOLS_DIR}/gtk/check-for-webkitdom-api-breaks
++)
++
++if (DEVELOPER_MODE)
++    configure_file(
++        ${TOOLS_DIR}/gtk/manifest.txt.in
++        ${CMAKE_BINARY_DIR}/manifest.txt
++    )
++
++    add_custom_command(
++        OUTPUT ${CMAKE_BINARY_DIR}/webkitgtk-${PROJECT_VERSION}.tar
++        DEPENDS ${TOOLS_DIR}/gtk/make-dist.py
++        DEPENDS ${CMAKE_BINARY_DIR}/manifest.txt
++        DEPENDS WebKit2
++        DEPENDS gtkdoc
++        COMMAND ${TOOLS_DIR}/gtk/make-dist.py
++                --source-dir=${CMAKE_SOURCE_DIR}
++                --build-dir=${CMAKE_BINARY_DIR}
++                --version=${PROJECT_VERSION}
++                ${CMAKE_BINARY_DIR}/manifest.txt
++    )
++
++    add_custom_command(
++        OUTPUT ${CMAKE_BINARY_DIR}/webkitgtk-${PROJECT_VERSION}.tar.xz
++        DEPENDS ${CMAKE_BINARY_DIR}/webkitgtk-${PROJECT_VERSION}.tar
++        COMMAND xz -f ${CMAKE_BINARY_DIR}/webkitgtk-${PROJECT_VERSION}.tar
++    )
++
++    add_custom_target(dist
++        DEPENDS ${CMAKE_BINARY_DIR}/webkitgtk-${PROJECT_VERSION}.tar.xz
++    )
++
++    add_custom_target(distcheck
++        DEPENDS ${TOOLS_DIR}/gtk/make-dist.py
++        DEPENDS ${CMAKE_BINARY_DIR}/manifest.txt
++        DEPENDS WebKit2
++        DEPENDS gtkdoc
++        COMMAND ${TOOLS_DIR}/gtk/make-dist.py
++                --check
++                --source-dir=${CMAKE_SOURCE_DIR}
++                --build-dir=${CMAKE_BINARY_DIR}
++                --version=${PROJECT_VERSION}
++                ${CMAKE_BINARY_DIR}/manifest.txt
++        COMMAND xz -f ${CMAKE_BINARY_DIR}/webkitgtk-${PROJECT_VERSION}.tar
++    )
++endif ()
 diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp
 --- webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp	2016-01-29 21:59:32.000000000 +0530
 +++ webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp	2016-02-25 08:25:04.000000000 +0530
@@ -138,6 +369,34 @@ diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake webkitgtk-2.10.7/So
      ${ZLIB_LIBRARIES}
  )
  
+diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake
+--- webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake	1970-01-01 05:30:00.000000000 +0530
++++ webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake	2016-04-03 17:19:11.000000000 +0530
+@@ -0,0 +1,24 @@
++set(WTF_LIBRARY_TYPE STATIC)
++set(WTF_OUTPUT_NAME WTFGTK)
++
++list(APPEND WTF_SOURCES
++    glib/GLibUtilities.cpp
++    glib/GMainLoopSource.cpp
++    glib/GRefPtr.cpp
++    glib/GThreadSafeMainLoopSource.cpp
++    glib/MainThreadGLib.cpp
++    glib/RunLoopGLib.cpp
++    glib/WorkQueueGLib.cpp
++)
++
++list(APPEND WTF_LIBRARIES
++    ${GLIB_GIO_LIBRARIES}
++    ${GLIB_GOBJECT_LIBRARIES}
++    ${GLIB_LIBRARIES}
++#    pthread
++    ${ZLIB_LIBRARIES}
++)
++
++list(APPEND WTF_SYSTEM_INCLUDE_DIRECTORIES
++    ${GLIB_INCLUDE_DIRS}
++)
 diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp
 --- webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp	2016-01-28 14:25:09.000000000 +0530
 +++ webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp	2016-02-25 08:25:04.000000000 +0530
@@ -627,6 +886,151 @@ diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp webkitgtk-2.10.
          return result;
      }
      
+diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake
+--- webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake	2016-01-29 22:23:52.000000000 +0530
++++ webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake	2016-04-03 17:02:18.000000000 +0530
+@@ -201,6 +201,7 @@
+ endif ()
+ 
+ set(USE_UDIS86 ON)
++set(ENABLE_WEBCORE ON)
+ set(ENABLE_WEBKIT OFF)
+ set(ENABLE_WEBKIT2 ON)
+ set(ENABLE_PLUGIN_PROCESS ${ENABLE_X11_TARGET})
+diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake
+--- webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake	1970-01-01 05:30:00.000000000 +0530
++++ webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake	2016-04-03 17:01:28.000000000 +0530
+@@ -0,0 +1,130 @@
++include(GNUInstallDirs)
++
++set(PROJECT_VERSION_MAJOR 2)
++set(PROJECT_VERSION_MINOR 10)
++set(PROJECT_VERSION_MICRO 7)
++set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_MICRO})
++set(WEBKITGTK_API_VERSION 4.0)
++
++# IndexedDB support requires GCC 4.9, see https://bugs.webkit.org/show_bug.cgi?id=98932.
++if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
++    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9.0")
++        message(FATAL_ERROR "GCC 4.9.0 is required to build WebKitGTK+, use a newer GCC version or clang")
++    endif ()
++endif ()
++
++# Libtool library version, not to be confused with API version.
++# See http://www.gnu.org/software/libtool/manual/html_node/Libtool-versioning.html
++CALCULATE_LIBRARY_VERSIONS_FROM_LIBTOOL_TRIPLE(WEBKIT2 48 10 11)
++CALCULATE_LIBRARY_VERSIONS_FROM_LIBTOOL_TRIPLE(JAVASCRIPTCORE 20 15 2)
++
++# These are shared variables, but we special case their definition so that we can use the
++# CMAKE_INSTALL_* variables that are populated by the GNUInstallDirs macro.
++set(LIB_INSTALL_DIR "${CMAKE_INSTALL_FULL_LIBDIR}" CACHE PATH "Absolute path to library installation directory")
++set(EXEC_INSTALL_DIR "${CMAKE_INSTALL_FULL_BINDIR}" CACHE PATH "Absolute path to executable installation directory")
++set(LIBEXEC_INSTALL_DIR "${CMAKE_INSTALL_FULL_LIBEXECDIR}/webkit2gtk-${WEBKITGTK_API_VERSION}" CACHE PATH "Absolute path to install executables executed by the library")
++
++set(DATA_BUILD_DIR "${CMAKE_BINARY_DIR}/share/${WebKit_OUTPUT_NAME}")
++set(DATA_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/webkitgtk-${WEBKITGTK_API_VERSION}")
++set(WEBKITGTK_HEADER_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/webkitgtk-${WEBKITGTK_API_VERSION}")
++set(INTROSPECTION_INSTALL_GIRDIR "${CMAKE_INSTALL_FULL_DATADIR}/gir-1.0")
++set(INTROSPECTION_INSTALL_TYPELIBDIR "${LIB_INSTALL_DIR}/girepository-1.0")
++
++find_package(ICU REQUIRED)
++find_package(Threads REQUIRED)
++find_package(ZLIB REQUIRED)
++
++WEBKIT_OPTION_BEGIN()
++
++# Set the default value for ENABLE_GLES2 automatically.
++# We are not enabling or disabling automatically a feature here, because
++# the feature is by default always on (ENABLE_OPENGL=ON).
++# What we select here automatically is if we use OPENGL (ENABLE_GLES2=OFF)
++# or OPENGLES2 (ENABLE_GLES2=ON) for building the feature.
++set(ENABLE_GLES2_DEFAULT OFF)
++
++if (NOT OPENGL_FOUND AND OPENGLES2_FOUND)
++    set(ENABLE_GLES2_DEFAULT ON)
++endif ()
++
++if (CMAKE_SYSTEM_NAME MATCHES "Linux")
++    WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_MEMORY_SAMPLER PUBLIC ON)
++else ()
++    WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_MEMORY_SAMPLER PUBLIC OFF)
++endif ()
++
++WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_JIT PUBLIC ON)
++WEBKIT_OPTION_DEFAULT_PORT_VALUE(USE_SYSTEM_MALLOC PUBLIC OFF)
++
++# Finalize the value for all options. Do not attempt to use an option before
++# this point, and do not attempt to change any option after this point.
++WEBKIT_OPTION_END()
++
++set(USE_UDIS86 ON)
++set(ENABLE_WEBKIT OFF)
++set(ENABLE_WEBKIT2 OFF)
++set(ENABLE_WEBCORE OFF)
++
++add_definitions(-DBUILDING_GTK__=1)
++#add_definitions(-DGETTEXT_PACKAGE="WebKit2GTK-${WEBKITGTK_API_VERSION}")
++add_definitions(-DDATA_DIR="${CMAKE_INSTALL_DATADIR}")
++add_definitions(-DUSER_AGENT_GTK_MAJOR_VERSION=602)
++add_definitions(-DUSER_AGENT_GTK_MINOR_VERSION=1)
++add_definitions(-DWEBKITGTK_API_VERSION_STRING="${WEBKITGTK_API_VERSION}")
++
++#set(GTK_LIBRARIES ${GTK3_LIBRARIES})
++#set(GTK_INCLUDE_DIRS ${GTK3_INCLUDE_DIRS})
++#set(GDK_LIBRARIES ${GDK3_LIBRARIES})
++#set(GDK_INCLUDE_DIRS ${GDK3_INCLUDE_DIRS})
++
++#SET_AND_EXPOSE_TO_BUILD(HAVE_GTK_GESTURES ${GTK3_SUPPORTS_GESTURES})
++#SET_AND_EXPOSE_TO_BUILD(HAVE_GTK_UNIX_PRINTING ${GTK_UNIX_PRINT_FOUND})
++
++set(glib_components gio gobject gthread gmodule)
++if (ENABLE_GAMEPAD_DEPRECATED OR ENABLE_GEOLOCATION)
++    list(APPEND glib_components gio-unix)
++endif ()
++find_package(GLIB 2.36 REQUIRED COMPONENTS ${glib_components})
++
++# Override the cached variables, gtk-doc and gobject-introspection do not really work when cross-building.
++if (CMAKE_CROSSCOMPILING)
++    set(ENABLE_GTKDOC OFF)
++    set(ENABLE_INTROSPECTION OFF)
++endif ()
++
++set(SHOULD_INSTALL_JS_SHELL ON)
++
++# CMake does not automatically add --whole-archive when building shared objects from
++# a list of convenience libraries. This can lead to missing symbols in the final output.
++# We add --whole-archive to all libraries manually to prevent the linker from trimming
++# symbols that we actually need later. (--whole-archive isn't an option on XCode's
++# linker, though.)
++macro(ADD_WHOLE_ARCHIVE_TO_LIBRARIES _list_name)
++    if (NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
++        foreach (library IN LISTS ${_list_name})
++          list(APPEND ${_list_name}_TMP -Wl,--whole-archive ${library} -Wl,--no-whole-archive)
++        endforeach ()
++        set(${_list_name} "${${_list_name}_TMP}")
++    endif ()
++endmacro()
++
++if (CMAKE_MAJOR_VERSION LESS 3)
++    # Before CMake 3 it was necessary to use a build script instead of using cmake --build directly
++    # to preserve colors and pretty-printing.
++
++    build_command(COMMAND_LINE_TO_BUILD)
++    # build_command unconditionally adds -i (ignore errors) for make, and there's
++    # no reasonable way to turn that off, so we just replace it with -k, which has
++    # the same effect, except that the return code will indicate that an error occurred.
++    # See: http://www.cmake.org/cmake/help/v3.0/command/build_command.html
++    string(REPLACE " -i" " -k" COMMAND_LINE_TO_BUILD ${COMMAND_LINE_TO_BUILD})
++    file(WRITE
++        ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/build.sh
++        "#!/bin/sh\n"
++        "${COMMAND_LINE_TO_BUILD} $@"
++    )
++    file(COPY ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/build.sh
++        DESTINATION ${CMAKE_BINARY_DIR}
++        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE
++    )
++endif ()
 diff -Naur webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt
 --- webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt	2016-01-28 14:25:09.000000000 +0530
 +++ webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt	2016-03-06 19:56:51.000000000 +0530
