@@ -39,14 +39,14 @@ diff -Naur webkitgtk-2.10.7/Source/CMakeLists.txt webkitgtk-2.10.7/Source/CMakeL
      WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebKit ${ADDITIONAL_COMPILER_FLAGS})
 diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-04-03 21:18:39.000000000 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-04-05 21:14:58.000000000 +0530
 @@ -752,7 +752,11 @@
      ${JAVASCRIPTCORE_DIR}/llint/LLIntOffsetsExtractor.cpp
      ${DERIVED_SOURCES_JAVASCRIPTCORE_DIR}/LLIntDesiredOffsets.h ${DERIVED_SOURCES_JAVASCRIPTCORE_DIR}/Bytecodes.h
  )
 -target_link_libraries(LLIntOffsetsExtractor WTF)
 +if ( MIPS OR MIPS64 )
-+    target_link_libraries(LLIntOffsetsExtractor WTF -L${SANDBOX}/lib ffi gmodule-2.0 icudata)
++    target_link_libraries(LLIntOffsetsExtractor WTF -L${SANDBOX}/lib ffi gmodule-2.0 icudata intl iconv)
 +else ()
 +    target_link_libraries(LLIntOffsetsExtractor WTF)
 +endif ()
@@ -157,14 +157,14 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp webkitg
  
 diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-04-03 21:37:34.000000000 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-04-05 21:14:49.000000000 +0530
 @@ -21,7 +21,11 @@
  WEBKIT_WRAP_SOURCELIST(${JSC_SOURCES})
  include_directories(./ ${JavaScriptCore_INCLUDE_DIRECTORIES})
  add_executable(jsc ${JSC_SOURCES})
 -target_link_libraries(jsc ${JSC_LIBRARIES})
 +if ( MIPS OR MIPS64 )
-+    target_link_libraries(jsc ${JSC_LIBRARIES} -L${SANDBOX}/lib ffi gmodule-2.0 icudata)
++    target_link_libraries(jsc ${JSC_LIBRARIES} -L${SANDBOX}/lib64 -L${SANDBOX}/lib ffi gmodule-2.0 icudata intl iconv)
 +else ()
 +    target_link_libraries(jsc ${JSC_LIBRARIES})
 +endif ()
@@ -411,13 +411,22 @@ diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp webk
  #else
 diff -Naur webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-02-25 23:49:30.000000000 +0530
-@@ -3670,7 +3670,7 @@
++++ webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-04-05 21:14:29.000000000 +0530
+@@ -3670,7 +3670,16 @@
      WEBKIT_SET_EXTRA_COMPILER_FLAGS(ANGLESupport IGNORECXX_WARNINGS)
  endif ()
  
 -target_link_libraries(WebCore ${WebCore_LIBRARIES})
-+target_link_libraries(WebCore -Wl,--unresolved-symbols=ignore-in-object-files ${WebCore_LIBRARIES})
++if ( MIPS OR MIPS64 )
++    target_link_libraries(WebCore -Wl,--unresolved-symbols=ignore-in-object-files 
++        -L${SANDBOX}/lib64 -L${SANDBOX}/lib
++        ${WebCore_LIBRARIES}
++        ffi gmodule-2.0 icudata epoxy pangoft2-1.0 pixman-1 gthread-2.0
++        log android stdc++ intl iconv
++    )
++else ()
++    target_link_libraries(WebCore -Wl,--unresolved-symbols=ignore-in-object-files ${WebCore_LIBRARIES})
++endif ()
  
  if (WebCore_OUTPUT_NAME)
      set_target_properties(WebCore PROPERTIES OUTPUT_NAME ${WebCore_OUTPUT_NAME})
@@ -843,7 +852,7 @@ diff -Naur webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp we
      instance->m_data = data;
 diff -Naur webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-01-29 21:59:33.000000000 +0530
-+++ webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-03-13 19:30:22.000000000 +0530
++++ webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-04-04 19:05:19.000000000 +0530
 @@ -570,7 +570,7 @@
  
  list(APPEND WebKit2_LIBRARIES
@@ -870,6 +879,15 @@ diff -Naur webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake webkitgtk-2.10.7/So
  ADD_WHOLE_ARCHIVE_TO_LIBRARIES(WebKit2_LIBRARIES)
  
  set(WebKit2_MARSHAL_LIST ${WEBKIT2_DIR}/UIProcess/API/gtk/webkit2marshal.list)
+@@ -862,7 +872,7 @@
+ add_library(webkit2gtkinjectedbundle MODULE "${WEBKIT2_DIR}/WebProcess/gtk/WebGtkInjectedBundleMain.cpp")
+ add_dependencies(webkit2gtkinjectedbundle GObjectDOMBindings)
+ add_webkit2_prefix_header(webkit2gtkinjectedbundle)
+-target_link_libraries(webkit2gtkinjectedbundle WebKit2)
++target_link_libraries(webkit2gtkinjectedbundle WebKit2 log android)
+ 
+ # Add ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} to LD_LIBRARY_PATH
+ string(COMPARE EQUAL "$ENV{LD_LIBRARY_PATH}" "" ld_library_path_not_exist)
 diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp
 --- webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp	2016-01-28 14:25:09.000000000 +0530
 +++ webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp	2016-02-25 08:32:40.000000000 +0530
@@ -886,271 +904,3 @@ diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp webkitgtk-2.10.
          return result;
      }
      
-diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake
---- webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake	2016-01-29 22:23:52.000000000 +0530
-+++ webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake	2016-04-03 17:02:18.000000000 +0530
-@@ -201,6 +201,7 @@
- endif ()
- 
- set(USE_UDIS86 ON)
-+set(ENABLE_WEBCORE ON)
- set(ENABLE_WEBKIT OFF)
- set(ENABLE_WEBKIT2 ON)
- set(ENABLE_PLUGIN_PROCESS ${ENABLE_X11_TARGET})
-diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake
---- webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake	1970-01-01 05:30:00.000000000 +0530
-+++ webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake	2016-04-03 17:01:28.000000000 +0530
-@@ -0,0 +1,130 @@
-+include(GNUInstallDirs)
-+
-+set(PROJECT_VERSION_MAJOR 2)
-+set(PROJECT_VERSION_MINOR 10)
-+set(PROJECT_VERSION_MICRO 7)
-+set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_MICRO})
-+set(WEBKITGTK_API_VERSION 4.0)
-+
-+# IndexedDB support requires GCC 4.9, see https://bugs.webkit.org/show_bug.cgi?id=98932.
-+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9.0")
-+        message(FATAL_ERROR "GCC 4.9.0 is required to build WebKitGTK+, use a newer GCC version or clang")
-+    endif ()
-+endif ()
-+
-+# Libtool library version, not to be confused with API version.
-+# See http://www.gnu.org/software/libtool/manual/html_node/Libtool-versioning.html
-+CALCULATE_LIBRARY_VERSIONS_FROM_LIBTOOL_TRIPLE(WEBKIT2 48 10 11)
-+CALCULATE_LIBRARY_VERSIONS_FROM_LIBTOOL_TRIPLE(JAVASCRIPTCORE 20 15 2)
-+
-+# These are shared variables, but we special case their definition so that we can use the
-+# CMAKE_INSTALL_* variables that are populated by the GNUInstallDirs macro.
-+set(LIB_INSTALL_DIR "${CMAKE_INSTALL_FULL_LIBDIR}" CACHE PATH "Absolute path to library installation directory")
-+set(EXEC_INSTALL_DIR "${CMAKE_INSTALL_FULL_BINDIR}" CACHE PATH "Absolute path to executable installation directory")
-+set(LIBEXEC_INSTALL_DIR "${CMAKE_INSTALL_FULL_LIBEXECDIR}/webkit2gtk-${WEBKITGTK_API_VERSION}" CACHE PATH "Absolute path to install executables executed by the library")
-+
-+set(DATA_BUILD_DIR "${CMAKE_BINARY_DIR}/share/${WebKit_OUTPUT_NAME}")
-+set(DATA_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/webkitgtk-${WEBKITGTK_API_VERSION}")
-+set(WEBKITGTK_HEADER_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/webkitgtk-${WEBKITGTK_API_VERSION}")
-+set(INTROSPECTION_INSTALL_GIRDIR "${CMAKE_INSTALL_FULL_DATADIR}/gir-1.0")
-+set(INTROSPECTION_INSTALL_TYPELIBDIR "${LIB_INSTALL_DIR}/girepository-1.0")
-+
-+find_package(ICU REQUIRED)
-+find_package(Threads REQUIRED)
-+find_package(ZLIB REQUIRED)
-+
-+WEBKIT_OPTION_BEGIN()
-+
-+# Set the default value for ENABLE_GLES2 automatically.
-+# We are not enabling or disabling automatically a feature here, because
-+# the feature is by default always on (ENABLE_OPENGL=ON).
-+# What we select here automatically is if we use OPENGL (ENABLE_GLES2=OFF)
-+# or OPENGLES2 (ENABLE_GLES2=ON) for building the feature.
-+set(ENABLE_GLES2_DEFAULT OFF)
-+
-+if (NOT OPENGL_FOUND AND OPENGLES2_FOUND)
-+    set(ENABLE_GLES2_DEFAULT ON)
-+endif ()
-+
-+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-+    WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_MEMORY_SAMPLER PUBLIC ON)
-+else ()
-+    WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_MEMORY_SAMPLER PUBLIC OFF)
-+endif ()
-+
-+WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_JIT PUBLIC ON)
-+WEBKIT_OPTION_DEFAULT_PORT_VALUE(USE_SYSTEM_MALLOC PUBLIC OFF)
-+
-+# Finalize the value for all options. Do not attempt to use an option before
-+# this point, and do not attempt to change any option after this point.
-+WEBKIT_OPTION_END()
-+
-+set(USE_UDIS86 ON)
-+set(ENABLE_WEBKIT OFF)
-+set(ENABLE_WEBKIT2 OFF)
-+set(ENABLE_WEBCORE OFF)
-+
-+add_definitions(-DBUILDING_GTK__=1)
-+#add_definitions(-DGETTEXT_PACKAGE="WebKit2GTK-${WEBKITGTK_API_VERSION}")
-+add_definitions(-DDATA_DIR="${CMAKE_INSTALL_DATADIR}")
-+add_definitions(-DUSER_AGENT_GTK_MAJOR_VERSION=602)
-+add_definitions(-DUSER_AGENT_GTK_MINOR_VERSION=1)
-+add_definitions(-DWEBKITGTK_API_VERSION_STRING="${WEBKITGTK_API_VERSION}")
-+
-+#set(GTK_LIBRARIES ${GTK3_LIBRARIES})
-+#set(GTK_INCLUDE_DIRS ${GTK3_INCLUDE_DIRS})
-+#set(GDK_LIBRARIES ${GDK3_LIBRARIES})
-+#set(GDK_INCLUDE_DIRS ${GDK3_INCLUDE_DIRS})
-+
-+#SET_AND_EXPOSE_TO_BUILD(HAVE_GTK_GESTURES ${GTK3_SUPPORTS_GESTURES})
-+#SET_AND_EXPOSE_TO_BUILD(HAVE_GTK_UNIX_PRINTING ${GTK_UNIX_PRINT_FOUND})
-+
-+set(glib_components gio gobject gthread gmodule)
-+if (ENABLE_GAMEPAD_DEPRECATED OR ENABLE_GEOLOCATION)
-+    list(APPEND glib_components gio-unix)
-+endif ()
-+find_package(GLIB 2.36 REQUIRED COMPONENTS ${glib_components})
-+
-+# Override the cached variables, gtk-doc and gobject-introspection do not really work when cross-building.
-+if (CMAKE_CROSSCOMPILING)
-+    set(ENABLE_GTKDOC OFF)
-+    set(ENABLE_INTROSPECTION OFF)
-+endif ()
-+
-+set(SHOULD_INSTALL_JS_SHELL ON)
-+
-+# CMake does not automatically add --whole-archive when building shared objects from
-+# a list of convenience libraries. This can lead to missing symbols in the final output.
-+# We add --whole-archive to all libraries manually to prevent the linker from trimming
-+# symbols that we actually need later. (--whole-archive isn't an option on XCode's
-+# linker, though.)
-+macro(ADD_WHOLE_ARCHIVE_TO_LIBRARIES _list_name)
-+    if (NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
-+        foreach (library IN LISTS ${_list_name})
-+          list(APPEND ${_list_name}_TMP -Wl,--whole-archive ${library} -Wl,--no-whole-archive)
-+        endforeach ()
-+        set(${_list_name} "${${_list_name}_TMP}")
-+    endif ()
-+endmacro()
-+
-+if (CMAKE_MAJOR_VERSION LESS 3)
-+    # Before CMake 3 it was necessary to use a build script instead of using cmake --build directly
-+    # to preserve colors and pretty-printing.
-+
-+    build_command(COMMAND_LINE_TO_BUILD)
-+    # build_command unconditionally adds -i (ignore errors) for make, and there's
-+    # no reasonable way to turn that off, so we just replace it with -k, which has
-+    # the same effect, except that the return code will indicate that an error occurred.
-+    # See: http://www.cmake.org/cmake/help/v3.0/command/build_command.html
-+    string(REPLACE " -i" " -k" COMMAND_LINE_TO_BUILD ${COMMAND_LINE_TO_BUILD})
-+    file(WRITE
-+        ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/build.sh
-+        "#!/bin/sh\n"
-+        "${COMMAND_LINE_TO_BUILD} $@"
-+    )
-+    file(COPY ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/build.sh
-+        DESTINATION ${CMAKE_BINARY_DIR}
-+        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE
-+    )
-+endif ()
-diff -Naur webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt
---- webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt	2016-01-28 14:25:09.000000000 +0530
-+++ webkitgtk-2.10.7/Tools/MiniBrowser/gtk/CMakeLists.txt	2016-03-06 19:56:51.000000000 +0530
-@@ -57,7 +57,7 @@
- include_directories(${MiniBrowser_INCLUDE_DIRECTORIES})
- include_directories(SYSTEM ${MiniBrowser_SYSTEM_INCLUDE_DIRECTORIES})
- add_executable(MiniBrowser ${MiniBrowser_SOURCES})
--target_link_libraries(MiniBrowser ${MiniBrowser_LIBRARIES})
-+target_link_libraries(MiniBrowser ${MiniBrowser_LIBRARIES} -pie)
- set_target_properties(MiniBrowser PROPERTIES FOLDER "Tools")
- 
- install(TARGETS MiniBrowser DESTINATION "${EXEC_INSTALL_DIR}")
-diff -Naur webkitgtk-2.10.7/Tools/MiniBrowser/gtk/main.c webkitgtk-2.10.7/Tools/MiniBrowser/gtk/main.c
---- webkitgtk-2.10.7/Tools/MiniBrowser/gtk/main.c	2016-01-29 21:59:33.000000000 +0530
-+++ webkitgtk-2.10.7/Tools/MiniBrowser/gtk/main.c	2016-03-19 15:50:17.000000000 +0530
-@@ -33,6 +33,8 @@
- #include <string.h>
- #include <webkit2/webkit2.h>
- 
-+#include <android_native_app_glue.h>
-+
- #define MINI_BROWSER_ERROR (miniBrowserErrorQuark())
- 
- static const gchar **uriArguments = NULL;
-@@ -259,9 +261,78 @@
-     }
- }
- 
--int main(int argc, char *argv[])
-+static void hello(GtkWidget *widget, gpointer data)
-+{
-+    GtkWidget *box = (GtkWidget *) data;
-+    GtkWidget *label = gtk_label_new("Hello!");
-+    gtk_container_add(GTK_CONTAINER(box), label);
-+    gtk_widget_show(label);
-+}
-+
-+static void quit_gtk(GtkWidget *widget, gpointer data)
- {
--    gtk_init(&argc, &argv);
-+    g_info("quit!");
-+    gtk_main_quit();
-+}
-+
-+//int main(int argc, char *argv[])
-+void android_main(struct android_app *state)
-+{
-+/*
-+    GtkWidget *window, *vbox, *hbox, *halign, *valign,
-+              *edit, *button, *label;
-+
-+    //g_usleep(15 * 1000000);
-+    app_dummy();
-+    gtk_android_init(state);
-+
-+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-+    gtk_window_maximize(GTK_WINDOW(window));
-+
-+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 25);
-+    valign = gtk_alignment_new(0, 1, 0, 0);
-+    gtk_container_add(GTK_CONTAINER(vbox), valign);
-+    gtk_container_add(GTK_CONTAINER(window), vbox);
-+
-+    //edit = gtk_entry_new();
-+    //gtk_entry_set_text(GTK_ENTRY(edit), "Hello world");
-+    //gtk_container_add(GTK_CONTAINER(vbox), edit);
-+
-+    button = gtk_button_new_with_label("Say Hello");
-+    gtk_widget_set_size_request(button, 200, 100);
-+    gtk_container_add(GTK_CONTAINER(vbox), button);
-+    g_signal_connect(button, "clicked", G_CALLBACK(hello), vbox);
-+
-+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
-+
-+    button = gtk_button_new_with_label("Quit");
-+    gtk_widget_set_size_request(button, 200, 100);
-+    gtk_container_add(GTK_CONTAINER(hbox), button);
-+    g_signal_connect(button, "clicked", G_CALLBACK(quit_gtk), NULL);
-+
-+    halign = gtk_alignment_new(1, 0, 0, 0);
-+    gtk_container_add(GTK_CONTAINER(halign), hbox);
-+
-+    gtk_box_pack_end(GTK_BOX(vbox), halign, FALSE, FALSE, 0);
-+
-+    //g_signal_connect_swapped(G_OBJECT(window), "destroy",
-+    //    G_CALLBACK(gtk_main_quit), G_OBJECT(window));
-+
-+    gtk_widget_show_all(window);
-+
-+    gtk_main();
-+
-+    // Finish the activity and makes sure it is properly unloaded
-+    gtk_android_exit(state);
-+*/
-+//    gtk_init(&argc, &argv);
-+    char *args[] = {"MiniBrowser"};
-+    char **argv = args;
-+    int argc = 1;
-+    
-+    app_dummy();
-+    
-+    gtk_android_init(state);
- #if ENABLE_DEVELOPER_MODE
-     g_setenv("WEBKIT_INJECTED_BUNDLE_PATH", WEBKIT_INJECTED_BUNDLE_PATH, FALSE);
- #endif
-@@ -286,7 +357,7 @@
-         g_error_free(error);
-         g_option_context_free(context);
- 
--        return 1;
-+        goto done;
-     }
-     g_option_context_free (context);
- 
-@@ -307,5 +378,7 @@
- 
-     gtk_main();
- 
--    return 0;
-+done:
-+    gtk_android_exit(state);
-+//    return 0;
- }
