@@ -11,6 +11,10 @@ case $PREFIX in
         ;;
     *mips64*)
         rm -f ${SRCDIR}/mpn/mips64/{addmul_1.asm,submul_1.asm,mul_1.asm,sqr_diagonal.asm,umul.asm}
+        export ABI=
+        ;;
+    *)
+        export ABI=
         ;;
 esac
 

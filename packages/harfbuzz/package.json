@@ -31,6 +31,14 @@
                 "minor" : 6,
                 "patch" : 3
             }
+        },
+        {
+            "package" : "libpng",
+            "version" : {
+                "major" : 1,
+                "minor" : 6,
+                "patch" : 21
+            }
         }
     ],
     "patches" : [
