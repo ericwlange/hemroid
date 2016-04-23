@@ -432,10 +432,11 @@ class Install(Options):
             print "[" + abi + "] " + \
                 "Packaging repo " + pkgtar
         command = "(find " + OUTPUT + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
-            "xargs sed -i'' -e 's|" + SANDBOX + "|{{SANDBOX}}|g') ; "
+            "xargs sed -i.killme -e 's|" + SANDBOX + "|{{SANDBOX}}|g') ; "
         command = command + \
             "(find " + OUTPUT + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
-            "xargs sed -i'' -e 's|" + OUTPUT + "|{{SANDBOX}}|g')"
+            "xargs sed -i.killme -e 's|" + OUTPUT + "|{{SANDBOX}}|g') ; "
+        command = command + "(find " + OUTPUT + " -name \"*\.killme\" | xargs rm -f)"
         process = Popen(command,stdout=PIPE,stderr=STDOUT,shell=True)
         proc_stdout = process.communicate()[0].strip()
         if process.returncode != 0: raise ValueError(proc_stdout)
@@ -487,8 +488,9 @@ class Install(Options):
             mkdir_p(dest)
             output = call([TAR,'-xzf',REPODIR + '/' + repo,'-C',dest])
             if output !=0: raise ValueError("Failed to extract repo")
-            command = "find " + dest + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
-                "xargs sed -i'' -e 's|{{SANDBOX}}|" + dest + "|g'"
+            command = "(find " + dest + " -name \"*\.pc\" -o -name \"*\.la\" | " + \
+                "xargs sed -i.killme -e 's|{{SANDBOX}}|" + dest + "|g') ; "
+            command = command + "(find " + dest + " -name \"*\.killme\" | xargs rm -f)"
             process = Popen(command,stdout=PIPE,stderr=STDOUT,shell=True)
             proc_stdout = process.communicate()[0].strip()
             if process.returncode != 0: raise ValueError(proc_stdout)
