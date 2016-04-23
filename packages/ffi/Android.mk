@@ -9,7 +9,7 @@ endif
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE		:= libffi
+LOCAL_MODULE		:= libffi_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES		:= $(VAULT_PATH)/$(LIB64)/libffi.so
 LOCAL_EXPORT_CFLAGS := -I$(LOCAL_PATH)/$(VAULT_PATH)/$(LIB64)/libffi-3.0.13/include
 LOCAL_EXPORT_LDLIBS := -L$(LOCAL_PATH)/$(VAULT_PATH)/$(LIB64) -lffi

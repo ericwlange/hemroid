@@ -4,7 +4,7 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 # libpng
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        := libpng
+LOCAL_MODULE        := libpng_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     := $(VAULT_PATH)/lib/libpng16.so
 LOCAL_EXPORT_CFLAGS := -I$(LOCAL_PATH)/$(VAULT_PATH)/include/libpng16
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lpng16

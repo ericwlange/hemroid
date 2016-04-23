@@ -4,9 +4,9 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 # pango
 include $(CLEAR_VARS)
 
-LOCAL_MODULE			:= pango
+LOCAL_MODULE			:= pango_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libpango-1.0.so
-LOCAL_SHARED_LIBRARIES	:= gthread gobject
+LOCAL_SHARED_LIBRARIES	:= gthread_$(TARGET_ARCH_ABI) gobject_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS		:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/pango-1.0
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lpango-1.0
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)
@@ -23,9 +23,10 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # pangoft2
 include $(CLEAR_VARS)
 
-LOCAL_MODULE			:= pangoft2
+LOCAL_MODULE			:= pangoft2_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libpangoft2-1.0.so
-LOCAL_SHARED_LIBRARIES	:= pango freetype harfbuzz fontconfig
+LOCAL_SHARED_LIBRARIES	:= pango_$(TARGET_ARCH_ABI) freetype_$(TARGET_ARCH_ABI) \
+                           harfbuzz_$(TARGET_ARCH_ABI) fontconfig_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS		:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/pango-1.0
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lpangoft2-1.0
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)
@@ -42,9 +43,9 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # pangocairo
 include $(CLEAR_VARS)
 
-LOCAL_MODULE			:= pangocairo
+LOCAL_MODULE			:= pangocairo_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libpangocairo-1.0.so
-LOCAL_SHARED_LIBRARIES	:= pango pangoft2 cairo
+LOCAL_SHARED_LIBRARIES	:= pango_$(TARGET_ARCH_ABI) pangoft2_$(TARGET_ARCH_ABI) cairo_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS		:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/pango-1.0
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lpangocairo-1.0
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)

@@ -3,7 +3,7 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := libiconv
+LOCAL_MODULE    := libiconv_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES := $(VAULT_PATH)/lib/libiconv.so
 LOCAL_EXPORT_LDLIBS := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -liconv
 $(LOCAL_MODULE):

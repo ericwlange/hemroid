@@ -3,9 +3,9 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE            := libintl
+LOCAL_MODULE            := libintl_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES         := $(VAULT_PATH)/lib/libintl.so
-LOCAL_SHARED_LIBRARIES  := libiconv
+LOCAL_SHARED_LIBRARIES  := libiconv_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS     := -I$(LOCAL_PATH)/$(VAULT_PATH)/include
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lintl
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)

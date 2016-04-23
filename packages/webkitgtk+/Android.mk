@@ -4,9 +4,15 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 # javascriptcore
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= javascriptcore
+LOCAL_MODULE        	:= javascriptcore_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libjavascriptcoregtk-4.0.so
-LOCAL_SHARED_LIBRARIES 	:= icui18n glib icuuc gnustl_shared gio gobject
+LOCAL_SHARED_LIBRARIES 	:= icui18n_$(TARGET_ARCH_ABI) \
+                           glib_$(TARGET_ARCH_ABI) \ 
+                           icuuc_$(TARGET_ARCH_ABI) \
+                           gnustl_shared \
+                           _$(TARGET_ARCH_ABI) \
+                           gio_$(TARGET_ARCH_ABI) \
+                           gobject_$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS 			:= -llog -lz -lm -lstdc++
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/webkitgtk-4.0
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -ljavascriptcoregtk-4.0
@@ -25,14 +31,48 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # webcore
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= webcore
+LOCAL_MODULE        	:= webcore_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libWebCoreGTK.so
-LOCAL_SHARED_LIBRARIES  := gtk gdk pangocairo pango atk cairo-gobject cairo \
-                           gdk-pixbuf glib gio gobject libnotify gthread pangoft2 \
-                           libepoxy icudata icui18n icuuc enchant fontconfig freetype \
-                           gmodule harfbuzz harfbuzz-icu libjpeg libsecret libsoup libxml2 \
-                           hyphen libpng sqlite3 libwebp gstapp gstbase gstreamer \
-                           gstpbutils gstaudio gsttag gstvideo gstfft
+LOCAL_SHARED_LIBRARIES  := gtk_$(TARGET_ARCH_ABI) \
+                           gdk_$(TARGET_ARCH_ABI) \
+                           pangocairo_$(TARGET_ARCH_ABI) \
+                           pango_$(TARGET_ARCH_ABI) \
+                           atk_$(TARGET_ARCH_ABI) \
+                           cairo-gobject_$(TARGET_ARCH_ABI) \
+                           cairo_$(TARGET_ARCH_ABI) \
+                           gdk-pixbuf_$(TARGET_ARCH_ABI) \
+                           glib_$(TARGET_ARCH_ABI) \
+                           gio_$(TARGET_ARCH_ABI) \
+                           gobject_$(TARGET_ARCH_ABI) \
+                           libnotify_$(TARGET_ARCH_ABI) \
+                           gthread_$(TARGET_ARCH_ABI) \
+                           pangoft2_$(TARGET_ARCH_ABI) \
+                           libepoxy_$(TARGET_ARCH_ABI) \
+                           icudata_$(TARGET_ARCH_ABI) \
+                           icui18n_$(TARGET_ARCH_ABI) \
+                           icuuc_$(TARGET_ARCH_ABI) \
+                           enchant_$(TARGET_ARCH_ABI) \
+                           fontconfig_$(TARGET_ARCH_ABI) \
+                           freetype_$(TARGET_ARCH_ABI) \
+                           gmodule_$(TARGET_ARCH_ABI) \
+                           harfbuzz_$(TARGET_ARCH_ABI) \
+                           harfbuzz-icu_$(TARGET_ARCH_ABI) \
+                           libjpeg_$(TARGET_ARCH_ABI) \
+                           libsecret_$(TARGET_ARCH_ABI) \
+                           libsoup_$(TARGET_ARCH_ABI) \
+                           libxml2_$(TARGET_ARCH_ABI) \
+                           hyphen_$(TARGET_ARCH_ABI) \
+                           libpng_$(TARGET_ARCH_ABI) \
+                           sqlite3_$(TARGET_ARCH_ABI) \
+                           libwebp_$(TARGET_ARCH_ABI) \
+                           gstapp_$(TARGET_ARCH_ABI) \
+                           gstbase_$(TARGET_ARCH_ABI) \
+                           gstreamer_$(TARGET_ARCH_ABI) \
+                           gstpbutils_$(TARGET_ARCH_ABI) \
+                           gstaudio_$(TARGET_ARCH_ABI) \
+                           gsttag_$(TARGET_ARCH_ABI) \
+                           gstvideo_$(TARGET_ARCH_ABI) \
+                           gstfft_$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS 			:= -llog -lz -lm -lstdc++
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/webkitgtk-4.0
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lWebCoreGTK
@@ -51,9 +91,9 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # webkit2
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= webkit2
+LOCAL_MODULE        	:= webkit2_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libwebkit2gtk-4.0.so
-LOCAL_SHARED_LIBRARIES 	:= javascriptcore webcore
+LOCAL_SHARED_LIBRARIES 	:= javascriptcore_$(TARGET_ARCH_ABI) webcore_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/webkitgtk-4.0
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lwebkit2gtk-4.0
 

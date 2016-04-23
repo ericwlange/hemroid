@@ -3,7 +3,7 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= libepoxy
+LOCAL_MODULE        	:= libepoxy_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libepoxy.so
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lepoxy

@@ -3,7 +3,7 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= libtasn1
+LOCAL_MODULE        	:= libtasn1_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libtasn1.so
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -ltasn1

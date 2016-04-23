@@ -3,7 +3,7 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= libxml2
+LOCAL_MODULE        	:= libxml2_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libxml2.so
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/libxml2
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lxml2

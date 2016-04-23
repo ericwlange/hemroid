@@ -4,11 +4,24 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 # gdk
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= gdk
+LOCAL_MODULE        	:= gdk_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libgdk-3.so
-LOCAL_SHARED_LIBRARIES 	:= pangocairo pangoft2 gthread fontconfig xml2 harfbuzz \
-                           gnustl_shared freetype libpng cairo pixman pango gobject \
-                           glib libffi atk
+LOCAL_SHARED_LIBRARIES 	:= pangocairo_$(TARGET_ARCH_ABI) \
+                           pangoft2_$(TARGET_ARCH_ABI) \
+                           gthread_$(TARGET_ARCH_ABI) \
+                           fontconfig_$(TARGET_ARCH_ABI) \
+                           xml2_$(TARGET_ARCH_ABI) \
+                           harfbuzz_$(TARGET_ARCH_ABI) \
+                           gnustl_shared \
+                           freetype_$(TARGET_ARCH_ABI) \
+                           libpng_$(TARGET_ARCH_ABI) \
+                           cairo_$(TARGET_ARCH_ABI) \
+                           pixman_$(TARGET_ARCH_ABI) \
+                           pango_$(TARGET_ARCH_ABI) \
+                           gobject_$(TARGET_ARCH_ABI) \
+                           glib_$(TARGET_ARCH_ABI) \
+                           libffi_$(TARGET_ARCH_ABI) \
+                           atk_$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS 			:= -llog -lz -lm -lstdc++ -lGLESv2 -lEGL
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/gtk-3.0
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lgdk-3
@@ -26,10 +39,10 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # gtk
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= gtk
+LOCAL_MODULE        	:= gtk_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libgtk-3.so
-LOCAL_SHARED_LIBRARIES 	:= gdk
-LOCAL_STATIC_LIBRARIES  := hicolor-icon-theme
+LOCAL_SHARED_LIBRARIES 	:= gdk_$(TARGET_ARCH_ABI)
+LOCAL_STATIC_LIBRARIES  := hicolor-icon-theme_$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS 			:= -llog -lz -lm -lstdc++
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/gtk-3.0
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lgtk-3

@@ -3,9 +3,9 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= libsecret
+LOCAL_MODULE        	:= libsecret_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libsecret-1.so
-LOCAL_SHARED_LIBRARIES 	:= glib
+LOCAL_SHARED_LIBRARIES 	:= glib_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lsecret-1
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)

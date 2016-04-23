@@ -3,10 +3,10 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= sqlite3
+LOCAL_MODULE        	:= sqlite3_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES      	:= $(VAULT_PATH)/lib/libsqlite3.so
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include
-LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -l$(LOCAL_MODULE)
+LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lsqlite3
 
 $(LOCAL_MODULE):
 	$(shell mkdir -p src/main/java/org/liquidplayer/hemroid)

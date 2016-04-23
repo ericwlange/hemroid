@@ -4,9 +4,14 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 # javascriptcore
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= javascriptcore
+LOCAL_MODULE        	:= javascriptcore_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libjavascriptcoregtk-4.0.so
-LOCAL_SHARED_LIBRARIES 	:= icui18n glib icuuc gnustl_shared gio gobject
+LOCAL_SHARED_LIBRARIES 	:= icui18n_$(TARGET_ARCH_ABI) \
+                           glib_$(TARGET_ARCH_ABI) \
+                           icuuc_$(TARGET_ARCH_ABI) \
+                           gnustl_shared \
+                           gio_$(TARGET_ARCH_ABI) \
+                           gobject_$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS 			:= -llog -lz -lm -lstdc++
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/webkitgtk-4.0
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -ljavascriptcoregtk-4.0

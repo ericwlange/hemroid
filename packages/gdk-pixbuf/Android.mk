@@ -3,9 +3,10 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= gdk-pixbuf
+LOCAL_MODULE        	:= gdk-pixbuf_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libgdk_pixbuf-2.0.so
-LOCAL_SHARED_LIBRARIES 	:= glib gobject libjpeg libpng
+LOCAL_SHARED_LIBRARIES 	:= glib_$(TARGET_ARCH_ABI) gobject_$(TARGET_ARCH_ABI) \
+                           libjpeg_$(TARGET_ARCH_ABI) libpng_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/gdk-pixbuf-2.0
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lgdk_pixbuf-2.0
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)

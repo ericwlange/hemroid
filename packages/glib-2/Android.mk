@@ -4,7 +4,7 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 # glib
 include $(CLEAR_VARS)
 
-LOCAL_MODULE			:= glib
+LOCAL_MODULE			:= glib_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libglib-2.0.so
 LOCAL_LDLIBS			:= -ldl
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lglib-2.0
@@ -27,9 +27,9 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # gobject
 include $(CLEAR_VARS)
 
-LOCAL_MODULE			:= gobject
+LOCAL_MODULE			:= gobject_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libgobject-2.0.so
-LOCAL_SHARED_LIBRARIES	:= glib libffi
+LOCAL_SHARED_LIBRARIES	:= glib_$(TARGET_ARCH_ABI) libffi_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lgobject-2.0
 
 LOCAL_EXPORT_CFLAGS :=				\
@@ -49,9 +49,9 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # gmodule
 include $(CLEAR_VARS)
 
-LOCAL_MODULE			:= gmodule
+LOCAL_MODULE			:= gmodule_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libgmodule-2.0.so
-LOCAL_SHARED_LIBRARIES	:= glib
+LOCAL_SHARED_LIBRARIES	:= glib_$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS			:= -ldl
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lgmodule-2.0
 
@@ -72,9 +72,9 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # gthread
 include $(CLEAR_VARS)
 
-LOCAL_MODULE			:= gthread
+LOCAL_MODULE			:= gthread_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libgthread-2.0.so
-LOCAL_SHARED_LIBRARIES	:= glib
+LOCAL_SHARED_LIBRARIES	:= glib_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lgthread-2.0
 
 LOCAL_EXPORT_CFLAGS :=				\
@@ -94,9 +94,9 @@ include $(LOCAL_PATH)/../hemroid/prebuilt-shared-library.mk
 # gio
 include $(CLEAR_VARS)
 
-LOCAL_MODULE			:= gio
+LOCAL_MODULE			:= gio_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libgio-2.0.so
-LOCAL_SHARED_LIBRARIES	:= glib gobject gmodule
+LOCAL_SHARED_LIBRARIES	:= glib_$(TARGET_ARCH_ABI) gobject_$(TARGET_ARCH_ABI) gmodule_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS		:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include/glib-2.0
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lgio-2.0
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)

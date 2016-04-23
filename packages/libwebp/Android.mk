@@ -3,9 +3,9 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= libwebp
+LOCAL_MODULE        	:= libwebp_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libwebp.so
-LOCAL_SHARED_LIBRARIES 	:= libpng libjpeg
+LOCAL_SHARED_LIBRARIES 	:= libpng_$(TARGET_ARCH_ABI) libjpeg_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include
 LOCAL_LDLIBS 			:= -lm
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lwebp

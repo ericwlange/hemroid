@@ -3,10 +3,10 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= hyphen
+LOCAL_MODULE        	:= hyphen_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libhyphen.so
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include
-LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -l$(LOCAL_MODULE)
+LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lhyphen
 $(LOCAL_MODULE):
 	$(shell mkdir -p src/main/java/org/liquidplayer/hemroid)
 	$(shell cp -r $(LOCAL_PATH)/../hyphen/java/Hyphen.java src/main/java/org/liquidplayer/hemroid)

@@ -3,9 +3,9 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= libnotify
+LOCAL_MODULE        	:= libnotify_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:= $(VAULT_PATH)/lib/libnotify.so
-LOCAL_SHARED_LIBRARIES 	:= gdk gtk
+LOCAL_SHARED_LIBRARIES 	:= gdk_$(TARGET_ARCH_ABI) gtk_$(TARGET_ARCH_ABI)
 LOCAL_EXPORT_CFLAGS 	:= -I$(LOCAL_PATH)/$(VAULT_PATH)/include
 LOCAL_EXPORT_LDLIBS     := -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lnotify
 $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)

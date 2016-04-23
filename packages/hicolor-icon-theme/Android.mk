@@ -4,7 +4,7 @@ VAULT_PATH := ../../vault/hemroot/$(TARGET_ARCH_ABI)
 # A dummy module just to be able to include the icons
 include $(CLEAR_VARS)
 
-LOCAL_MODULE        	:= hicolor-icon-theme
+LOCAL_MODULE        	:= hicolor-icon-theme_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:=
 
 $(LOCAL_MODULE): $(VAULT_PATH)/share/icons/hicolor
