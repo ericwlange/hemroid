@@ -1,6 +1,6 @@
-diff -Naur webkitgtk-2.10.7/CMakeLists.txt /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/CMakeLists.txt
+diff -Naur webkitgtk-2.10.7/CMakeLists.txt webkitgtk-2.10.7/CMakeLists.txt
 --- webkitgtk-2.10.7/CMakeLists.txt	2016-01-29 21:59:31.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/CMakeLists.txt	2016-04-05 22:52:15.356286008 +0530
++++ webkitgtk-2.10.7/CMakeLists.txt	2016-04-05 22:52:15.356286008 +0530
 @@ -41,7 +41,7 @@
  # -----------------------------------------------------------------------------
  # Determine which port will be built
@@ -10,9 +10,9 @@ diff -Naur webkitgtk-2.10.7/CMakeLists.txt /home/eric/workspace/hemroid/vault/sr
  set(PORT "NOPORT" CACHE STRING "choose which WebKit port to build (one of ${ALL_PORTS})")
  
  list(FIND ALL_PORTS ${PORT} RET)
-diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp
+diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp
 --- webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp	2016-01-28 14:25:09.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp	2016-04-05 22:52:15.500286120 +0530
++++ webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp	2016-04-05 22:52:15.500286120 +0530
 @@ -73,8 +73,12 @@
  
      if (!m_isBmallocEnabled) {
@@ -26,9 +26,9 @@ diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp /home/eric/work
          return result;
      }
      
-diff -Naur webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake
+diff -Naur webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake
 --- webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake	1970-01-01 05:30:00.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake	2016-04-23 10:05:44.966787122 +0530
++++ webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake	2016-04-23 10:05:44.966787122 +0530
 @@ -0,0 +1,21 @@
 +include(FindPkgConfig)
 +
@@ -51,9 +51,9 @@ diff -Naur webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake /home/eric/workspace/hem
 +    ZLIB_LIBRARIES
 +)
 +
-diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake
+diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake
 --- webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake	2016-01-29 22:23:52.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake	2016-04-23 10:06:27.138787766 +0530
++++ webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake	2016-04-23 10:06:27.138787766 +0530
 @@ -44,7 +44,6 @@
  find_package(PNG REQUIRED)
  find_package(Sqlite REQUIRED)
@@ -70,9 +70,9 @@ diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsGTK.cmake /home/eric/workspace/h
  
  WEBKIT_OPTION_BEGIN()
  
-diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake
+diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake
 --- webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake	1970-01-01 05:30:00.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake	2016-04-23 08:57:46.636195486 +0530
++++ webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake	2016-04-23 08:57:46.636195486 +0530
 @@ -0,0 +1,135 @@
 +include(GNUInstallDirs)
 +
@@ -209,9 +209,9 @@ diff -Naur webkitgtk-2.10.7/Source/cmake/OptionsJSC.cmake /home/eric/workspace/h
 +        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE
 +    )
 +endif ()
-diff -Naur webkitgtk-2.10.7/Source/CMakeLists.txt /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/CMakeLists.txt
+diff -Naur webkitgtk-2.10.7/Source/CMakeLists.txt webkitgtk-2.10.7/Source/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
 @@ -10,7 +10,9 @@
  
  add_subdirectory(JavaScriptCore)
@@ -236,9 +236,9 @@ diff -Naur webkitgtk-2.10.7/Source/CMakeLists.txt /home/eric/workspace/hemroid/v
  
  if (ENABLE_WEBKIT)
      WEBKIT_SET_EXTRA_COMPILER_FLAGS(WebKit ${ADDITIONAL_COMPILER_FLAGS})
-diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp
 --- webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cpp	2016-04-05 22:52:15.496286112 +0530
 @@ -31,20 +31,22 @@
  
  #include "MacroAssemblerARM.h"
@@ -279,9 +279,9 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cp
  #endif // OS(LINUX)
  
  #if (COMPILER(GCC_OR_CLANG) && defined(__VFP_FP__))
-diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
 @@ -752,7 +752,11 @@
      ${JAVASCRIPTCORE_DIR}/llint/LLIntOffsetsExtractor.cpp
      ${DERIVED_SOURCES_JAVASCRIPTCORE_DIR}/LLIntDesiredOffsets.h ${DERIVED_SOURCES_JAVASCRIPTCORE_DIR}/Bytecodes.h
@@ -295,9 +295,9 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt /home/eric/work
  
  # The build system will execute asm.rb every time LLIntOffsetsExtractor's mtime is newer than
  # LLIntAssembly.h's mtime. The problem we have here is: asm.rb has some built-in optimization
-diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake
 --- webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake	1970-01-01 05:30:00.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake	2016-04-05 22:52:15.496286112 +0530
 @@ -0,0 +1,42 @@
 +set(JavaScriptCore_OUTPUT_NAME javascriptcoregtk-${WEBKITGTK_API_VERSION})
 +
@@ -341,9 +341,9 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/PlatformJSC.cmake /home/eric/w
 +list(APPEND JavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES
 +    ${GLIB_INCLUDE_DIRS}
 +)
-diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp
 --- webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp	2016-04-05 22:52:15.496286112 +0530
 @@ -355,6 +355,9 @@
  
  EncodedJSValue JSC_HOST_CALL mathProtoFuncLog2(ExecState* exec)
@@ -354,25 +354,25 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp /home/e
      return JSValue::encode(jsDoubleNumber(log2(exec->argument(0).toNumber(exec))));
  }
  
-diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-04-23 12:10:41.202757727 +0530
 @@ -21,7 +21,11 @@
  WEBKIT_WRAP_SOURCELIST(${JSC_SOURCES})
  include_directories(./ ${JavaScriptCore_INCLUDE_DIRECTORIES})
  add_executable(jsc ${JSC_SOURCES})
 -target_link_libraries(jsc ${JSC_LIBRARIES})
 +if ( MIPS OR MIPS64 )
-+    target_link_libraries(jsc ${JSC_LIBRARIES} -L${SANDBOX}/lib64 -L${SANDBOX}/lib ffi gmodule-2.0 icudata intl iconv)
++    target_link_libraries(jsc ${JSC_LIBRARIES} -L${SANDBOX}/lib ffi gmodule-2.0 icudata intl iconv)
 +else ()
 +    target_link_libraries(jsc ${JSC_LIBRARIES})
 +endif ()
  set_target_properties(jsc PROPERTIES FOLDER "JavaScriptCore")
  
  if (JSC_OUTPUT_NAME)
-diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake	2013-08-03 21:40:38.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake	2016-04-05 22:52:15.496286112 +0530
 @@ -1,3 +1,12 @@
 +include_directories(./ ${JavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES})
 +
@@ -386,9 +386,9 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformGTK.cmake /home/
  list(APPEND JSC_LIBRARIES
      ${GLIB_LIBRARIES}
  )
-diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake
+diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake
 --- webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake	1970-01-01 05:30:00.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake	2016-04-05 22:52:15.496286112 +0530
 @@ -0,0 +1,12 @@
 +include_directories(./ ${JavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES})
 +
@@ -402,9 +402,9 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/PlatformJSC.cmake /home/
 +list(APPEND JSC_LIBRARIES
 +    ${GLIB_LIBRARIES}
 +)
-diff -Naur webkitgtk-2.10.7/Source/PlatformJSC.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/PlatformJSC.cmake
+diff -Naur webkitgtk-2.10.7/Source/PlatformJSC.cmake webkitgtk-2.10.7/Source/PlatformJSC.cmake
 --- webkitgtk-2.10.7/Source/PlatformJSC.cmake	1970-01-01 05:30:00.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/PlatformJSC.cmake	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/PlatformJSC.cmake	2016-04-05 22:52:15.496286112 +0530
 @@ -0,0 +1,94 @@
 +# This allows exposing a 'gir' target which builds all GObject introspection files.
 +if (ENABLE_INTROSPECTION)
@@ -500,9 +500,9 @@ diff -Naur webkitgtk-2.10.7/Source/PlatformJSC.cmake /home/eric/workspace/hemroi
 +        COMMAND xz -f ${CMAKE_BINARY_DIR}/webkitgtk-${PROJECT_VERSION}.tar
 +    )
 +endif ()
-diff -Naur webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt
+diff -Naur webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
 @@ -3670,7 +3670,16 @@
      WEBKIT_SET_EXTRA_COMPILER_FLAGS(ANGLESupport IGNORECXX_WARNINGS)
  endif ()
@@ -521,9 +521,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt /home/eric/workspace/h
  
  if (WebCore_OUTPUT_NAME)
      set_target_properties(WebCore PROPERTIES OUTPUT_NAME ${WebCore_OUTPUT_NAME})
-diff -Naur webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/PeriodicWave.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/PeriodicWave.cpp
+diff -Naur webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/PeriodicWave.cpp webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/PeriodicWave.cpp
 --- webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/PeriodicWave.cpp	2016-01-28 14:25:09.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/PeriodicWave.cpp	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/PeriodicWave.cpp	2016-04-05 22:52:15.496286112 +0530
 @@ -99,6 +99,10 @@
  
  void PeriodicWave::waveDataForFundamentalFrequency(float fundamentalFrequency, float* &lowerWaveData, float* &higherWaveData, float& tableInterpolationFactor)
@@ -535,9 +535,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/PeriodicWave.cpp /ho
      // Negative frequencies are allowed, in which case we alias to the positive frequency.
      fundamentalFrequency = fabsf(fundamentalFrequency);
  
-diff -Naur webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp
+diff -Naur webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp
 --- webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp	2015-07-22 18:07:57.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp	2016-04-05 22:52:15.496286112 +0530
 @@ -77,6 +77,10 @@
  {
      ASSERT(isMainThread());
@@ -549,9 +549,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/Modules/webaudio/RealtimeAnalyser.cpp
      // Only allow powers of two.
      unsigned log2size = static_cast<unsigned>(log2(size));
      bool isPOT(1UL << log2size == size);
-diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp
+diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp
 --- webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp	2015-07-22 18:07:57.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStreamer.cpp	2016-04-05 22:52:15.496286112 +0530
 @@ -42,7 +42,11 @@
  // Normal constructor: allocates for a given fftSize.
  FFTFrame::FFTFrame(unsigned fftSize)
@@ -564,9 +564,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/audio/gstreamer/FFTFrameGStr
      , m_complexData(std::make_unique<GstFFTF32Complex[]>(unpackedFFTDataSize(m_FFTSize)))
      , m_realData(unpackedFFTDataSize(m_FFTSize))
      , m_imagData(unpackedFFTDataSize(m_FFTSize))
-diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/ANGLEWebKitBridge.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/graphics/ANGLEWebKitBridge.cpp
+diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/ANGLEWebKitBridge.cpp webkitgtk-2.10.7/Source/WebCore/platform/graphics/ANGLEWebKitBridge.cpp
 --- webkitgtk-2.10.7/Source/WebCore/platform/graphics/ANGLEWebKitBridge.cpp	2016-01-28 14:25:09.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/graphics/ANGLEWebKitBridge.cpp	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WebCore/platform/graphics/ANGLEWebKitBridge.cpp	2016-04-05 22:52:15.496286112 +0530
 @@ -43,7 +43,13 @@
      
      if (variable.isArray()) {
@@ -596,9 +596,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/ANGLEWebKitBridge.c
                  std::string arrayName = variable.name + arrayBrackets;
                  std::string arrayMappedName = variable.mappedName + arrayBrackets;
                  for (const auto& field : variable.fields)
-diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/GLContext.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/graphics/GLContext.cpp
+diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/GLContext.cpp webkitgtk-2.10.7/Source/WebCore/platform/graphics/GLContext.cpp
 --- webkitgtk-2.10.7/Source/WebCore/platform/graphics/GLContext.cpp	2016-01-29 21:59:33.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/graphics/GLContext.cpp	2016-04-05 22:52:15.500286120 +0530
++++ webkitgtk-2.10.7/Source/WebCore/platform/graphics/GLContext.cpp	2016-04-05 22:52:15.500286120 +0530
 @@ -132,7 +132,10 @@
          return WTF::move(glxContext);
  #endif
@@ -611,9 +611,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/GLContext.cpp /home
          return WTF::move(eglContext);
  #endif
      return nullptr;
-diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.cpp
+diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.cpp webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.cpp
 --- webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.cpp	2016-01-29 21:59:33.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.cpp	2016-04-05 22:52:15.500286120 +0530
++++ webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.cpp	2016-04-05 22:52:15.500286120 +0530
 @@ -44,8 +44,10 @@
      , m_supportsOESvertexArrayObject(false)
      , m_supportsIMGMultisampledRenderToTexture(false)
@@ -759,9 +759,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3D
          } else if (name == "GL_EXT_draw_buffers") {
              // FIXME: implement the support.
              return false;
-diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.h /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.h
+diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.h webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.h
 --- webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.h	2016-01-04 16:08:34.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.h	2016-04-05 22:52:15.500286120 +0530
++++ webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3DOpenGLES.h	2016-04-05 22:52:15.500286120 +0530
 @@ -106,8 +106,10 @@
      bool m_supportsIMGMultisampledRenderToTexture;
      bool m_supportsANGLEinstancedArrays;
@@ -785,9 +785,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/graphics/opengl/Extensions3D
  
      std::unique_ptr<GraphicsContext3D::ContextLostCallback> m_contextLostCallback;
  };
-diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/linux/MemoryPressureHandlerLinux.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/linux/MemoryPressureHandlerLinux.cpp
+diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/linux/MemoryPressureHandlerLinux.cpp webkitgtk-2.10.7/Source/WebCore/platform/linux/MemoryPressureHandlerLinux.cpp
 --- webkitgtk-2.10.7/Source/WebCore/platform/linux/MemoryPressureHandlerLinux.cpp	2016-01-29 21:59:33.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/platform/linux/MemoryPressureHandlerLinux.cpp	2016-04-05 22:52:15.500286120 +0530
++++ webkitgtk-2.10.7/Source/WebCore/platform/linux/MemoryPressureHandlerLinux.cpp	2016-04-05 22:52:15.500286120 +0530
 @@ -202,7 +202,9 @@
  void MemoryPressureHandler::platformReleaseMemory(Critical)
  {
@@ -798,9 +798,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/platform/linux/MemoryPressureHandlerL
  }
  
  void MemoryPressureHandler::ReliefLogger::platformLog()
-diff -Naur webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake
+diff -Naur webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake	2016-04-05 22:52:15.496286112 +0530
 @@ -201,7 +201,7 @@
      platform/text/hyphen/HyphenationLibHyphen.cpp
  )
@@ -867,9 +867,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/PlatformGTK.cmake /home/eric/workspac
  
  include_directories(
      ${WebCore_INCLUDE_DIRECTORIES}
-diff -Naur webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp
+diff -Naur webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp
 --- webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp	2016-01-29 21:59:33.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp	2016-04-05 22:52:15.500286120 +0530
++++ webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp	2016-04-05 22:52:15.500286120 +0530
 @@ -44,6 +44,10 @@
  #include <wtf/UniStdExtras.h>
  #include <wtf/text/CString.h>
@@ -941,9 +941,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp /h
  
      RefPtr<SharedMemory> instance = adoptRef(new SharedMemory());
      instance->m_data = data;
-diff -Naur webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake
+diff -Naur webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-01-29 21:59:33.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-04-05 22:52:15.500286120 +0530
++++ webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-04-05 22:52:15.500286120 +0530
 @@ -570,7 +570,7 @@
  
  list(APPEND WebKit2_LIBRARIES
@@ -979,9 +979,9 @@ diff -Naur webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake /home/eric/workspac
  
  # Add ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} to LD_LIBRARY_PATH
  string(COMPARE EQUAL "$ENV{LD_LIBRARY_PATH}" "" ld_library_path_not_exist)
-diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp
+diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp
 --- webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp	2016-04-05 22:52:15.496286112 +0530
 @@ -71,7 +71,9 @@
  #if OS(DARWIN) || (OS(LINUX) && !defined(__UCLIBC__))
  #include <cxxabi.h>
@@ -1002,9 +1002,9 @@ diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/Assertions.cpp /home/eric/workspace/h
      *size = backtrace(stack, *size);
  #elif OS(WINDOWS)
      // The CaptureStackBackTrace function is available in XP, but it is not defined
-diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake
+diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake	2016-04-05 22:52:15.496286112 +0530
 @@ -15,7 +15,7 @@
      ${GLIB_GIO_LIBRARIES}
      ${GLIB_GOBJECT_LIBRARIES}
@@ -1014,9 +1014,9 @@ diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformGTK.cmake /home/eric/workspac
      ${ZLIB_LIBRARIES}
  )
  
-diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/Platform.h /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/Platform.h
+diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/Platform.h webkitgtk-2.10.7/Source/WTF/wtf/Platform.h
 --- webkitgtk-2.10.7/Source/WTF/wtf/Platform.h	2016-01-29 21:59:32.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/Platform.h	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WTF/wtf/Platform.h	2016-04-05 22:52:15.496286112 +0530
 @@ -590,7 +590,6 @@
  
  #if OS(UNIX)
@@ -1047,9 +1047,9 @@ diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/Platform.h /home/eric/workspace/hemro
  #define HAVE_TIMEGM 1
  #endif
  
-diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake
+diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake
 --- webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake	1970-01-01 05:30:00.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake	2016-04-05 22:52:15.496286112 +0530
 @@ -0,0 +1,24 @@
 +set(WTF_LIBRARY_TYPE STATIC)
 +set(WTF_OUTPUT_NAME WTFGTK)
@@ -1075,9 +1075,9 @@ diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/PlatformJSC.cmake /home/eric/workspac
 +list(APPEND WTF_SYSTEM_INCLUDE_DIRECTORIES
 +    ${GLIB_INCLUDE_DIRS}
 +)
-diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp
+diff -Naur webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp
 --- webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp	2016-01-28 14:25:09.000000000 +0530
-+++ /home/eric/workspace/hemroid/vault/src/webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WTF/wtf/ThreadIdentifierDataPthreads.cpp	2016-04-05 22:52:15.496286112 +0530
 @@ -36,7 +36,7 @@
  
  #include "Threading.h"

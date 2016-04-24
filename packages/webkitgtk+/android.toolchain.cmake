@@ -1328,7 +1328,7 @@ set( ANDROID_RELRO                  ${ANDROID_RELRO}                  CACHE BOOL
 mark_as_advanced( ANDROID_NO_UNDEFINED ANDROID_SO_UNDEFINED ANDROID_FUNCTION_LEVEL_LINKING ANDROID_GOLD_LINKER ANDROID_NOEXECSTACK ANDROID_RELRO )
 
 # linker flags
-set( ANDROID_LINKER_FLAGS "-L${DEFAULT_LIB_DIR}" )
+set( ANDROID_LINKER_FLAGS "-L${ANDROID_SYSROOT}/usr/lib64 -L${ANDROID_SYSROOT}/usr/lib -L${DEFAULT_LIB_DIR}../lib64 -L${DEFAULT_LIB_DIR}" )
 
 if( ARMEABI_V7A )
  # this is *required* to use the following linker flags that routes around
