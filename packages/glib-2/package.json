@@ -27,6 +27,7 @@
 	    }
 	],
 	"patches" : [
+	    "glib-2.46.2.patch"
 	],
 	"api" : {
 		"min" : 9

@@ -6,6 +6,6 @@ public class ICUI18n extends Hemroid {
         new ICUUC(context);
         new ICUData(context);
         loadLibrary("gnustl_shared");
-        loadLibrary("icui18n");
+        loadLibrary("icuhemi18n");
     }
 }

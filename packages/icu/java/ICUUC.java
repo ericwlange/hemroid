@@ -5,6 +5,6 @@ public class ICUUC extends Hemroid {
         super(context);
         new ICUData(context);
         loadLibrary("gnustl_shared");
-        loadLibrary("icuuc");
+        loadLibrary("icuhemuc");
     }
 }

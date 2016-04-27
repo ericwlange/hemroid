@@ -6,6 +6,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE			:= glib_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES			:= $(VAULT_PATH)/lib/libglib-2.0.so
+LOCAL_SHARED_LIBRARIES	:= libiconv_$(TARGET_ARCH_ABI) libffi_$(TARGET_ARCH_ABI) \
+                           libintl_$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS			:= -ldl
 LOCAL_EXPORT_LDLIBS		:= -L$(LOCAL_PATH)/$(VAULT_PATH)/lib -lglib-2.0
 

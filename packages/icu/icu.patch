@@ -1,3 +1,55 @@
+diff -Naur icu/source/config/mh-linux icu/source/config/mh-linux
+--- icu/source/config/mh-linux	2015-10-08 09:24:32.000000000 +0530
++++ icu/source/config/mh-linux	2016-04-25 07:58:08.000000000 +0530
+@@ -25,7 +25,8 @@
+ 
+ ## Compiler switch to embed a library name
+ # The initial tab in the next line is to prevent icu-config from reading it.
+-	LD_SONAME = -Wl,-soname -Wl,$(notdir $(MIDDLE_SO_TARGET))
++#	LD_SONAME = -Wl,-soname -Wl,$(notdir $(MIDDLE_SO_TARGET))
++	LD_SONAME = -Wl,-soname -Wl,$(notdir $(SO_TARGET))
+ #SH# # We can't depend on MIDDLE_SO_TARGET being set.
+ #SH# LD_SONAME=
+ 
+diff -Naur icu/source/icudefs.mk.in icu/source/icudefs.mk.in
+--- icu/source/icudefs.mk.in	2015-10-08 09:30:26.000000000 +0530
++++ icu/source/icudefs.mk.in	2016-04-26 08:15:23.000000000 +0530
+@@ -240,14 +240,14 @@
+ 
+ # Name flexibility for the library naming scheme.  Any modifications should
+ # be made in the mh- file for the specific platform.
+-DATA_STUBNAME = data
+-COMMON_STUBNAME = uc
+-I18N_STUBNAME = i18n
+-LAYOUT_STUBNAME = le
+-LAYOUTEX_STUBNAME = lx
+-IO_STUBNAME = io
+-TOOLUTIL_STUBNAME = tu
+-CTESTFW_STUBNAME = test
++DATA_STUBNAME = hemdata
++COMMON_STUBNAME = hemuc
++I18N_STUBNAME = hemi18n
++LAYOUT_STUBNAME = hemle
++LAYOUTEX_STUBNAME = hemlx
++IO_STUBNAME = hemio
++TOOLUTIL_STUBNAME = hemtu
++CTESTFW_STUBNAME = hemtest
+ 
+ # get these from pkg-config, if available
+ ICULEHB_CFLAGS=@ICULEHB_CFLAGS@
+diff -Naur icu/source/tools/pkgdata/pkgdata.cpp icu/source/tools/pkgdata/pkgdata.cpp
+--- icu/source/tools/pkgdata/pkgdata.cpp	2015-10-08 09:24:02.000000000 +0530
++++ icu/source/tools/pkgdata/pkgdata.cpp	2016-04-27 08:28:15.000000000 +0530
+@@ -960,7 +960,8 @@
+                     reverseExt ? pkgDataFlags[SOBJ_EXT] : version);
+         }
+ #endif
+-        if (noVersion && !reverseExt) {
++//        if (noVersion && !reverseExt) {
++        if (1) {
+             sprintf(libFileNames[LIB_FILE_VERSION_MAJOR], "%s%s%s",
+                     libFileNames[LIB_FILE],
+                     FILE_SUFFIX,
 diff -Naur icu/source/tools/toolutil/flagparser.c icu/source/tools/toolutil/flagparser.c
 --- icu/source/tools/toolutil/flagparser.c	2015-10-08 09:24:06.000000000 +0530
 +++ icu/source/tools/toolutil/flagparser.c	2016-02-14 10:58:06.000000000 +0530

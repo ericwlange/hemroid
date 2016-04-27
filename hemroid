@@ -6,6 +6,7 @@ import inspect
 import json
 import uuid
 import glob
+import textwrap
 
 HEMDIR  = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))
 VAULT   = HEMDIR + '/vault'
@@ -133,16 +134,59 @@ def usage():
 hemroid - package manager for android
 
 Usage:
-    hemroid <command> <options>
+    hemroid <command> <options> <pkgs>
 Where:
     <command> is one of:
       install
       remove
-      update
+      pkginfo
+      dependencies
 
-hemroid install <pkg> [--abi=<abi>] [--api=<api>]
+hemroid install [--abi=<abi>] [--api=<api>] [--dirty] [--quiet] [--verbose] <pkgs>
+    Installs space-delimted packages, recursively installing dependencies.
+        --abi=<abi> install for ABI <abi> only (default: all ABIs)
+        --api=<api> override API level (default: max(package min,NDK min))
+        --dirty     Do not clean up sandbox when done (debug only)
+        --verbose   Echo make output to stdout
+        --quiet     Suppress info messages
+        
+hemroid remove [--abi=<abi>] [--clean] [--quiet] <pkgs>
+    Removes space-delimted packages.  This does not recurse dependencies.
+        --abi=<abi> remove for ABI <abi> only (default: all ABIs)
+        --clean     Delete saved repo, will force fresh rebuild on next install
+        --quiet     Suppress info messages
+
+hemroid pkginfo [--abi=<abi>] [--api=<api>] [--quiet] <pkgs>
+    Displays package information for space-delimted packages.  The output is in JSON
+    format and is not particularly readable for humans.  Future versions will be formatted
+    in English.
+        --abi=<abi> Information for ABI <abi> only (default: all ABIs)
+        --api=<api> override API level (default: max(package min,NDK min))
+        --quiet     Suppress info messages
+
+hemroid dependencies [--abi=<abi>] [--api=<api>] [--quiet] <pkgs>
+    Displays dependency information for space-delimted packages.  The output is in JSON
+    format and is not particularly readable for humans.  Future versions will be formatted
+    in English.
+        --abi=<abi> Dependencies for ABI <abi> only (default: all ABIs)
+        --api=<api> override API level (default: max(package min,NDK min))
+        --quiet     Suppress info messages
 
 """
+    print "<pkgs> is one or more of:"
+    print "\n".join(textwrap.wrap(" ".join(sorted(AVAILABLE_PACKAGES)),
+        width=80, break_long_words=False))
+    print ""
+    print "<abi> is one or more of:"
+    print " ".join(valid_ABI(None))
+    print ""
+    print "Supported <api> depends on ABI, what the package supports, and the NDK."
+    print "Minimum <api> for each ABI:"
+    for abi in get_available_apis():
+        print "    " + (abi + '            ')[0:12] + str(get_available_apis()[abi])
+    print "Unless you know exactly what you're doing, you shouldn't set <api>.  Use "
+    print "the default."
+    print ""
 
 def valid_ABI(abi):
     VALID = ['armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64', 'mips', 'mips64']
@@ -176,6 +220,8 @@ def get_available_apis():
     _apis['armeabi'] = _apis['arm']
     _apis['armeabi-v7a'] = _apis['arm']
     _apis['arm64-v8a'] = _apis['arm64']
+    _apis.pop('arm',None)
+    _apis.pop('arm64', None)
     g_apis = _apis
     return _apis
     
@@ -327,7 +373,7 @@ class Install(Options):
         OUTPUT = '/'.join([VAULT,'sandbox',sandbox,abi,'out'])
         LDFLAGS ="\"-Wl,-rpath-link," + toolchain_dir + "/usr/lib " + \
             "-L${SANDBOX}/lib64 -L${SANDBOX}/lib -L${PLATFORM}/usr/lib64 " + \
-            "-L${PLATFORM}/usr/lib -pie\""
+            "-L${PLATFORM}/usr/lib -pie \""
         PREFIX =  PREFIXES[abi]
         HOST   =  HOSTS[abi]
         CROSS_COMPILE = toolchain_dir+"/bin/${PREFIX}"
@@ -367,7 +413,7 @@ class Install(Options):
                 try: message = step['message']
                 except KeyError: message = ""
                 try: environment = step['environment']
-                except KeyError: environement = "cross"
+                except KeyError: environment = "cross"
                 try: shell = step['shell']
                 except KeyError: shell = "/bin/bash"
                 try: script = step['script']
@@ -519,7 +565,9 @@ class Install(Options):
             for pkg in argv:
                 if pkg not in AVAILABLE_PACKAGES:
                     raise ValueError("Don't know how to build package '" + pkg + "'\n" +
-                        "Available packages: " + " ".join(sorted(AVAILABLE_PACKAGES)))
+                        "\n".join(textwrap.wrap("Available packages: " +
+                            " ".join(sorted(AVAILABLE_PACKAGES)),
+                             width=80, break_long_words=False)))
         
             for abi in self._abis:
                 if loc is None: dest = '/'.join([HEMROOT,abi])
