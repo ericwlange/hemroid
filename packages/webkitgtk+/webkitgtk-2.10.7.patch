@@ -26,6 +26,27 @@ diff -Naur webkitgtk-2.10.7/Source/bmalloc/bmalloc/Allocator.cpp webkitgtk-2.10.
          return result;
      }
      
+diff -Naur webkitgtk-2.10.7/Source/cmake/FindICU.cmake webkitgtk-2.10.7/Source/cmake/FindICU.cmake
+--- webkitgtk-2.10.7/Source/cmake/FindICU.cmake	2016-01-28 14:25:09.000000000 +0530
++++ webkitgtk-2.10.7/Source/cmake/FindICU.cmake	2016-04-27 23:06:32.040056288 +0530
+@@ -24,7 +24,7 @@
+ # Look for the library.
+ find_library(
+     ICU_LIBRARY
+-    NAMES icuuc cygicuuc cygicuuc32
++    NAMES icuhemuc cygicuuc cygicuuc32
+     HINTS ${PC_ICU_LIBRARY_DIRS}
+           ${PC_ICU_LIBDIR}
+     DOC "Libraries to link against for the common parts of ICU")
+@@ -49,7 +49,7 @@
+     pkg_check_modules(PC_ICU_I18N icu-i18n)
+     find_library(
+         ICU_I18N_LIBRARY
+-        NAMES icui18n icuin cygicuin cygicuin32
++        NAMES icuhemi18n icuin cygicuin cygicuin32
+         HINTS ${PC_ICU_I18N_LIBRARY_DIRS}
+               ${PC_ICU_I18N_LIBDIR}
+         DOC "Libraries to link against for ICU internationalization")
 diff -Naur webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake
 --- webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake	1970-01-01 05:30:00.000000000 +0530
 +++ webkitgtk-2.10.7/Source/cmake/FindZLIB.cmake	2016-04-23 10:05:44.966787122 +0530
@@ -281,14 +302,14 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/assembler/MacroAssemblerARM.cp
  #if (COMPILER(GCC_OR_CLANG) && defined(__VFP_FP__))
 diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/CMakeLists.txt	2016-04-27 23:09:59.064421319 +0530
 @@ -752,7 +752,11 @@
      ${JAVASCRIPTCORE_DIR}/llint/LLIntOffsetsExtractor.cpp
      ${DERIVED_SOURCES_JAVASCRIPTCORE_DIR}/LLIntDesiredOffsets.h ${DERIVED_SOURCES_JAVASCRIPTCORE_DIR}/Bytecodes.h
  )
 -target_link_libraries(LLIntOffsetsExtractor WTF)
 +if ( MIPS OR MIPS64 )
-+    target_link_libraries(LLIntOffsetsExtractor WTF -L${SANDBOX}/lib ffi gmodule-2.0 icudata intl iconv)
++    target_link_libraries(LLIntOffsetsExtractor WTF -L${SANDBOX}/lib ffi gmodule-2.0 icuhemdata intl iconv)
 +else ()
 +    target_link_libraries(LLIntOffsetsExtractor WTF)
 +endif ()
@@ -356,14 +377,14 @@ diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/runtime/MathObject.cpp webkitg
  
 diff -Naur webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-04-23 12:10:41.202757727 +0530
++++ webkitgtk-2.10.7/Source/JavaScriptCore/shell/CMakeLists.txt	2016-04-27 23:11:37.364527047 +0530
 @@ -21,7 +21,11 @@
  WEBKIT_WRAP_SOURCELIST(${JSC_SOURCES})
  include_directories(./ ${JavaScriptCore_INCLUDE_DIRECTORIES})
  add_executable(jsc ${JSC_SOURCES})
 -target_link_libraries(jsc ${JSC_LIBRARIES})
 +if ( MIPS OR MIPS64 )
-+    target_link_libraries(jsc ${JSC_LIBRARIES} -L${SANDBOX}/lib ffi gmodule-2.0 icudata intl iconv)
++    target_link_libraries(jsc ${JSC_LIBRARIES} -L${SANDBOX}/lib ffi gmodule-2.0 icuhemdata intl iconv)
 +else ()
 +    target_link_libraries(jsc ${JSC_LIBRARIES})
 +endif ()
@@ -502,7 +523,7 @@ diff -Naur webkitgtk-2.10.7/Source/PlatformJSC.cmake webkitgtk-2.10.7/Source/Pla
 +endif ()
 diff -Naur webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt
 --- webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-01-29 21:59:32.000000000 +0530
-+++ webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-04-05 22:52:15.496286112 +0530
++++ webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt	2016-04-27 23:11:06.136502299 +0530
 @@ -3670,7 +3670,16 @@
      WEBKIT_SET_EXTRA_COMPILER_FLAGS(ANGLESupport IGNORECXX_WARNINGS)
  endif ()
@@ -512,7 +533,7 @@ diff -Naur webkitgtk-2.10.7/Source/WebCore/CMakeLists.txt webkitgtk-2.10.7/Sourc
 +    target_link_libraries(WebCore -Wl,--unresolved-symbols=ignore-in-object-files 
 +        -L${SANDBOX}/lib64 -L${SANDBOX}/lib
 +        ${WebCore_LIBRARIES}
-+        ffi gmodule-2.0 icudata epoxy pangoft2-1.0 pixman-1 gthread-2.0
++        ffi gmodule-2.0 icuhemdata epoxy pangoft2-1.0 pixman-1 gthread-2.0
 +        log android stdc++ intl iconv
 +    )
 +else ()
@@ -943,7 +964,7 @@ diff -Naur webkitgtk-2.10.7/Source/WebKit2/Platform/unix/SharedMemoryUnix.cpp we
      instance->m_data = data;
 diff -Naur webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake
 --- webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-01-29 21:59:33.000000000 +0530
-+++ webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-04-05 22:52:15.500286120 +0530
++++ webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake	2016-04-27 23:08:20.524247391 +0530
 @@ -570,7 +570,7 @@
  
  list(APPEND WebKit2_LIBRARIES
@@ -964,7 +985,7 @@ diff -Naur webkitgtk-2.10.7/Source/WebKit2/PlatformGTK.cmake webkitgtk-2.10.7/So
 +    pixman-1
 +    ffi
 +    stdc++
-+    icudata
++    icuhemdata
 +)
 +
  ADD_WHOLE_ARCHIVE_TO_LIBRARIES(WebKit2_LIBRARIES)
