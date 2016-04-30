@@ -7,7 +7,7 @@ LOCAL_MODULE        	:= hemroid_$(TARGET_ARCH_ABI)
 LOCAL_SRC_FILES     	:=
 
 $(LOCAL_MODULE):
-	$(shell cp -r $(LOCAL_PATH)/../webkitgtk+/java/Hemroid*.java src/main/java/org/liquidplayer/hemroid)
+	$(shell cp -r $(LOCAL_PATH)/java/Hemroid*.java src/main/java/org/liquidplayer/hemroid)
 	$(shell mkdir -p src/main/jniLibs)
 	$(shell cp -r libs/* src/main/jniLibs)
 
