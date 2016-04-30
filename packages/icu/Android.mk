@@ -12,7 +12,7 @@ $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)
 	$(shell mkdir -p src/main/java/org/liquidplayer/hemroid)
 	$(shell cp -r $(LOCAL_PATH)/../icu/java/ICUUC.java src/main/java/org/liquidplayer/hemroid)
 $(LOCAL_MODULE)_JavaInterface:
-	$(eval EXPORT_JAVA_INTERFACE += new ICUUC(context);)
+	$(if $(findstring ICUUC,$(EXPORT_JAVA_INTERFACE)),,$(eval EXPORT_JAVA_INTERFACE += new ICUUC(context);))
 $(LOCAL_PATH)/$(LOCAL_SRC_FILES):
 	$(LOCAL_PATH)/../../hemroid install --abi=$(TARGET_ARCH_ABI) icu
 libraries: $(LOCAL_PATH)/$(LOCAL_SRC_FILES)
@@ -30,7 +30,7 @@ $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)
 	$(shell mkdir -p src/main/java/org/liquidplayer/hemroid)
 	$(shell cp -r $(LOCAL_PATH)/../icu/java/ICUI18n.java src/main/java/org/liquidplayer/hemroid)
 $(LOCAL_MODULE)_JavaInterface:
-	$(eval EXPORT_JAVA_INTERFACE += new ICUI18n(context);)
+	$(if $(findstring ICUI18n,$(EXPORT_JAVA_INTERFACE)),,$(eval EXPORT_JAVA_INTERFACE += new ICUI18n(context);))
 $(LOCAL_PATH)/$(LOCAL_SRC_FILES):
 	$(LOCAL_PATH)/../../hemroid install --abi=$(TARGET_ARCH_ABI) icu
 libraries: $(LOCAL_PATH)/$(LOCAL_SRC_FILES)

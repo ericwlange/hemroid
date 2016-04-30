@@ -20,7 +20,7 @@ $(LOCAL_MODULE): $(LOCAL_SHARED_LIBRARIES)
 	$(shell mkdir -p src/main/java/org/liquidplayer/hemroid)
 	$(shell cp -r $(LOCAL_PATH)/../webkitgtk+/java/JavaScriptCoreGTK.java src/main/java/org/liquidplayer/hemroid)
 $(LOCAL_MODULE)_JavaInterface:
-	$(eval EXPORT_JAVA_INTERFACE += new JavaScriptCoreGTK(context);)
+	$(if $(findstring JavaScriptCoreGTK,$(EXPORT_JAVA_INTERFACE)),,$(eval EXPORT_JAVA_INTERFACE += new JavaScriptCoreGTK(context);))
 $(LOCAL_PATH)/$(LOCAL_SRC_FILES):
 	$(LOCAL_PATH)/../../hemroid install --abi=$(TARGET_ARCH_ABI) javascriptcore
 libraries: $(LOCAL_PATH)/$(LOCAL_SRC_FILES)
