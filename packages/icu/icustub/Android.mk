@@ -1,6 +1,6 @@
 # icustub
 LOCAL_PATH := $(call my-dir)
-VAULT_PATH := ../../../vault/hemroot/$(TARGET_ARCH_ABI)
+VAULT_PATH := $(LOCAL_PATH)/../../../vault/hemroot/$(TARGET_ARCH_ABI)
 
 include $(CLEAR_VARS)
 
