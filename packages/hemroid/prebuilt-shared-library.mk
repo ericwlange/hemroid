@@ -16,6 +16,7 @@
 # this file is included from Android.mk files to build a target-specific
 # shared library
 #
+LOCAL_PATH := $(call my-dir)
 
 LOCAL_BUILD_SCRIPT := PREBUILT_SHARED_LIBRARY
 LOCAL_MODULE_CLASS := PREBUILT_SHARED_LIBRARY
