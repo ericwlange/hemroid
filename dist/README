@@ -1,0 +1,6 @@
+These patches are a one-off build of GCC 4.9 for 64-bit processors.  There is an issue
+with atomics that results in an error, but should only be a warning and fallback to default
+handling.  See `android-gcc.patch` for what has changed.
+
+These files are stored using GIT LFS.  If you are having trouble getting them to expand
+then you have neglected to install LFS.  Go here: https://git-lfs.github.com/
