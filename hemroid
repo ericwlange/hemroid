@@ -104,7 +104,7 @@ def create_toolchain(abi,api):
 #        '--llvm-version='+CLANG_VERSION, # don't use CLANG -- too many bugs
         '--platform=android-' + str(api),
         '--install-dir=' + toolchain_dir,
-        '--system='+SYSTEM_OS,
+#        '--system='+SYSTEM_OS,
         '--stl=gnustl'
     ])
     if output != 0:
@@ -364,6 +364,8 @@ class Install(Options):
             str(api) + '"'
         CPPFLAGS = "\"-fPIC -DANDROID -DNO_XMALLOC -mandroid " + \
             "-isystem " + ANDROID_NDK +  "/sources/android/support/include " + \
+            "-I" + toolchain_dir+"/include/c++/4.9.x " + \
+            "-I" + toolchain_dir+"/include/c++/4.9.x/"+PREFIXES[abi] + " " + \
             "-Wno-error=implicit-function-declaration -DANDROID_API=" + \
             str(api) + '"'
         LIBS = "-lc"            

@@ -29,7 +29,7 @@
         "../webkitgtk+/webkitgtk-2.10.7.patch"
     ],
     "api" : {
-        "min" : 9
+        "min" : 13
     },
     "steps": [
         {

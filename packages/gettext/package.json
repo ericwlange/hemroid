@@ -21,7 +21,7 @@
 	    "gettext-0.18.3.patch"
 	],
 	"api" : {
-		"min" : 9
+		"min" : 13
 	},
 	"steps": [
 		{

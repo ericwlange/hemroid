@@ -26,7 +26,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=${PKGDIR}/../webkitgtk+/android.toolchain.cmake \
     -DPORT=JSC \
     -DCMAKE_FIND_ROOT_PATH=${SANDBOX} \
     -DSANDBOX=${SANDBOX} \
-    -DOTHER_INCLUDE_DIRS=${ANDROID_NDK}/sources/android/native_app_glue \
+    -DOTHER_CXX_FLAGS="-I${ANDROID_NDK}/sources/android/native_app_glue -I${PLATFORM}/../include/c++/4.9.x -I${PLATFORM}/../include/c++/4.9.x/${PREFIX}" \
     -DDEFAULT_LIB_DIR=${SANDBOX}/lib \
     -DPYTHON_EXECUTABLE=`which python` -DPERL_EXECUTABLE=`which perl` \
     -DRUBY_EXECUTABLE=`which ruby` -DSHARED_CORE=1 \
