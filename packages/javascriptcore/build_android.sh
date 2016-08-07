@@ -5,10 +5,12 @@ set -e
 rm ${SANDBOX}/bin/msgfmt
 ln -s `which msgfmt` ${SANDBOX}/bin/msgfmt
 
-if [ -e ${SANDBOX}/lib64/libffi.so ]
+if [ -e ${SANDBOX}/lib64/libffi.a ]
 then
-    ln -s ${SANDBOX}/lib64/libffi.so ${SANDBOX}/lib/libffi.so
+    ln -s ${SANDBOX}/lib64/libffi.a ${SANDBOX}/lib/libffi.a
 fi
+rm -rf ${SANDBOX}/lib/*.so
+cp ${SANDBOX}/lib/icu/stubdata/libicuhemdata.a ${SANDBOX}/lib
 
 case ${HOST} in
     mips*)
@@ -22,7 +24,7 @@ esac
 cmake -DCMAKE_TOOLCHAIN_FILE=${PKGDIR}/../webkitgtk+/android.toolchain.cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DANDROID_STANDALONE_TOOLCHAIN=${PLATFORM}/.. \
-    -DANDROID_STL=gnustl_shared \
+    -DANDROID_STL=gnustl_static \
     -DPORT=JSC \
     -DCMAKE_FIND_ROOT_PATH=${SANDBOX} \
     -DSANDBOX=${SANDBOX} \
